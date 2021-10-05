@@ -5,12 +5,9 @@ from tkinter import *
 def create_window():
     root = tk.Tk()
     root.title('Software Inventory Tool')
-
-    mainWindow = tk.Label(
-                background = "#2a3439",
-                width = 192,
-                height = 64
-    )
+    root.geometry("1000x800")
+    root.configure(background="#2a3439")
+    root.minsize(750,600)
 
     """
     button = tk.Button(
@@ -21,7 +18,7 @@ def create_window():
         fg="yellow",
     )
     """
-    mainWindow.pack()
+
     #button.pack()
 
 

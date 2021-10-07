@@ -81,12 +81,12 @@ def create_window():
     title_label.pack(side=LEFT, pady=4, padx=100)
 
     # Create close button
-    close_label = Label(title_bar, text="X  ", bg="#1f262A", fg="white", relief="raised", bd=0)
-    close_label.pack(side=RIGHT, pady=4)
+    close_label = Label(title_bar, text="X", bg="#1f262A", fg="white", font=("",16), relief="raised", bd=0)
+    close_label.pack(side=RIGHT, padx=4, pady=4)
     close_label.bind("<Button-1>", quitter)
 
     # Create Minimize button
-    minimize_label = Label(title_bar, text="---", bg="#1f262A", fg="white", relief="raised", bd=0)
+    minimize_label = Label(title_bar, text="─", bg="#1f262A", fg="white", font=("",16), relief="raised", bd=0)
     minimize_label.pack(side=RIGHT, pady=4)
     minimize_label.bind("<Button-1>", minimizer)
 

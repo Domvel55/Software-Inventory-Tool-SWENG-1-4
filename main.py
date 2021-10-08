@@ -60,19 +60,47 @@ def create_window():
     title_bar.bind("<B1-Motion>", move_app)
 
     # Navigation Buttons
-    home_button = tk.Button(title_bar, text='Home', command=lambda: MainWindow().init(root))
+    home_button = TkinterCustomButton(master=title_bar, bg_color=None,
+                                          fg_color="#1F262A",
+                                          hover_color="#2a3439",
+                                          text_font="Bold, 14",
+                                          text="Home",
+                                          text_color="white",
+                                          corner_radius=0,
+                                          width=75,
+                                          height=40,
+                                          hover=True,
+                                          command=lambda: MainWindow().init(root))
     home_button.pack(side=LEFT, padx=5)
 
     # Results Button here
 
     # Create Settings Button
-    settingsButton = tk.Button(title_bar, text="Settings", command=lambda: SettingsPage().init(root))
-    settingsButton.pack(side=LEFT, padx=5)
+    settings_button = TkinterCustomButton(master=title_bar, bg_color=None,
+                                      fg_color="#1F262A",
+                                      hover_color="#2a3439",
+                                      text_font="Bold, 14",
+                                      text="Settings",
+                                      text_color="white",
+                                      corner_radius=0,
+                                      width=75,
+                                      height=40,
+                                      hover=True,
+                                      command=lambda: SettingsPage().init(root))
+    settings_button.pack(side=LEFT, padx=5)
 
-    # Future version
-    # help_button = TkinterCustomButton(title_bar, text='Help', command=lambda: HelpPage().init(root))
-
-    help_button = tk.Button(title_bar, text='Help', command=lambda: HelpPage().init(root))
+    # Create Help Button
+    help_button = TkinterCustomButton(master=title_bar, bg_color=None,
+                                      fg_color="#1F262A",
+                                      hover_color="#2a3439",
+                                      text_font="Bold, 14",
+                                      text="Help",
+                                      text_color="white",
+                                      corner_radius=0,
+                                      width=75,
+                                      height=40,
+                                      hover=True,
+                                      command=lambda: HelpPage().init(root))
     help_button.pack(side=LEFT, padx=5)
 
     # Will need to fix where the label is placed (there is not center align ugh)
@@ -92,6 +120,13 @@ def create_window():
 
     root.mainloop()
 
+class ResultsPage():
+
+    def init(self, root):
+        # root.geometry("600x600")
+        # root.minsize(750, 600)
+        root.configure(background="#fff000")
+
 
 class HelpPage():
 
@@ -104,26 +139,26 @@ class HelpPage():
 class SettingsPage():
 
     def init(self, root):
-        settingsFrame = ttk.Frame(root)
-        settingsFrame.place(relx=0.5, rely=0.5, anchor='center')
-        settingsFrame.config(height=300, width=500)
-        settingsFrame.config(relief=RIDGE)
+        settings_frame = ttk.Frame(root)
+        settings_frame.place(relx=0.5, rely=0.5, anchor='center')
+        settings_frame.config(height=300, width=500)
+        settings_frame.config(relief=RIDGE)
 
-        settingsPageLabel = ttk.Label(settingsFrame, text='Settings Page')
-        settingsPageLabel.place(relx=0.5, rely=0.15, anchor='center')
+        settings_page_label = ttk.Label(settings_frame, text='Settings Page')
+        settings_page_label.place(relx=0.5, rely=0.15, anchor='center')
 
-        setOptionsFrame = ttk.Frame(settingsFrame)
-        setOptionsFrame.place(relx=0.5, rely=0.5, anchor='center')
-        setOptionsFrame.config(height=300, width=500)
-        setOptionsFrame.config(relief=RIDGE)
-        setOptionsFrame.config(padding=(30, 15))
+        set_options_frame = ttk.Frame(settings_frame)
+        set_options_frame.place(relx=0.5, rely=0.5, anchor='center')
+        set_options_frame.config(height=300, width=500)
+        set_options_frame.config(relief=RIDGE)
+        set_options_frame.config(padding=(30, 15))
 
-        set1label = ttk.Label(setOptionsFrame, text='Setting 1')
-        set1label.grid(row=0, column=0)
-        set2label = ttk.Label(setOptionsFrame, text='Setting 2')
-        set2label.grid(row=1, column=0)
-        set3label = ttk.Label(setOptionsFrame, text='Setting 3')
-        set3label.grid(row=2, column=0)
+        set1_label = ttk.Label(set_options_frame, text='Setting 1')
+        set1_label.grid(row=0, column=0)
+        set2_label = ttk.Label(set_options_frame, text='Setting 2')
+        set2_label.grid(row=1, column=0)
+        set3_label = ttk.Label(set_options_frame, text='Setting 3')
+        set3_label.grid(row=2, column=0)
 
 
 if __name__ == '__main__':

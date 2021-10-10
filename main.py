@@ -4,20 +4,85 @@ from tkinter import ttk
 from tkinter_custom_button import TkinterCustomButton
 
 
-class MainWindow():
-    def init(self, root):
+class MainWindow:
+
+    def __init__(self):
+        global root
+
+        for widget in root.winfo_children()[1:]:
+            widget.destroy()
+
         # root.geometry("600x600")
         # root.minsize(750, 600)
         root.configure(background="#2a3439")
 
 
-def create_window():
-    root = tk.Tk()
+class ResultsPage:
 
-    # Initialize all windows
-    MainWindow().init(root)
-    HelpPage().init(root)
-    SettingsPage().init(root)
+    def __init__(self):
+        global root
+
+        for widget in root.winfo_children()[1:]:
+            widget.destroy()
+
+        # root.geometry("600x600")
+        # root.minsize(750, 600)
+        root.configure(background="#2a3439")
+
+
+class HelpPage:
+
+    def __init__(self):
+        global root
+
+        for widget in root.winfo_children()[1:]:
+            widget.destroy()
+
+        # root.geometry("600x600")
+        # root.minsize(750, 600)
+        root.configure(background="#2a3439")
+
+
+class SettingsPage:
+
+    def __init__(self):
+        global root
+
+        for widget in root.winfo_children()[1:]:
+            widget.destroy()
+
+        root.configure(background="#2a3439")
+
+        settings_frame = tk.Frame(root)
+        settings_frame.place(relx=0.5, rely=0.5, anchor='center')
+        settings_frame.config(height=300, width=500)
+        settings_frame.config(relief=RIDGE)
+
+        settings_page_label = ttk.Label(settings_frame, text='Settings Page')
+        settings_page_label.place(relx=0.5, rely=0.15, anchor='center')
+
+        set_options_frame = ttk.Frame(settings_frame)
+        set_options_frame.place(relx=0.5, rely=0.5, anchor='center')
+        set_options_frame.config(height=300, width=500)
+        set_options_frame.config(relief=RIDGE)
+        set_options_frame.config(padding=(30, 15))
+
+        set1_label = ttk.Label(set_options_frame, text='Setting 1')
+        set1_label.grid(row=0, column=0)
+        set2_label = ttk.Label(set_options_frame, text='Setting 2')
+        set2_label.grid(row=1, column=0)
+        set3_label = ttk.Label(set_options_frame, text='Setting 3')
+        set3_label.grid(row=2, column=0)
+
+
+root = tk.Tk()
+
+
+def create_window():
+    # root = tk.Tk()
+
+    # Initialize the first window
+    MainWindow()
 
     # Window background color
     root.configure(background="#2a3439")
@@ -70,7 +135,7 @@ def create_window():
                                           width=75,
                                           height=40,
                                           hover=True,
-                                          command=lambda: MainWindow().init(root))
+                                          command=lambda: MainWindow())
     home_button.pack(side=LEFT, padx=5)
 
     # Results Button here
@@ -86,7 +151,7 @@ def create_window():
                                       width=75,
                                       height=40,
                                       hover=True,
-                                      command=lambda: SettingsPage().init(root))
+                                      command=lambda: SettingsPage())
     settings_button.pack(side=LEFT, padx=5)
 
     # Create Help Button
@@ -100,7 +165,7 @@ def create_window():
                                       width=75,
                                       height=40,
                                       hover=True,
-                                      command=lambda: HelpPage().init(root))
+                                      command=lambda: HelpPage())
     help_button.pack(side=LEFT, padx=5)
 
     # Will need to fix where the label is placed (there is not center align ugh)
@@ -119,46 +184,6 @@ def create_window():
     minimize_label.bind("<Button-1>", minimizer)
 
     root.mainloop()
-
-class ResultsPage():
-
-    def init(self, root):
-        # root.geometry("600x600")
-        # root.minsize(750, 600)
-        root.configure(background="#fff000")
-
-
-class HelpPage():
-
-    def init(self, root):
-        # root.geometry("600x600")
-        # root.minsize(750, 600)
-        root.configure(background="#fff000")
-
-
-class SettingsPage():
-
-    def init(self, root):
-        settings_frame = ttk.Frame(root)
-        settings_frame.place(relx=0.5, rely=0.5, anchor='center')
-        settings_frame.config(height=300, width=500)
-        settings_frame.config(relief=RIDGE)
-
-        settings_page_label = ttk.Label(settings_frame, text='Settings Page')
-        settings_page_label.place(relx=0.5, rely=0.15, anchor='center')
-
-        set_options_frame = ttk.Frame(settings_frame)
-        set_options_frame.place(relx=0.5, rely=0.5, anchor='center')
-        set_options_frame.config(height=300, width=500)
-        set_options_frame.config(relief=RIDGE)
-        set_options_frame.config(padding=(30, 15))
-
-        set1_label = ttk.Label(set_options_frame, text='Setting 1')
-        set1_label.grid(row=0, column=0)
-        set2_label = ttk.Label(set_options_frame, text='Setting 2')
-        set2_label.grid(row=1, column=0)
-        set3_label = ttk.Label(set_options_frame, text='Setting 3')
-        set3_label.grid(row=2, column=0)
 
 
 if __name__ == '__main__':

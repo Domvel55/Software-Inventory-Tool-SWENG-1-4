@@ -18,6 +18,7 @@ def create_window():
     MainWindow().init(root)
     HelpPage().init(root)
     SettingsPage().init(root)
+    LoginPage().init(root)
 
     # Window background color
     root.configure(background="#2a3439")
@@ -103,6 +104,20 @@ def create_window():
                                       command=lambda: HelpPage().init(root))
     help_button.pack(side=LEFT, padx=5)
 
+    # Create Login Button
+    login_button = TkinterCustomButton(master=title_bar, bg_color=None,
+                                      fg_color="#1F262A",
+                                      hover_color="#2a3439",
+                                      text_font="Bold, 14",
+                                      text="Login",
+                                      text_color="white",
+                                      corner_radius=0,
+                                      width=75,
+                                      height=40,
+                                      hover=True,
+                                      command=lambda: LoginPage().init(root))
+    login_button.pack(side=LEFT, padx=5)
+
     # Will need to fix where the label is placed (there is not center align ugh)
     # Create Title Text
     title_label = Label(title_bar, text="Software Inventory Tool", bg="#1F262A", fg="white")
@@ -159,6 +174,62 @@ class SettingsPage():
         set2_label.grid(row=1, column=0)
         set3_label = ttk.Label(set_options_frame, text='Setting 3')
         set3_label.grid(row=2, column=0)
+
+
+class LoginPage():
+
+    def init(self, root):
+        root.configure(background="#2a3439")
+        login_style = ttk.Style()
+        login_style.configure('Login.TFrame', background="#2a3439", foreground="white")
+        login_style.configure('Login.TLabel', background="#2a3439", foreground="white")
+
+        login_frame = Frame(root, bg='#1F262A')
+        login_frame.place(relx=0.5, rely=0.5, anchor='center')
+        login_frame.config(height=300, width=500)
+        login_frame.config(relief=RAISED)
+
+        login_page_label = Label(login_frame, text='Login Page', font="Bold, 20", bg='#1F262A', fg="white")
+        login_page_label.place(relx=0.5, rely=0.15, anchor='center')
+
+        login_options_frame = ttk.Frame(login_frame, style='Login.TFrame')
+        login_options_frame.place(relx=0.5, rely=0.5, anchor='center')
+        #login_options_frame.config(relief=RAISED)
+        login_options_frame.config(padding=(90, 45))
+
+        username_label = ttk.Label(login_options_frame, text='Username', style='Login.TLabel')
+        username_label.grid(row=0, column=0)
+        set2_label = ttk.Label(login_options_frame, text='', style='Login.TLabel')
+        set2_label.grid(row=1, column=0)
+        token_label = ttk.Label(login_options_frame, text='RSA Token', style='Login.TLabel')
+        token_label.grid(row=2, column=0)
+
+
+        login_button = TkinterCustomButton( bg_color=None,
+                                          fg_color="#1F262A",
+                                          hover_color="#2a3439",
+                                          text_font="Bold, 10",
+                                          text="Login",
+                                          text_color="white",
+                                          corner_radius=0,
+                                          width=50,
+                                          height=20,
+                                          hover=True,
+                                          command=lambda: LoginPage().init(root))
+        login_button.place(relx=0.45, rely=0.65, anchor='center')
+
+        register_button = TkinterCustomButton( bg_color=None,
+                                          fg_color="#1F262A",
+                                          hover_color="#2a3439",
+                                          text_font="Bold, 10",
+                                          text="Register",
+                                          text_color="white",
+                                          corner_radius=0,
+                                          width=55,
+                                          height=20,
+                                          hover=True,
+                                          command=lambda: LoginPage().init(root))
+        register_button.place(relx=0.55, rely=0.65, anchor='center')
 
 
 if __name__ == '__main__':

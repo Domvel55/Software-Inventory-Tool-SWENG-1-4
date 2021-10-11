@@ -12,9 +12,10 @@ class MainWindow:
         for widget in root.winfo_children()[1:]:
             widget.destroy()
 
-        #root.geometry("600x600")
-        #root.minsize(750, 600)
+        # root.geometry("600x600")
+        # root.minsize(750, 600)
         root.configure(background="#2a3439")
+
 
 class ResultsPage:
 
@@ -35,7 +36,7 @@ class ResultsPage:
         results_frame.config(height=root.winfo_height(), width=root.winfo_width())
 
         # Container for results
-        results_container = tk.Frame(results_frame, bg="#1F262A", borderwidth = 2)
+        results_container = tk.Frame(results_frame, bg="#1F262A", borderwidth=2)
         results_container.place(relx=0.5, rely=0.1, anchor="n")
         results_container.config(relief=RIDGE)
 
@@ -43,7 +44,7 @@ class ResultsPage:
         results_example1 = tk.Frame(results_container, bg="#2a3439")
         results_example1.place(relx=0.5, rely=0.02, anchor="n")
         results_example1.config(height=50, width=900)
-        results_example1_label = tk.Label(results_example1, text='Software 1',  font=14, bg="#2a3439", fg="#5B676D")
+        results_example1_label = tk.Label(results_example1, text='Software 1', font=14, bg="#2a3439", fg="#5B676D")
         results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
 
         results_example2 = tk.Frame(results_container, bg="#2a3439")
@@ -87,42 +88,42 @@ class ResultsPage:
 
         # <editor-fold desc="Results Buttons">
         update_all_button = TkinterCustomButton(master=results_frame,
-                                          fg_color="#848689",
-                                          hover_color="#1F262A",
-                                          text_font="Bold, 14",
-                                          text="Update All",
-                                          text_color="white",
-                                          corner_radius=10,
-                                          width=200,
-                                          height=75,
-                                          hover=True,
-                                          command=lambda: None)
-        update_all_button.place(relx=0.25, rely=0.8, anchor="center")
-
-        update_selected_button = TkinterCustomButton(master=results_frame,
-                                                fg_color="#8797AF",
+                                                fg_color="#848689",
                                                 hover_color="#1F262A",
                                                 text_font="Bold, 14",
-                                                text="Update Selected",
+                                                text="Update All",
                                                 text_color="white",
                                                 corner_radius=10,
                                                 width=200,
                                                 height=75,
                                                 hover=True,
                                                 command=lambda: None)
+        update_all_button.place(relx=0.25, rely=0.8, anchor="center")
+
+        update_selected_button = TkinterCustomButton(master=results_frame,
+                                                     fg_color="#8797AF",
+                                                     hover_color="#1F262A",
+                                                     text_font="Bold, 14",
+                                                     text="Update Selected",
+                                                     text_color="white",
+                                                     corner_radius=10,
+                                                     width=200,
+                                                     height=75,
+                                                     hover=True,
+                                                     command=lambda: None)
         update_selected_button.place(relx=0.5, rely=0.8, anchor="center")
 
         cancel_button = TkinterCustomButton(master=results_frame,
-                                                fg_color="#5F4866",
-                                                hover_color="#1F262A",
-                                                text_font="Bold, 14",
-                                                text="Cancel",
-                                                text_color="white",
-                                                corner_radius=10,
-                                                width=100,
-                                                height=50,
-                                                hover=True,
-                                                command=lambda: None)
+                                            fg_color="#5F4866",
+                                            hover_color="#1F262A",
+                                            text_font="Bold, 14",
+                                            text="Cancel",
+                                            text_color="white",
+                                            corner_radius=10,
+                                            width=100,
+                                            height=50,
+                                            hover=True,
+                                            command=lambda: None)
         cancel_button.place(relx=0.70, rely=0.8, anchor="center")
         # </editor-fold>
 
@@ -154,19 +155,22 @@ class HelpPage:
         help_example1 = tk.Frame(help_container, bg="#2a3439")
         help_example1.place(relx=0.5, rely=0.02, anchor="n")
         help_example1.config(height=200, width=900)
-        help_example1_header_label = tk.Label(help_example1, text='How to use the program:', font=24, bg="#2a3439", fg="#FFFFFF")
+        help_example1_header_label = tk.Label(help_example1, text='How to use the program:', font=24, bg="#2a3439",
+                                              fg="#FFFFFF")
         help_example1_header_label.place(relx=0.01, rely=0.1, anchor="nw")
 
         help_example2 = tk.Frame(help_container, bg="#2a3439")
         help_example2.place(relx=0.5, rely=0.02, anchor="n")
         help_example2.config(height=200, width=900)
-        help_example2_header_label = tk.Label(help_example2, text='How the Vulnerabilities are scored:', font=24, bg="#2a3439", fg="#FFFFFF")
+        help_example2_header_label = tk.Label(help_example2, text='How the Vulnerabilities are scored:', font=24,
+                                              bg="#2a3439", fg="#FFFFFF")
         help_example2_header_label.place(relx=0.01, rely=0.1, anchor="nw")
 
         help_example3 = tk.Frame(help_container, bg="#2a3439")
         help_example3.place(relx=0.5, rely=0.02, anchor="n")
         help_example3.config(height=200, width=900)
-        help_example3_header_label = tk.Label(help_example3, text="What databases we're checking against:", font=24, bg="#2a3439", fg="#FFFFFF")
+        help_example3_header_label = tk.Label(help_example3, text="What databases we're checking against:", font=24,
+                                              bg="#2a3439", fg="#FFFFFF")
         help_example3_header_label.place(relx=0.01, rely=0.1, anchor="nw")
 
         # Align tips in a grid
@@ -188,7 +192,7 @@ class SettingsPage:
 
         settings_frame = tk.Frame(root)
         settings_frame.place(relx=0.5, rely=0.5, anchor='center')
-        settings_frame.config(height=300, width=500)
+        settings_frame.config(height=500, width=700)
         settings_frame.config(relief=RIDGE)
 
         settings_page_label = ttk.Label(settings_frame, text='Settings Page')
@@ -200,14 +204,51 @@ class SettingsPage:
         set_options_frame.config(relief=RIDGE)
         set_options_frame.config(padding=(30, 15))
 
-        set1_label = ttk.Label(set_options_frame, text='Setting 1')
-        set1_label.grid(row=0, column=0)
-        set2_label = ttk.Label(set_options_frame, text='Setting 2')
-        set2_label.grid(row=1, column=0)
-        set3_label = ttk.Label(set_options_frame, text='Setting 3')
-        set3_label.grid(row=2, column=0)
-    
-    
+        set_1_label = ttk.Label(set_options_frame, text='Text size')
+        set_1_label.grid(row=0, column=0, padx=50, pady=30)
+        decrease_txt_size_button = ttk.Button(set_options_frame, text='-')
+        decrease_txt_size_button.grid(row=0, column=1)
+        txt_size_entry = ttk.Entry(set_options_frame, width=5)
+        txt_size_entry.grid(row=0, column=2)
+        txt_size_entry.insert(0, '12')
+        increase_txt_size_button = ttk.Button(set_options_frame, text='+')
+        increase_txt_size_button.grid(row=0, column=3)
+
+        set_2_label = ttk.Label(set_options_frame, text='Sort scan results...')
+        set_2_label.grid(row=1, column=0, padx=50)
+        sort_order = StringVar()
+        set_2_button_1 = ttk.Radiobutton(set_options_frame, text='By severity', variable=sort_order, value='severity')
+        set_2_button_1.grid(row=1, column=2)
+        set_2_button_2 = ttk.Radiobutton(set_options_frame, text='In order discovered', variable=sort_order,
+                                         value='discovered')
+        set_2_button_2.grid(row=2, column=2)
+
+        set_3_label = ttk.Label(set_options_frame, text='Choose directories to ignore:')
+        set_3_label.grid(row=3, column=0, padx=50, pady=30)
+        set_3_button = ttk.Button(set_options_frame, text='Browse...')
+        set_3_button.grid(row=3, column=2)
+
+        set_4_label = ttk.Label(set_options_frame, text='When scan finishes...')
+        set_4_label.grid(row=4, column=0, padx=50)
+        after_scan = StringVar()
+        set_4_button_1 = ttk.Radiobutton(set_options_frame, text='Do Nothing', variable=after_scan, value='nothing')
+        set_4_button_1.grid(row=4, column=2)
+        set_4_button_2 = ttk.Radiobutton(set_options_frame, text='Close the program', variable=after_scan,
+                                         value='close')
+        set_4_button_2.grid(row=5, column=2)
+        set_4_button_3 = ttk.Radiobutton(set_options_frame, text='Shut down computer', variable=after_scan,
+                                         value='shut_down')
+        set_4_button_3.grid(row=6, column=2)
+
+        set_5_label = ttk.Label(set_options_frame, text='Reset Default Settings')
+        set_5_label.grid(row=7, column=0, padx=50, pady=30)
+        set_5_button = ttk.Button(set_options_frame, text='Reset')
+        set_5_button.grid(row=7, column=2)
+
+        apply_button = ttk.Button(settings_frame, text='Apply')
+        apply_button.place(relx=0.5, rely=0.95, anchor='center')
+
+
 class LoginPage:
 
     def __init__(self):
@@ -239,35 +280,35 @@ class LoginPage:
         token_entry = Entry(root, background="#1F262A", foreground="white", font=15)
         token_entry.place(relx=0.5, rely=0.565, anchor='center')
 
-        #Login Button
-        login_button = TkinterCustomButton( bg_color="#2a3439",
-                                          fg_color="#56667A",
-                                          hover_color="#AAA9AD",
-                                          text_font="Bold, 12",
-                                          text="Login",
-                                          text_color="white",
-                                          corner_radius=10,
-                                          width=80,
-                                          height=40,
-                                          hover=True,
-                                          command=lambda: MainWindow())
+        # Login Button
+        login_button = TkinterCustomButton(bg_color="#2a3439",
+                                           fg_color="#56667A",
+                                           hover_color="#AAA9AD",
+                                           text_font="Bold, 12",
+                                           text="Login",
+                                           text_color="white",
+                                           corner_radius=10,
+                                           width=80,
+                                           height=40,
+                                           hover=True,
+                                           command=lambda: MainWindow())
         login_button.place(relx=0.45, rely=0.65, anchor='center')
 
-        #Registration Button
-        register_button = TkinterCustomButton( bg_color="#2a3439",
-                                          fg_color="#56667A",
-                                          hover_color="#AAA9AD",
-                                          text_font="Bold, 12",
-                                          text="Register",
-                                          text_color="white",
-                                          corner_radius=10,
-                                          width=80,
-                                          height=40,
-                                          hover=True,
-                                          command=lambda: RegisterPage())
+        # Registration Button
+        register_button = TkinterCustomButton(bg_color="#2a3439",
+                                              fg_color="#56667A",
+                                              hover_color="#AAA9AD",
+                                              text_font="Bold, 12",
+                                              text="Register",
+                                              text_color="white",
+                                              corner_radius=10,
+                                              width=80,
+                                              height=40,
+                                              hover=True,
+                                              command=lambda: RegisterPage())
         register_button.place(relx=0.55, rely=0.65, anchor='center')
 
-        
+
 class RegisterPage:
 
     def __init__(self):
@@ -302,18 +343,18 @@ class RegisterPage:
         token_entry = Entry(root, background="#2a3439", foreground="white", width=25, font=20)
         token_entry.place(relx=.45, rely=.62)
 
-        #Create Account Button
-        create_button = TkinterCustomButton( bg_color="#1F262A",
-                                          fg_color="#56667A",
-                                          hover_color="#AAA9AD",
-                                          text_font= 20,
-                                          text="Create",
-                                          text_color="white",
-                                          corner_radius=10,
-                                          width=100,
-                                          height=30,
-                                          hover=True,
-                                          command=lambda: LoginPage())
+        # Create Account Button
+        create_button = TkinterCustomButton(bg_color="#1F262A",
+                                            fg_color="#56667A",
+                                            hover_color="#AAA9AD",
+                                            text_font=20,
+                                            text="Create",
+                                            text_color="white",
+                                            corner_radius=10,
+                                            width=100,
+                                            height=30,
+                                            hover=True,
+                                            command=lambda: LoginPage())
         create_button.place(relx=0.5, rely=0.73, anchor='center')
 
 
@@ -364,58 +405,58 @@ def create_window():
 
     # Navigation Buttons
     home_button = TkinterCustomButton(master=title_bar, bg_color=None,
+                                      fg_color="#1F262A",
+                                      hover_color="#2a3439",
+                                      text_font="Bold, 14",
+                                      text="Home",
+                                      text_color="white",
+                                      corner_radius=0,
+                                      width=75,
+                                      height=40,
+                                      hover=True,
+                                      command=lambda: MainWindow())
+    home_button.pack(side=LEFT, padx=5)
+
+    # Create Login Button
+    login_button = TkinterCustomButton(master=title_bar, bg_color=None,
+                                       fg_color="#1F262A",
+                                       hover_color="#2a3439",
+                                       text_font="Bold, 14",
+                                       text="Login",
+                                       text_color="white",
+                                       corner_radius=0,
+                                       width=75,
+                                       height=40,
+                                       hover=True,
+                                       command=lambda: LoginPage())
+    login_button.pack(side=LEFT, padx=5)
+
+    # Results Button here
+    results_button = TkinterCustomButton(master=title_bar, bg_color=None,
+                                         fg_color="#1F262A",
+                                         hover_color="#2a3439",
+                                         text_font="Bold, 14",
+                                         text="Results",
+                                         text_color="white",
+                                         corner_radius=0,
+                                         width=75,
+                                         height=40,
+                                         hover=True,
+                                         command=lambda: ResultsPage())
+    results_button.pack(side=LEFT, padx=5)
+
+    # Create Settings Button
+    settings_button = TkinterCustomButton(master=title_bar, bg_color=None,
                                           fg_color="#1F262A",
                                           hover_color="#2a3439",
                                           text_font="Bold, 14",
-                                          text="Home",
+                                          text="Settings",
                                           text_color="white",
                                           corner_radius=0,
                                           width=75,
                                           height=40,
                                           hover=True,
-                                          command=lambda: MainWindow())
-    home_button.pack(side=LEFT, padx=5)
-
-    # Create Login Button
-    login_button = TkinterCustomButton(master=title_bar, bg_color=None,
-                                      fg_color="#1F262A",
-                                      hover_color="#2a3439",
-                                      text_font="Bold, 14",
-                                      text="Login",
-                                      text_color="white",
-                                      corner_radius=0,
-                                      width=75,
-                                      height=40,
-                                      hover=True,
-                                      command=lambda: LoginPage())
-    login_button.pack(side=LEFT, padx=5)
-
-    # Results Button here
-    results_button = TkinterCustomButton(master=title_bar, bg_color=None,
-                                      fg_color="#1F262A",
-                                      hover_color="#2a3439",
-                                      text_font="Bold, 14",
-                                      text="Results",
-                                      text_color="white",
-                                      corner_radius=0,
-                                      width=75,
-                                      height=40,
-                                      hover=True,
-                                      command=lambda: ResultsPage())
-    results_button.pack(side=LEFT, padx=5)
-
-    # Create Settings Button
-    settings_button = TkinterCustomButton(master=title_bar, bg_color=None,
-                                      fg_color="#1F262A",
-                                      hover_color="#2a3439",
-                                      text_font="Bold, 14",
-                                      text="Settings",
-                                      text_color="white",
-                                      corner_radius=0,
-                                      width=75,
-                                      height=40,
-                                      hover=True,
-                                      command=lambda: SettingsPage())
+                                          command=lambda: SettingsPage())
     settings_button.pack(side=LEFT, padx=5)
 
     # Create Help Button
@@ -446,6 +487,20 @@ def create_window():
                                       command=lambda: ResultsPage())
     scan_button.place(relx=.05, rely=.1)
 
+    # Create Express Scan Button
+    scan_button = TkinterCustomButton(master=root, bg_color="#2a3439",
+                                      fg_color="#1F262A",
+                                      hover_color="#AAA9AD",
+                                      text_font="Bold, 14",
+                                      text="Express Scan",
+                                      text_color="white",
+                                      corner_radius=10,
+                                      width=130,
+                                      height=40,
+                                      hover=True,
+                                      command=lambda: ResultsPage())
+    scan_button.place(relx=.15, rely=.1)
+
     # Create Title Text
     title_label = Label(title_bar, text="Software Inventory Tool", font="Bold, 10", bg="#1F262A", fg="white")
     title_label.place(relx=.5, rely=.5, anchor="center")
@@ -465,4 +520,4 @@ def create_window():
 
 if __name__ == '__main__':
     create_window()
-    #main = mainloop()
+    # main = mainloop()

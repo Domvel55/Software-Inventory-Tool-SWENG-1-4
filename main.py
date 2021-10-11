@@ -16,7 +16,6 @@ class MainWindow:
         #root.minsize(750, 600)
         root.configure(background="#2a3439")
 
-
 class ResultsPage:
 
     def __init__(self):
@@ -209,9 +208,14 @@ class SettingsPage:
         set3_label.grid(row=2, column=0)
     
     
-class LoginPage():
+class LoginPage:
 
-    def init(self, root):
+    def __init__(self):
+        global root
+
+        for widget in root.winfo_children()[1:]:
+            widget.destroy()
+
         root.configure(background="#2a3439")
 
         login_outer_frame = Frame(root, bg='#1F262A')
@@ -236,42 +240,47 @@ class LoginPage():
         token_entry.place(relx=0.5, rely=0.565, anchor='center')
 
         #Login Button
-        login_button = TkinterCustomButton( bg_color=None,
+        login_button = TkinterCustomButton( bg_color="#2a3439",
                                           fg_color="#56667A",
                                           hover_color="#AAA9AD",
                                           text_font="Bold, 12",
                                           text="Login",
                                           text_color="white",
-                                          corner_radius=0,
+                                          corner_radius=10,
                                           width=80,
                                           height=40,
                                           hover=True,
-                                          command=lambda: MainWindow().init(root))
+                                          command=lambda: MainWindow())
         login_button.place(relx=0.45, rely=0.65, anchor='center')
 
         #Registration Button
-        register_button = TkinterCustomButton( bg_color=None,
+        register_button = TkinterCustomButton( bg_color="#2a3439",
                                           fg_color="#56667A",
                                           hover_color="#AAA9AD",
                                           text_font="Bold, 12",
                                           text="Register",
                                           text_color="white",
-                                          corner_radius=0,
+                                          corner_radius=10,
                                           width=80,
                                           height=40,
                                           hover=True,
-                                          command=lambda: RegisterPage().init(root))
+                                          command=lambda: RegisterPage())
         register_button.place(relx=0.55, rely=0.65, anchor='center')
 
         
-class RegisterPage():
+class RegisterPage:
 
-    def init(self, root):
+    def __init__(self):
+        global root
+
+        for widget in root.winfo_children()[1:]:
+            widget.destroy()
+
         root.configure(background="#2a3439")
 
         register_frame = Frame(root, bg='#1F262A')
         register_frame.place(relx=0.5, rely=0.5, anchor='center')
-        register_frame.config(height=300, width=500)
+        register_frame.config(height=350, width=500)
         register_frame.config(relief=RAISED)
 
         register_title = Label(root, text="Register", background="#1F262A", foreground="white", font="Bold, 25")
@@ -293,18 +302,19 @@ class RegisterPage():
         token_entry = Entry(root, background="#2a3439", foreground="white", width=25, font=20)
         token_entry.place(relx=.45, rely=.62)
 
-        login_button = TkinterCustomButton( bg_color=None,
+        #Create Account Button
+        create_button = TkinterCustomButton( bg_color="#1F262A",
                                           fg_color="#56667A",
                                           hover_color="#AAA9AD",
                                           text_font= 20,
                                           text="Create",
                                           text_color="white",
-                                          corner_radius=0,
+                                          corner_radius=10,
                                           width=100,
                                           height=30,
                                           hover=True,
-                                          command=lambda: LoginPage().init(root))
-        login_button.place(relx=0.5, rely=0.73, anchor='center')
+                                          command=lambda: LoginPage())
+        create_button.place(relx=0.5, rely=0.73, anchor='center')
 
 
 root = tk.Tk()
@@ -377,7 +387,7 @@ def create_window():
                                       width=75,
                                       height=40,
                                       hover=True,
-                                      command=lambda: LoginPage().init(root))
+                                      command=lambda: LoginPage())
     login_button.pack(side=LEFT, padx=5)
 
     # Results Button here
@@ -391,7 +401,7 @@ def create_window():
                                       width=75,
                                       height=40,
                                       hover=True,
-                                      command=lambda: ResultsPage().init(root))
+                                      command=lambda: ResultsPage())
     results_button.pack(side=LEFT, padx=5)
 
     # Create Settings Button
@@ -423,17 +433,17 @@ def create_window():
     help_button.pack(side=LEFT, padx=5)
 
     # Create Scan
-    scan_button = TkinterCustomButton(master=root, bg_color=None,
+    scan_button = TkinterCustomButton(master=root, bg_color="#2a3439",
                                       fg_color="#1F262A",
-                                      hover_color="#2a3439",
+                                      hover_color="#AAA9AD",
                                       text_font="Bold, 14",
                                       text="Scan",
                                       text_color="white",
-                                      corner_radius=0,
+                                      corner_radius=10,
                                       width=75,
                                       height=40,
                                       hover=True,
-                                      command=lambda: ResultsPage().init(root))
+                                      command=lambda: ResultsPage())
     scan_button.place(relx=.05, rely=.1)
 
     # Create Title Text

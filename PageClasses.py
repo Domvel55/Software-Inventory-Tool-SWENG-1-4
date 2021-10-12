@@ -327,7 +327,7 @@ class LoginPage:
                                            width=80,
                                            height=40,
                                            hover=True,
-                                           command=lambda: MainWindow())
+                                           command=lambda: None)
         login_button.place(relx=0.45, rely=0.65, anchor='center')
 
         # Registration Button
@@ -374,10 +374,11 @@ class RegisterPage:
         username.place(relx=.34, rely=.54)
         username_entry = Entry(root, background="#2a3439", foreground="white", width=25, font=20)
         username_entry.place(relx=.45, rely=.54)
-        token = Label(root, text="RSA Token ID", background="#1F262A", foreground="white", font=20)
-        token.place(relx=.34, rely=.62)
-        token_entry = Entry(root, background="#2a3439", foreground="white", width=25, font=20)
-        token_entry.place(relx=.45, rely=.62)
+        phone = Label(root, text="Phone Number", background="#1F262A", foreground="white", font=20)
+        phone.place(relx=.34, rely=.62)
+        phone_entry = Entry(root, background="#2a3439", foreground="white", width=25, font=20)
+        phone_entry.place(relx=.45, rely=.62)
+
 
         # Create Account Button
         create_button = TkinterCustomButton(bg_color="#1F262A",

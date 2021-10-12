@@ -1,10 +1,10 @@
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
-
 from tkinter_custom_button import TkinterCustomButton
 
 root = tk.Tk()
+
 
 def move_app(e):
     root.geometry(f'+{e.x_root}+{e.y_root}')
@@ -378,6 +378,7 @@ class RegisterPage:
         phone.place(relx=.34, rely=.62)
         phone_entry = Entry(root, background="#2a3439", foreground="white", width=25, font=20)
         phone_entry.place(relx=.45, rely=.62)
+
 
         # Create Account Button
         create_button = TkinterCustomButton(bg_color="#1F262A",

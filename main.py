@@ -112,7 +112,7 @@ def create_window():
     scan_button.place(relx=.05, rely=.1)
 
     # Create Express Scan Button
-    scan_button = TkinterCustomButton(master=root, bg_color="#2a3439",
+    express_scan_button = TkinterCustomButton(master=root, bg_color="#2a3439",
                                       fg_color="#1F262A",
                                       hover_color="#AAA9AD",
                                       text_font="Bold, 14",
@@ -123,7 +123,7 @@ def create_window():
                                       height=40,
                                       hover=True,
                                       command=lambda: ResultsPage())
-    scan_button.place(relx=.15, rely=.1)
+    express_scan_button.place(relx=.15, rely=.1)
 
     close_button = Button(title_bar, text='  ×  ', command=root.destroy, bg="#1f262A", padx=2, pady=2,
                           font=("calibre", 13),

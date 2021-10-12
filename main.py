@@ -3,7 +3,6 @@ from PageClasses import root as root
 
 
 def create_window():
-
     # Window background color
     root.configure(background="#2a3439")
 
@@ -18,13 +17,15 @@ def create_window():
 
     # remove title bar
     root.overrideredirect(True)
+    root.minimized = False  # only to know if root is minimized
+    root.maximized = False  # only to know if root is maximized
 
     # Create New Title Bar
     title_bar = Frame(root, bg="#1F262A", relief="raised", bd=1)
     title_bar.pack(fill=X)
 
     # 'Binding the title bar
-    title_bar.bind("<B1-Motion>", move_app)
+    title_bar.bind("<Map>", frame_mapped)
 
     # Navigation Buttons
     home_button = TkinterCustomButton(master=title_bar, bg_color=None,
@@ -124,19 +125,91 @@ def create_window():
                                       command=lambda: ResultsPage())
     scan_button.place(relx=.15, rely=.1)
 
-    # Create Title Text
-    title_label = Label(title_bar, text="Software Inventory Tool", font="Bold, 10", bg="#1F262A", fg="white")
-    title_label.place(relx=.5, rely=.5, anchor="center")
+    close_button = Button(title_bar, text='  ×  ', command=root.destroy, bg="#1f262A", padx=2, pady=2,
+                          font=("calibre", 13),
+                          bd=0, fg='white', highlightthickness=0)
+    expand_button = Button(title_bar, text=' 🗖 ', bg="#1f262A", padx=2, pady=2, bd=0, fg='white',
+                           font=("calibre", 13), highlightthickness=0)
+    minimize_button = Button(title_bar, text=' — ', bg="#1f262A", padx=2, pady=2, bd=0, fg='white',
+                             font=("calibre", 13), highlightthickness=0)
+    title_bar_title = Label(title_bar, text="Software Inventory Tool", bg="#1f262A", bd=0, fg='white',
+                            font=("helvetica", 10),
+                            highlightthickness=0)
+    minimize_button.bind("<Button-1>", minimizer)
+    expand_button.bind("<Button-1>", maximize_me)
 
-    # Create close button
-    close_label = Label(title_bar, text="X", bg="#1f262A", fg="white", font=("", 16), relief="raised", bd=0)
-    close_label.pack(side=RIGHT, padx=4, pady=4)
-    close_label.bind("<Button-1>", quitter)
+    # Packing the title_bar with all the buttons
+    title_bar.pack(fill=X)
+    close_button.pack(side=RIGHT, ipadx=7, ipady=1)
+    expand_button.pack(side=RIGHT, ipadx=7, ipady=1)
+    minimize_button.pack(side=RIGHT, ipadx=7, ipady=1)
+    title_bar_title.pack(side=LEFT, padx=10)
 
-    # Create Minimize button
-    minimize_label = Label(title_bar, text="─", bg="#1f262A", fg="white", font=("", 16), relief="raised", bd=0)
-    minimize_label.pack(side=RIGHT, pady=4)
-    minimize_label.bind("<Button-1>", minimizer)
+    # Functions to change the color of buttons when hovered over
+    def changex_on_hovering(event):
+        close_button.configure(bg="red")
+
+    def returnx_to_normalstate(event):
+        close_button.configure(bg="#1f262A")
+
+    def change_size_on_hovering(event):
+        expand_button.configure(bg="#2a3439")
+
+    def return_size_on_hovering(event):
+        expand_button.configure(bg="#1f262A")
+
+    def changem_size_on_hovering(event):
+        minimize_button.configure(bg="#2a3439")
+
+    def returnm_size_on_hovering(event):
+        minimize_button.configure(bg="#1f262A")
+
+    def change_text_on_click(e):
+        if expand_button.cget("text") == " 🗗 ":
+            expand_button.configure(text=" 🗖 ")
+        else:
+            expand_button.configure(text=" 🗗 ")
+        maximize_me(e)
+
+    def get_pos(e):  # this is executed when the title bar is clicked to move the window
+
+        if not root.maximized:
+
+            xwin = root.winfo_x()
+            ywin = root.winfo_y()
+            startx = e.x_root
+            starty = e.y_root
+
+            ywin = ywin - starty
+            xwin = xwin - startx
+
+            def move_window(e):  # runs when window is dragged
+                root.config(cursor="fleur")
+                root.geometry(f'+{e.x_root + xwin}+{e.y_root + ywin}')
+
+            def release_window(e):  # runs when window is released
+                root.config(cursor="arrow")
+
+            title_bar.bind('<B1-Motion>', move_window)
+            title_bar.bind('<ButtonRelease-1>', release_window)
+            title_bar_title.bind('<B1-Motion>', move_window)
+            title_bar_title.bind('<ButtonRelease-1>', release_window)
+
+        else:
+            expand_button.config(text=" 🗖 ")
+            root.maximized = not root.maximized
+
+    title_bar.bind('<Button-1>', get_pos)  # so you can drag the window from the title bar
+    title_bar_title.bind('<Button-1>', get_pos)  # so you can drag the window from the title
+
+    # Binding buttons to Function to change color if hovered over
+    close_button.bind('<Enter>', changex_on_hovering)
+    close_button.bind('<Leave>', returnx_to_normalstate)
+    expand_button.bind('<Enter>', change_size_on_hovering)
+    expand_button.bind('<Leave>', return_size_on_hovering)
+    expand_button.bind('<Button-1>', change_text_on_click)
+    minimize_button.bind('<Enter>', changem_size_on_hovering)
+    minimize_button.bind('<Leave>', returnm_size_on_hovering)
 
     root.mainloop()
 

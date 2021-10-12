@@ -3,7 +3,6 @@ from tkinter import *
 from tkinter import ttk
 from tkinter_custom_button import TkinterCustomButton
 
-
 root = tk.Tk()
 
 
@@ -16,8 +15,29 @@ def quitter(e):
 
 
 def minimizer(e):
-    root.overrideredirect(0)
-    root.iconify()
+    root.update_idletasks()
+    root.overrideredirect(False)
+    root.state('iconic')
+
+
+def maximize_me(e):
+    if not root.maximized:  # if the window was not maximized
+        root.normal_size = root.geometry()
+        root.geometry(f"{root.winfo_screenwidth()}x{root.winfo_screenheight()}+0+0")
+        root.maximized = not root.maximized
+        # now it's maximized
+
+    else:  # if the window was maximized
+        root.geometry(root.normal_size)
+        root.maximized = not root.maximized
+        # now it is not maximized
+
+
+
+def frame_mapped(e):
+    root.update_idletasks()
+    root.overrideredirect(True)
+    root.state('normal')
 
 
 class MainWindow:

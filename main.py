@@ -102,14 +102,14 @@ def create_window():
                                       fg_color="#1F262A",
                                       hover_color="#AAA9AD",
                                       text_font="Bold, 14",
-                                      text="Scan",
+                                      text="Full Scan",
                                       text_color="white",
                                       corner_radius=10,
-                                      width=75,
+                                      width=90,
                                       height=40,
                                       hover=True,
                                       command=lambda: ResultsPage())
-    scan_button.place(relx=.05, rely=.1)
+    scan_button.place(relx=.04, rely=.1)
 
     # Create Express Scan Button
     express_scan_button = TkinterCustomButton(master=root, bg_color="#2a3439",

@@ -285,7 +285,7 @@ class SettingsPage:
         apply_button.place(relx=0.5, rely=0.95, anchor='center')
 
 
-class LoginPage:
+class LoginPage():
 
     def __init__(self):
         global root
@@ -295,29 +295,35 @@ class LoginPage:
 
         root.configure(background="#2a3439")
 
-        login_outer_frame = Frame(root, bg='#1F262A')
+        #Login page outer frame
+        login_outer_frame = tk.Frame(root, bg='#1F262A')
         login_outer_frame.place(relx=0.5, rely=0.5, anchor='center')
-        login_outer_frame.config(height=400, width=600)
+        login_outer_frame.config(height=450, width=650)
         login_outer_frame.config(relief=RAISED)
 
-        login_inner_frame = Frame(root, background="#2a3439")
+        #Login page inner frame
+
+        login_inner_frame = tk.Frame(login_outer_frame, background="#2a3439")
         login_inner_frame.place(relx=0.5, rely=0.5, anchor='center')
         login_inner_frame.config(height=300, width=500)
 
-        login_page_label = Label(root, text='Login Page', font="Bold, 20", bg='#2a3439', fg="white")
-        login_page_label.place(relx=0.5, rely=0.3, anchor='center')
+        #Login Page title
+        login_page_label = tk.Label(login_inner_frame, text='Login Page', font="Bold, 20", bg='#2a3439', fg="white")
+        login_page_label.place(relx=0.5, rely=0.15, anchor='center')
 
-        username_label = Label(root, text='Username', font=15, background="#2a3439", foreground="white")
-        username_label.place(relx=0.5, rely=0.4, anchor="center")
-        username_entry = Entry(root, background="#1F262A", foreground="white", font=15)
-        username_entry.place(relx=0.5, rely=0.45, anchor='center')
-        token_label = Label(root, text='RSA Token', font=15, background="#2a3439", foreground="white")
-        token_label.place(relx=0.5, rely=0.515, anchor='center')
-        token_entry = Entry(root, background="#1F262A", foreground="white", font=15)
-        token_entry.place(relx=0.5, rely=0.565, anchor='center')
+        #Login username and RSA token labels and entries
+        username_label = tk.Label(login_inner_frame, text='Username', font=15, background="#2a3439", foreground="white")
+        username_label.place(relx=0.5, rely=0.3, anchor="center")
+        username_entry = tk.Entry(login_inner_frame, background="#1F262A", foreground="white", font=15)
+        username_entry.place(relx=0.5, rely=0.4, anchor='center')
+        token_label = tk.Label(login_inner_frame, text='RSA Token', font=15, background="#2a3439", foreground="white")
+        token_label.place(relx=0.5, rely=0.53, anchor='center')
+        token_entry = tk.Entry(login_inner_frame, background="#1F262A", foreground="white", font=15)
+        token_entry.place(relx=0.5, rely=0.63, anchor='center')
 
-        # Login Button
-        login_button = TkinterCustomButton(bg_color="#2a3439",
+        #Login Button (sends you to home page)
+        login_button = TkinterCustomButton(master=login_inner_frame,
+                                           bg_color="#2a3439",
                                            fg_color="#56667A",
                                            hover_color="#AAA9AD",
                                            text_font="Bold, 12",
@@ -328,10 +334,11 @@ class LoginPage:
                                            height=40,
                                            hover=True,
                                            command=lambda: None)
-        login_button.place(relx=0.45, rely=0.65, anchor='center')
+        login_button.place(relx=0.4, rely=0.85, anchor='center')
 
-        # Registration Button
-        register_button = TkinterCustomButton(bg_color="#2a3439",
+        #Registration Button (Sends you to register page)
+        register_button = TkinterCustomButton(master=login_inner_frame,
+                                              bg_color="#2a3439",
                                               fg_color="#56667A",
                                               hover_color="#AAA9AD",
                                               text_font="Bold, 12",
@@ -342,7 +349,7 @@ class LoginPage:
                                               height=40,
                                               hover=True,
                                               command=lambda: RegisterPage())
-        register_button.place(relx=0.55, rely=0.65, anchor='center')
+        register_button.place(relx=0.6, rely=0.85, anchor='center')
 
 
 class RegisterPage:
@@ -355,33 +362,36 @@ class RegisterPage:
 
         root.configure(background="#2a3439")
 
+        #Register page frame
         register_frame = Frame(root, bg='#1F262A')
         register_frame.place(relx=0.5, rely=0.5, anchor='center')
         register_frame.config(height=350, width=500)
         register_frame.config(relief=RAISED)
 
-        register_title = Label(root, text="Register", background="#1F262A", foreground="white", font="Bold, 25")
-        register_title.place(relx=0.5, rely=.3, anchor='center')
-        first_name = Label(root, text="First Name", background="#1F262A", foreground="white", font=20)
-        first_name.place(relx=.34, rely=.38)
-        first_name_entry = Entry(root, background="#2a3439", foreground="white", width=25, font=20)
-        first_name_entry.place(relx=.45, rely=.38)
-        last_name = Label(root, text="Last Name", background="#1F262A", foreground="white", font=20)
-        last_name.place(relx=.34, rely=.46)
-        last_name_entry = Entry(root, background="#2a3439", foreground="white", width=25, font=20)
-        last_name_entry.place(relx=.45, rely=.46)
-        username = Label(root, text="Username", background="#1F262A", foreground="white", font=20)
-        username.place(relx=.34, rely=.54)
-        username_entry = Entry(root, background="#2a3439", foreground="white", width=25, font=20)
-        username_entry.place(relx=.45, rely=.54)
-        phone = Label(root, text="Phone Number", background="#1F262A", foreground="white", font=20)
-        phone.place(relx=.34, rely=.62)
-        phone_entry = Entry(root, background="#2a3439", foreground="white", width=25, font=20)
-        phone_entry.place(relx=.45, rely=.62)
+        #Register page entries and labels
+        register_title = Label(register_frame, text="Register", background="#1F262A", foreground="white", font="Bold, 25")
+        register_title.place(relx=0.5, rely=.1, anchor='center')
+        first_name = Label(register_frame, text="First Name", background="#1F262A", foreground="white", font=20)
+        first_name.place(relx=.17, rely=.3)
+        first_name_entry = Entry(register_frame, background="#2a3439", foreground="white", width=25, font=20)
+        first_name_entry.place(relx=.4, rely=.3)
+        last_name = Label(register_frame, text="Last Name", background="#1F262A", foreground="white", font=20)
+        last_name.place(relx=.17, rely=.42)
+        last_name_entry = Entry(register_frame, background="#2a3439", foreground="white", width=25, font=20)
+        last_name_entry.place(relx=.4, rely=.42)
+        username = Label(register_frame, text="Username", background="#1F262A", foreground="white", font=20)
+        username.place(relx=.17, rely=.54)
+        username_entry = Entry(register_frame, background="#2a3439", foreground="white", width=25, font=20)
+        username_entry.place(relx=.4, rely=.54)
+        phone = Label(register_frame, text="Phone Number", background="#1F262A", foreground="white", font=20)
+        phone.place(relx=.17, rely=.66)
+        phone_entry = Entry(register_frame, background="#2a3439", foreground="white", width=25, font=20)
+        phone_entry.place(relx=.4, rely=.66)
 
 
-        # Create Account Button
-        create_button = TkinterCustomButton(bg_color="#1F262A",
+        #Create Account Button (sends you to login page)
+        create_button = TkinterCustomButton(master=register_frame,
+                                            bg_color="#1F262A",
                                             fg_color="#56667A",
                                             hover_color="#AAA9AD",
                                             text_font=20,
@@ -392,4 +402,4 @@ class RegisterPage:
                                             height=30,
                                             hover=True,
                                             command=lambda: LoginPage())
-        create_button.place(relx=0.5, rely=0.73, anchor='center')
+        create_button.place(relx=0.5, rely=0.85, anchor='center')

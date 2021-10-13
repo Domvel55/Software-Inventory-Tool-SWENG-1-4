@@ -195,12 +195,46 @@ class HelpPage:
                                               fg="#FFFFFF")
         help_example1_header_label.place(relx=0.01, rely=0.1, anchor="nw")
 
+        text1 = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque semper, neque vitae 
+                placerat interdum, orci nisl hendrerit erat, vel iaculis tellus lacus a nibh. Mauris
+                consequat nunc non est sollicitudin efficitur. Fusce vestibulum eget est id euismod. Duis
+                egestas tellus ac lorem egestas, at elementum libero viverra. In volutpat rhoncus
+                dapibus. Morbi eu cursus felis. Mauris vel enim neque. Duis posuere rutrum varius.
+                Curabitur id vestibulum est, in scelerisque orci. Morbi vitae condimentum ante.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque semper, neque vitae 
+                placerat interdum, orci nisl hendrerit erat, vel iaculis tellus lacus a nibh. Mauris
+                consequat nunc non est sollicitudin efficitur. Fusce vestibulum eget est id euismod. Duis
+                egestas tellus ac lorem egestas, at elementum libero viverra. In volutpat rhoncus
+                dapibus. Morbi eu cursus felis. Mauris vel enim neque. Duis posuere rutrum varius.
+                Curabitur id vestibulum est, in scelerisque orci. Morbi vitae condimentum ante."""\
+            .replace('\n', ' ').replace('                ', ' ')
+        help_example1_body_label = tk.Label(help_example1, text=text1, font=20, bg="#2a3439", fg="#FFFFFF",
+                                            wraplength=880, justify="left")
+        help_example1_body_label.place(relx=0.01, rely=0.25, anchor="nw")
+
         help_example2 = tk.Frame(help_container, bg="#2a3439")
         help_example2.place(relx=0.5, rely=0.02, anchor="n")
         help_example2.config(height=200, width=900)
         help_example2_header_label = tk.Label(help_example2, text='How the Vulnerabilities are scored:', font=24,
                                               bg="#2a3439", fg="#FFFFFF")
         help_example2_header_label.place(relx=0.01, rely=0.1, anchor="nw")
+
+        text2 = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque semper, neque vitae 
+                placerat interdum, orci nisl hendrerit erat, vel iaculis tellus lacus a nibh. Mauris
+                consequat nunc non est sollicitudin efficitur. Fusce vestibulum eget est id euismod. Duis
+                egestas tellus ac lorem egestas, at elementum libero viverra. In volutpat rhoncus
+                dapibus. Morbi eu cursus felis. Mauris vel enim neque. Duis posuere rutrum varius.
+                Curabitur id vestibulum est, in scelerisque orci. Morbi vitae condimentum ante.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque semper, neque vitae 
+                placerat interdum, orci nisl hendrerit erat, vel iaculis tellus lacus a nibh. Mauris
+                consequat nunc non est sollicitudin efficitur. Fusce vestibulum eget est id euismod. Duis
+                egestas tellus ac lorem egestas, at elementum libero viverra. In volutpat rhoncus
+                dapibus. Morbi eu cursus felis. Mauris vel enim neque. Duis posuere rutrum varius.
+                Curabitur id vestibulum est, in scelerisque orci. Morbi vitae condimentum ante."""\
+            .replace('\n', ' ').replace('                ', ' ')
+        help_example2_body_label = tk.Label(help_example2, text=text2, font=20, bg="#2a3439", fg="#FFFFFF",
+                                           wraplength=880, justify="left")
+        help_example2_body_label.place(relx=0.01, rely=0.25, anchor="nw")
 
         help_example3 = tk.Frame(help_container, bg="#2a3439")
         help_example3.place(relx=0.5, rely=0.02, anchor="n")
@@ -209,6 +243,22 @@ class HelpPage:
                                               bg="#2a3439", fg="#FFFFFF")
         help_example3_header_label.place(relx=0.01, rely=0.1, anchor="nw")
 
+        text3 = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque semper, neque vitae 
+                placerat interdum, orci nisl hendrerit erat, vel iaculis tellus lacus a nibh. Mauris
+                consequat nunc non est sollicitudin efficitur. Fusce vestibulum eget est id euismod. Duis
+                egestas tellus ac lorem egestas, at elementum libero viverra. In volutpat rhoncus
+                dapibus. Morbi eu cursus felis. Mauris vel enim neque. Duis posuere rutrum varius.
+                Curabitur id vestibulum est, in scelerisque orci. Morbi vitae condimentum ante.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque semper, neque vitae 
+                placerat interdum, orci nisl hendrerit erat, vel iaculis tellus lacus a nibh. Mauris
+                consequat nunc non est sollicitudin efficitur. Fusce vestibulum eget est id euismod. Duis
+                egestas tellus ac lorem egestas, at elementum libero viverra. In volutpat rhoncus
+                dapibus. Morbi eu cursus felis. Mauris vel enim neque. Duis posuere rutrum varius.
+                Curabitur id vestibulum est, in scelerisque orci. Morbi vitae condimentum ante."""\
+            .replace('\n', ' ').replace('                ', ' ')
+        help_example3_body_label = tk.Label(help_example3, text=text3, font=20, bg="#2a3439", fg="#FFFFFF",
+                                            wraplength=880, justify="left")
+        help_example3_body_label.place(relx=0.01, rely=0.25, anchor="nw")
         # Align tips in a grid
         help_example1.grid(row=0, column=0, padx=10, pady=5)
         help_example2.grid(row=1, column=0, padx=10, pady=5)

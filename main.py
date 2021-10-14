@@ -38,7 +38,7 @@ def create_window():
                                       width=75,
                                       height=40,
                                       hover=True,
-                                      command=lambda: call_main())
+                                      command=lambda: MainWindow())
     home_button.pack(side=LEFT, padx=5)
 
     # Create Login Button
@@ -96,34 +96,6 @@ def create_window():
                                       hover=True,
                                       command=lambda: HelpPage())
     help_button.pack(side=LEFT, padx=5)
-
-    # Create Scan
-    scan_button = TkinterCustomButton(master=root, bg_color="#2a3439",
-                                      fg_color="#1F262A",
-                                      hover_color="#AAA9AD",
-                                      text_font="Bold, 14",
-                                      text="Full Scan",
-                                      text_color="white",
-                                      corner_radius=10,
-                                      width=90,
-                                      height=40,
-                                      hover=True,
-                                      command=lambda: ResultsPage())
-    scan_button.place(relx=.04, rely=.1)
-
-    # Create Express Scan Button
-    express_scan_button = TkinterCustomButton(master=root, bg_color="#2a3439",
-                                      fg_color="#1F262A",
-                                      hover_color="#AAA9AD",
-                                      text_font="Bold, 14",
-                                      text="Express Scan",
-                                      text_color="white",
-                                      corner_radius=10,
-                                      width=130,
-                                      height=40,
-                                      hover=True,
-                                      command=lambda: ResultsPage())
-    express_scan_button.place(relx=.15, rely=.1)
 
     close_button = Button(title_bar, text='  ×  ', command=root.destroy, bg="#1f262A", padx=2, pady=2,
                           font=("calibre", 13),
@@ -211,14 +183,12 @@ def create_window():
     minimize_button.bind('<Enter>', changem_size_on_hovering)
     minimize_button.bind('<Leave>', returnm_size_on_hovering)
 
-    root.mainloop()
-
 
 def call_main():
-    MainWindow()
     create_window()
+    LoginPage()
 
 
 if __name__ == '__main__':
-    MainWindow()
-    create_window()
+    call_main()
+    root.mainloop()

@@ -45,12 +45,48 @@ class MainWindow:
     def __init__(self):
         global root
 
-        for widget in root.winfo_children():
+        for widget in root.winfo_children()[1:]:
             widget.destroy()
 
-        # root.geometry("600x600")
-        # root.minsize(750, 600)
         root.configure(background="#2a3439")
+
+        main_frame = tk.Frame(root, bg="#2a3439")
+        main_frame.place(relx=0.5, rely=0.1, anchor="n")
+        main_frame.config(height=root.winfo_height(), width=root.winfo_width())
+
+        main_container = tk.Frame(main_frame, bg="#1F262A", borderwidth=2)
+        main_container.place(relx=0.5, rely=0.1, anchor="n")
+        main_container.config(relief=RIDGE)
+
+        # <editor-fold desc="Results Buttons">
+        scan_button = TkinterCustomButton(master=main_frame,
+                                          bg_color="#2a3439",
+                                          fg_color="#1F262A",
+                                          hover_color="#AAA9AD",
+                                          text_font="Bold, 14",
+                                          text="Full Scan",
+                                          text_color="white",
+                                          corner_radius=10,
+                                          width=90,
+                                          height=40,
+                                          hover=True,
+                                          command=lambda: ResultsPage())
+        scan_button.place(relx=.01)
+
+        express_scan_button = TkinterCustomButton(master=main_frame,
+                                                  bg_color="#2a3439",
+                                                  fg_color="#1F262A",
+                                                  hover_color="#AAA9AD",
+                                                  text_font="Bold, 14",
+                                                  text="Express Scan",
+                                                  text_color="white",
+                                                  corner_radius=10,
+                                                  width=130,
+                                                  height=40,
+                                                  hover=True,
+                                                  command=lambda: ResultsPage())
+        express_scan_button.place(relx=.12)
+        # </editor-fold>
 
 
 class ResultsPage:
@@ -61,8 +97,6 @@ class ResultsPage:
         for widget in root.winfo_children()[1:]:
             widget.destroy()
 
-        # root.geometry("600x600")
-        # root.minsize(750, 600)
         root.configure(background="#2a3439")
 
         # <editor-fold desc="Results GUI">
@@ -172,8 +206,6 @@ class HelpPage:
         for widget in root.winfo_children()[1:]:
             widget.destroy()
 
-        # root.geometry("600x600")
-        # root.minsize(750, 600)
         root.configure(background="#2a3439")
 
         # <editor-fold desc="Results GUI">
@@ -335,7 +367,7 @@ class SettingsPage:
         apply_button.place(relx=0.5, rely=0.95, anchor='center')
 
 
-class LoginPage():
+class LoginPage:
 
     def __init__(self):
         global root
@@ -345,23 +377,22 @@ class LoginPage():
 
         root.configure(background="#2a3439")
 
-        #Login page outer frame
+        # Login page outer frame
         login_outer_frame = tk.Frame(root, bg='#1F262A')
         login_outer_frame.place(relx=0.5, rely=0.5, anchor='center')
         login_outer_frame.config(height=450, width=650)
         login_outer_frame.config(relief=RAISED)
 
-        #Login page inner frame
-
+        # Login page inner frame
         login_inner_frame = tk.Frame(login_outer_frame, background="#2a3439")
         login_inner_frame.place(relx=0.5, rely=0.5, anchor='center')
         login_inner_frame.config(height=300, width=500)
 
-        #Login Page title
+        # Login Page title
         login_page_label = tk.Label(login_inner_frame, text='Login Page', font="Bold, 20", bg='#2a3439', fg="white")
         login_page_label.place(relx=0.5, rely=0.15, anchor='center')
 
-        #Login username and RSA token labels and entries
+        # Login username and RSA token labels and entries
         username_label = tk.Label(login_inner_frame, text='Username', font=15, background="#2a3439", foreground="white")
         username_label.place(relx=0.5, rely=0.3, anchor="center")
         username_entry = tk.Entry(login_inner_frame, background="#1F262A", foreground="white", font=15)
@@ -371,7 +402,7 @@ class LoginPage():
         token_entry = tk.Entry(login_inner_frame, background="#1F262A", foreground="white", font=15)
         token_entry.place(relx=0.5, rely=0.63, anchor='center')
 
-        #Login Button (sends you to home page)
+        # Login Button (sends you to home page)
         login_button = TkinterCustomButton(master=login_inner_frame,
                                            bg_color="#2a3439",
                                            fg_color="#56667A",
@@ -386,7 +417,7 @@ class LoginPage():
                                            command=lambda: None)
         login_button.place(relx=0.4, rely=0.85, anchor='center')
 
-        #Registration Button (Sends you to register page)
+        # Registration Button (Sends you to register page)
         register_button = TkinterCustomButton(master=login_inner_frame,
                                               bg_color="#2a3439",
                                               fg_color="#56667A",
@@ -412,13 +443,13 @@ class RegisterPage:
 
         root.configure(background="#2a3439")
 
-        #Register page frame
+        # Register page frame
         register_frame = Frame(root, bg='#1F262A')
         register_frame.place(relx=0.5, rely=0.5, anchor='center')
         register_frame.config(height=350, width=500)
         register_frame.config(relief=RAISED)
 
-        #Register page entries and labels
+        # Register page entries and labels
         register_title = Label(register_frame, text="Register", background="#1F262A", foreground="white", font="Bold, 25")
         register_title.place(relx=0.5, rely=.1, anchor='center')
         first_name = Label(register_frame, text="First Name", background="#1F262A", foreground="white", font=20)
@@ -439,7 +470,7 @@ class RegisterPage:
         phone_entry.place(relx=.4, rely=.66)
 
 
-        #Create Account Button (sends you to login page)
+        # Create Account Button (sends you to login page)
         create_button = TkinterCustomButton(master=register_frame,
                                             bg_color="#1F262A",
                                             fg_color="#56667A",

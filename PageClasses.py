@@ -3,6 +3,7 @@ from tkinter import *
 from tkinter import ttk
 from tkinter_custom_button import TkinterCustomButton
 
+
 root = tk.Tk()
 
 
@@ -33,7 +34,6 @@ def maximize_me(e):
         # now it is not maximized
 
 
-
 def frame_mapped(e):
     root.update_idletasks()
     root.overrideredirect(True)
@@ -53,10 +53,6 @@ class MainWindow:
         main_frame = tk.Frame(root, bg="#2a3439")
         main_frame.place(relx=0.5, rely=0.1, anchor="n")
         main_frame.config(height=root.winfo_height(), width=root.winfo_width())
-
-        main_container = tk.Frame(main_frame, bg="#1F262A", borderwidth=2)
-        main_container.place(relx=0.5, rely=0.1, anchor="n")
-        main_container.config(relief=RIDGE)
 
         # <editor-fold desc="Results Buttons">
         scan_button = TkinterCustomButton(master=main_frame,
@@ -86,6 +82,20 @@ class MainWindow:
                                                   hover=True,
                                                   command=lambda: ResultsPage())
         express_scan_button.place(relx=.12)
+
+        express_scan_button = TkinterCustomButton(master=main_frame,
+                                                  bg_color="#2a3439",
+                                                  fg_color="#1F262A",
+                                                  hover_color="#AAA9AD",
+                                                  text_font="Bold, 14",
+                                                  text="Schedule Scan",
+                                                  text_color="white",
+                                                  corner_radius=10,
+                                                  width=130,
+                                                  height=40,
+                                                  hover=True,
+                                                  command=lambda: ResultsPage())
+        express_scan_button.place(relx=.27)
         # </editor-fold>
 
 
@@ -468,7 +478,6 @@ class RegisterPage:
         phone.place(relx=.17, rely=.66)
         phone_entry = Entry(register_frame, background="#2a3439", foreground="white", width=25, font=20)
         phone_entry.place(relx=.4, rely=.66)
-
 
         # Create Account Button (sends you to login page)
         create_button = TkinterCustomButton(master=register_frame,

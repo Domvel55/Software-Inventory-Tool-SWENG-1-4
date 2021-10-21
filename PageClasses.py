@@ -226,27 +226,29 @@ class HelpPage:
 
         # Everything Commented out is for adding a scroll bar
 
-        # root.configure(background="#2a3439")
-        #
-        # helper_frame = Frame(root, bg="#2a3439")
-        # helper_frame.pack(fill=BOTH,expand=1)
-        #
-        # helper_canvas= Canvas(helper_frame)
-        # helper_canvas.pack(side=LEFT, fill=BOTH, expand=1)
-        #
-        # helper_scrollbar = ttk.Scrollbar(helper_frame,orient=VERTICAL, command=helper_canvas.yview)
-        # helper_scrollbar.pack(side=RIGHT, fill=Y)
-        #
-        # helper_canvas.configure(yscrollcommand=helper_scrollbar.set)
-        # helper_canvas.bind('<Configure>', lambda e: helper_canvas.configure(scrollregion=helper_canvas.bbox("all")))
+        root.configure(background="#2a3439")
+
+        helper_frame = Frame(root, bg="#2a3439")
+        helper_frame.pack(fill=BOTH,expand=1)
+
+        helper_canvas= Canvas(helper_frame)
+        helper_canvas.pack(side=LEFT, fill=BOTH, expand=1)
+
+        helper_scrollbar = ttk.Scrollbar(helper_frame,orient=VERTICAL, command=helper_canvas.yview)
+        helper_scrollbar.pack(side=RIGHT, fill=Y)
+
+        helper_canvas.configure(yscrollcommand=helper_scrollbar.set)
+        helper_canvas.bind('<Configure>', lambda e: helper_canvas.configure(scrollregion=helper_canvas.bbox("all")))
 
         root.configure(background="#2a3439")
 
         # <editor-fold desc="Results GUI">
         # Frame for whole results page
-        help_frame = tk.Frame(root, bg="#2a3439")
+        help_frame = tk.Frame(helper_frame, bg="#2a3439")
         help_frame.place(relx=0.5, rely=0.1, anchor="n")
         help_frame.config(height=root.winfo_height(), width=root.winfo_width())
+
+        helper_canvas.create_window((0,0), window=help_frame)
 
         # Container for results
         help_container = tk.Frame(help_frame, bg="#1F262A", borderwidth=2)

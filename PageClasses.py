@@ -1,3 +1,11 @@
+'''
+    This is the PageClasses.py class for the Software Inventory Tool Project
+    This is the file that contains all the different functions to create/destroy the different
+    windows that generate from clicking buttons on the GUI
+    This file was entirely made by the Puffins Team
+    Version:10.20.2021
+'''
+
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
@@ -215,6 +223,22 @@ class HelpPage:
 
         for widget in root.winfo_children()[1:]:
             widget.destroy()
+
+        # Everything Commented out is for adding a scroll bar
+
+        # root.configure(background="#2a3439")
+        #
+        # helper_frame = Frame(root, bg="#2a3439")
+        # helper_frame.pack(fill=BOTH,expand=1)
+        #
+        # helper_canvas= Canvas(helper_frame)
+        # helper_canvas.pack(side=LEFT, fill=BOTH, expand=1)
+        #
+        # helper_scrollbar = ttk.Scrollbar(helper_frame,orient=VERTICAL, command=helper_canvas.yview)
+        # helper_scrollbar.pack(side=RIGHT, fill=Y)
+        #
+        # helper_canvas.configure(yscrollcommand=helper_scrollbar.set)
+        # helper_canvas.bind('<Configure>', lambda e: helper_canvas.configure(scrollregion=helper_canvas.bbox("all")))
 
         root.configure(background="#2a3439")
 

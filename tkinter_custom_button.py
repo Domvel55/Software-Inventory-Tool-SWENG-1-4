@@ -1,3 +1,10 @@
+'''
+    This is the tkinter_custom_buttton.py class for the Software Inventory Tool Project
+    This is the file where the functions to making custom buttons is held
+    This file was entirely made by the Puffins Team
+    Version:10.20.2021
+'''
+
 import tkinter
 import sys
 

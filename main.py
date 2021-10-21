@@ -1,3 +1,11 @@
+'''
+    This is the main.py class for the Software Inventory Tool Project
+    This is the main file that will generate the whole of the GUI
+    This file imports from the PageClasses.py and tkinter_custom_button files
+    This file was entirely made by the Puffins Team
+    Version:10.20.2021
+'''
+
 from PageClasses import *
 from PageClasses import root as root
 
@@ -14,6 +22,12 @@ def create_window():
     x = (screen_width / 2) - (app_width / 2)
     y = (screen_height / 2) - (app_height / 2)
     root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
+
+    # Changes the default tkinter to our Sieve logo when minimized
+    root.iconbitmap('logo.ico')
+
+    # Change the text after minimizing the tool to task bar
+    root.title("Sieve")
 
     # remove title bar
     root.overrideredirect(True)

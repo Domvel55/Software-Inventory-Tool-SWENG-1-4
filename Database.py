@@ -1,3 +1,10 @@
+'''
+    This is the Database.py class for the Software Inventory Tool Project
+    This is the file where all the backend database information is handled
+    This file was entirely made by the Puffins Team
+    Version:10.20.2021
+'''
+
 import pandas as pd
 
 """

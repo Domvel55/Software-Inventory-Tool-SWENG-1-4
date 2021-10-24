@@ -198,7 +198,14 @@ def create_window():
     minimize_button.bind('<Leave>', returnm_size_on_hovering)
 
 
+def init_data():
+    cveobj = CVEDataFrame()
+    cveobj.create_metadata()
+    # cveobj.select_record_by_name('excel')
+
+
 def call_main():
+    init_data()
     create_window()
     LoginPage()
 

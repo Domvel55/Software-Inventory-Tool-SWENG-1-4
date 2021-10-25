@@ -10,6 +10,8 @@ from tkinter import *
 from tkinter import ttk
 from tkinter_custom_button import TkinterCustomButton
 from Database import *
+from tkinter import filedialog
+
 
 root = Tk()
 
@@ -73,7 +75,7 @@ class MainWindow:
                                           width=90,
                                           height=40,
                                           hover=True,
-                                          command=lambda: ResultsPage())
+                                          command=lambda: FullScanConfirmPage())
         scan_button.place(relx=.01)
 
         express_scan_button = TkinterCustomButton(master=main_frame,
@@ -87,10 +89,10 @@ class MainWindow:
                                                   width=130,
                                                   height=40,
                                                   hover=True,
-                                                  command=lambda: ResultsPage())
+                                                  command=lambda: ExpressScanConfirmPage())
         express_scan_button.place(relx=.12)
 
-        express_scan_button = TkinterCustomButton(master=main_frame,
+        schedule_scan_button = TkinterCustomButton(master=main_frame,
                                                   bg_color="#2a3439",
                                                   fg_color="#1F262A",
                                                   hover_color="#AAA9AD",
@@ -102,8 +104,165 @@ class MainWindow:
                                                   height=40,
                                                   hover=True,
                                                   command=lambda: ResultsPage())
-        express_scan_button.place(relx=.27)
+        schedule_scan_button.place(relx=.27)
         # </editor-fold>
+
+class FullScanConfirmPage:
+
+    def __init__(self):
+        global root
+
+        for widget in root.winfo_children()[1:]:
+            widget.destroy()
+
+        root.configure(background="#2a3439")
+
+        # Frame for scan confirmation dialog box
+        scan_confirm_frame = tk.Frame(root, bg="#2a3439")
+        scan_confirm_frame.place(relx=0.5, rely=0.1, anchor="n")
+        scan_confirm_frame.config(height=root.winfo_height(), width=root.winfo_width())
+
+        scan_confirm_label = tk.Label(scan_confirm_frame, text='What will be scanned:', font=14, bg="#2a3439",
+                                      fg="white")
+        scan_confirm_label.place(relx=0.05, rely=0.05, anchor="w")
+
+        # Container for confirmation dialog
+        scan_confirm_container = tk.Frame(scan_confirm_frame, bg="#1F262A", borderwidth=2)
+        scan_confirm_container.place(relx=0.5, rely=0.1, anchor="n")
+        scan_confirm_container.config(relief=RIDGE, height=250, width=700)
+
+        full_scan_dialog = tk.Label(scan_confirm_container, text='Full Scan: All Program Files Will Be Scanned.',
+                                      font=14, bg="#2a3439", fg="white")
+        full_scan_dialog.place(relx=0.5, rely=0.5, anchor="center")
+
+        continue_button = TkinterCustomButton(master=scan_confirm_frame,
+                                                fg_color="#848689",
+                                                hover_color="#1F262A",
+                                                text_font="Bold, 14",
+                                                text="Continue",
+                                                text_color="white",
+                                                corner_radius=10,
+                                                width=200,
+                                                height=75,
+                                                hover=True,
+                                                command=lambda: ResultsPage())
+        continue_button.place(relx=0.25, rely=0.8, anchor="center")
+
+        cancel_button = TkinterCustomButton(master=scan_confirm_frame,
+                                            fg_color="#5F4866",
+                                            hover_color="#1F262A",
+                                            text_font="Bold, 14",
+                                            text="Cancel",
+                                            text_color="white",
+                                            corner_radius=10,
+                                            width=100,
+                                            height=50,
+                                            hover=True,
+                                            command=lambda: MainWindow())
+        cancel_button.place(relx=0.70, rely=0.8, anchor="center")
+
+class ExpressScanConfirmPage:
+
+    def __init__(self):
+        global root
+
+        for widget in root.winfo_children()[1:]:
+            widget.destroy()
+
+        # Function for opening the
+        # file explorer window
+        def browseFiles():
+            filenames = filedialog.askopenfilenames(initialdir="C:\Program Files",
+                                                  title="Select Files",
+                                                  filetypes=(("all files",
+                                                              "*.*"),
+                                                            ("Text files",
+                                                              "*.txt*")))
+            files_list = list(filenames)
+            ctr = 0
+
+            for file in files_list:
+                file_block = tk.Frame(scan_confirm_container, bg="#2a3439")
+                file_block.place(relx=0.5, rely=0.02, anchor="n")
+                file_block.config(height=50, width=860)
+                file_label = tk.Label(file_block, text=files_list[ctr], font=14, bg="#2a3439", fg="white",
+                                      wraplength=845, justify='left')
+                file_label.place(relx=0.01, rely=0.5, anchor="w")
+                file_block.grid(row=ctr, column=0, padx=10, pady=5)
+
+                ctr = ctr + 1
+
+            if ctr > 6:
+                scan_confirim_sb = ttk.Scrollbar(scan_confirm_canvas, orient="vertical",
+                                                     command=scan_confirm_canvas.yview)
+                scan_confirim_sb.place(relx=0.98, height = 350)
+                scan_confirm_canvas.configure(yscrollcommand=scan_confirim_sb.set)
+
+
+        root.configure(background="#2a3439")
+
+        # Frame for scan confirmation dialog box
+        scan_confirm_frame = tk.Frame(root, bg="#2a3439")
+        scan_confirm_frame.place(relx=0.5, rely=0.1, anchor="n")
+        scan_confirm_frame.config(height=root.winfo_height(), width=root.winfo_width())
+
+        scan_confirm_label = tk.Label(scan_confirm_frame, text='What will be scanned:', font=14, bg="#2a3439", fg="white")
+        scan_confirm_label.place(relx=0.05, rely=0.05, anchor="w")
+
+        scan_confirm_canvas = tk.Canvas(scan_confirm_frame, height=350, width=900, bg="#2a3439")
+        scan_confirm_canvas.place(relx=0.5, rely=0.1, anchor="n")
+
+        # Container for files to be scanned
+        scan_confirm_container = tk.Frame(scan_confirm_canvas, bg="#1F262A", borderwidth=2)
+        scan_confirm_container.place(relx=0.5, rely=0.1, anchor="n")
+        scan_confirm_container.config(relief=RIDGE, height=350, width=900)
+        scan_confirm_container.bind(
+            "<Configure>",
+            lambda e: scan_confirm_canvas.configure(
+                scrollregion=scan_confirm_canvas.bbox("all")
+            )
+        )
+        scan_confirm_canvas.create_window((0, 0), window=scan_confirm_container, anchor="nw")
+
+
+        continue_button = TkinterCustomButton(master=scan_confirm_frame,
+                                                fg_color="#848689",
+                                                hover_color="#1F262A",
+                                                text_font="Bold, 14",
+                                                text="Continue",
+                                                text_color="white",
+                                                corner_radius=10,
+                                                width=200,
+                                                height=75,
+                                                hover=True,
+                                                command=lambda: ResultsPage())
+        continue_button.place(relx=0.25, rely=0.8, anchor="center")
+
+        add_files_button = TkinterCustomButton(master=scan_confirm_frame,
+                                                     fg_color="#8797AF",
+                                                     hover_color="#1F262A",
+                                                     text_font="Bold, 14",
+                                                     text="Add Files",
+                                                     text_color="white",
+                                                     corner_radius=10,
+                                                     width=200,
+                                                     height=75,
+                                                     hover=True,
+                                                     command=lambda: browseFiles())
+        add_files_button.place(relx=0.5, rely=0.8, anchor="center")
+
+        cancel_button = TkinterCustomButton(master=scan_confirm_frame,
+                                            fg_color="#5F4866",
+                                            hover_color="#1F262A",
+                                            text_font="Bold, 14",
+                                            text="Cancel",
+                                            text_color="white",
+                                            corner_radius=10,
+                                            width=100,
+                                            height=50,
+                                            hover=True,
+                                            command=lambda: MainWindow())
+        cancel_button.place(relx=0.70, rely=0.8, anchor="center")
 
 
 class ResultsPage:
@@ -343,7 +502,7 @@ class SettingsPage:
 
         root.configure(background="#2a3439")
 
-        settings_frame = Frame(root)
+        settings_frame = tk.Frame(root)
         settings_frame.place(relx=0.5, rely=0.5, anchor='center')
         settings_frame.config(height=500, width=700)
         settings_frame.config(relief=RIDGE)
@@ -357,8 +516,8 @@ class SettingsPage:
         set_options_frame.config(relief=RIDGE)
         set_options_frame.config(padding=(30, 15))
 
-        set_1_label = ttk.Label(set_options_frame, text='Text size')
-        set_1_label.grid(row=0, column=0, padx=50, pady=30)
+        text_size_label = ttk.Label(set_options_frame, text='Text size')
+        text_size_label.grid(row=0, column=0, padx=50, pady=30)
         decrease_txt_size_button = ttk.Button(set_options_frame, text='-')
         decrease_txt_size_button.grid(row=0, column=1)
         txt_size_entry = ttk.Entry(set_options_frame, width=5)
@@ -367,36 +526,27 @@ class SettingsPage:
         increase_txt_size_button = ttk.Button(set_options_frame, text='+')
         increase_txt_size_button.grid(row=0, column=3)
 
-        set_2_label = ttk.Label(set_options_frame, text='Sort scan results...')
-        set_2_label.grid(row=1, column=0, padx=50)
-        sort_order = StringVar()
-        set_2_button_1 = ttk.Radiobutton(set_options_frame, text='By severity', variable=sort_order, value='severity')
-        set_2_button_1.grid(row=1, column=2)
-        set_2_button_2 = ttk.Radiobutton(set_options_frame, text='In order discovered', variable=sort_order,
-                                         value='discovered')
-        set_2_button_2.grid(row=2, column=2)
+        ignore_directories_label = ttk.Label(set_options_frame, text='Choose directories to ignore:')
+        ignore_directories_label.grid(row=1, column=0, padx=50, pady=30)
+        browse_button = ttk.Button(set_options_frame, text='Browse...')
+        browse_button.grid(row=1, column=2)
 
-        set_3_label = ttk.Label(set_options_frame, text='Choose directories to ignore:')
-        set_3_label.grid(row=3, column=0, padx=50, pady=30)
-        set_3_button = ttk.Button(set_options_frame, text='Browse...')
-        set_3_button.grid(row=3, column=2)
-
-        set_4_label = ttk.Label(set_options_frame, text='When scan finishes...')
-        set_4_label.grid(row=4, column=0, padx=50)
+        set_3_label = ttk.Label(set_options_frame, text='When scan finishes...')
+        set_3_label.grid(row=2, column=0, padx=50)
         after_scan = StringVar()
-        set_4_button_1 = ttk.Radiobutton(set_options_frame, text='Do Nothing', variable=after_scan, value='nothing')
-        set_4_button_1.grid(row=4, column=2)
-        set_4_button_2 = ttk.Radiobutton(set_options_frame, text='Close the program', variable=after_scan,
+        set_3_button_1 = ttk.Radiobutton(set_options_frame, text='Do Nothing', variable=after_scan, value='nothing')
+        set_3_button_1.grid(row=2, column=2)
+        set_3_button_2 = ttk.Radiobutton(set_options_frame, text='Close the program', variable=after_scan,
                                          value='close')
-        set_4_button_2.grid(row=5, column=2)
-        set_4_button_3 = ttk.Radiobutton(set_options_frame, text='Shut down computer', variable=after_scan,
+        set_3_button_2.grid(row=3, column=2)
+        set_3_button_3 = ttk.Radiobutton(set_options_frame, text='Shut down computer', variable=after_scan,
                                          value='shut_down')
-        set_4_button_3.grid(row=6, column=2)
+        set_3_button_3.grid(row=4, column=2)
 
-        set_5_label = ttk.Label(set_options_frame, text='Reset Default Settings')
-        set_5_label.grid(row=7, column=0, padx=50, pady=30)
-        set_5_button = ttk.Button(set_options_frame, text='Reset')
-        set_5_button.grid(row=7, column=2)
+        reset_settings_label = ttk.Label(set_options_frame, text='Reset Default Settings')
+        reset_settings_label.grid(row=5, column=0, padx=50, pady=30)
+        reset_button = ttk.Button(set_options_frame, text='Reset')
+        reset_button.grid(row=5, column=2)
 
         apply_button = ttk.Button(settings_frame, text='Apply')
         apply_button.place(relx=0.5, rely=0.95, anchor='center')

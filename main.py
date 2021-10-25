@@ -1,3 +1,11 @@
+'''
+    This is the main.py class for the Software Inventory Tool Project
+    This is the main file that will generate the whole of the GUI
+    This file imports from the PageClasses.py and tkinter_custom_button files
+    This file was entirely made by the Puffins Team
+    Version:10.20.2021
+'''
+
 from PageClasses import *
 from PageClasses import root as root
 
@@ -14,6 +22,12 @@ def create_window():
     x = (screen_width / 2) - (app_width / 2)
     y = (screen_height / 2) - (app_height / 2)
     root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
+
+    # Changes the default tkinter to our Sieve logo when minimized
+    root.iconbitmap('logo.ico')
+
+    # Change the text after minimizing the tool to task bar
+    root.title("Sieve")
 
     # remove title bar
     root.overrideredirect(True)
@@ -38,7 +52,7 @@ def create_window():
                                       width=75,
                                       height=40,
                                       hover=True,
-                                      command=lambda: call_main())
+                                      command=lambda: MainWindow())
     home_button.pack(side=LEFT, padx=5)
 
     # Create Login Button
@@ -96,34 +110,6 @@ def create_window():
                                       hover=True,
                                       command=lambda: HelpPage())
     help_button.pack(side=LEFT, padx=5)
-
-    # Create Scan
-    scan_button = TkinterCustomButton(master=root, bg_color="#2a3439",
-                                      fg_color="#1F262A",
-                                      hover_color="#AAA9AD",
-                                      text_font="Bold, 14",
-                                      text="Full Scan",
-                                      text_color="white",
-                                      corner_radius=10,
-                                      width=90,
-                                      height=40,
-                                      hover=True,
-                                      command=lambda: ResultsPage())
-    scan_button.place(relx=.04, rely=.1)
-
-    # Create Express Scan Button
-    express_scan_button = TkinterCustomButton(master=root, bg_color="#2a3439",
-                                      fg_color="#1F262A",
-                                      hover_color="#AAA9AD",
-                                      text_font="Bold, 14",
-                                      text="Express Scan",
-                                      text_color="white",
-                                      corner_radius=10,
-                                      width=130,
-                                      height=40,
-                                      hover=True,
-                                      command=lambda: ResultsPage())
-    express_scan_button.place(relx=.15, rely=.1)
 
     close_button = Button(title_bar, text='  ×  ', command=root.destroy, bg="#1f262A", padx=2, pady=2,
                           font=("calibre", 13),
@@ -211,14 +197,19 @@ def create_window():
     minimize_button.bind('<Enter>', changem_size_on_hovering)
     minimize_button.bind('<Leave>', returnm_size_on_hovering)
 
-    root.mainloop()
+
+def init_data():
+    cveobj = CVEDataFrame()
+    cveobj.create_metadata()
+    # cveobj.select_record_by_name('excel')
 
 
 def call_main():
-    MainWindow()
+    init_data()
     create_window()
+    LoginPage()
 
 
 if __name__ == '__main__':
-    MainWindow()
-    create_window()
+    call_main()
+    root.mainloop()

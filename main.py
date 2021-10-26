@@ -9,7 +9,6 @@
 from PageClasses import *
 from PageClasses import root as root
 
-
 def create_window():
     # Window background color
     root.configure(background="#2a3439")
@@ -201,7 +200,7 @@ def create_window():
 def init_data():
     cveobj = CVEDataFrame()
     cveobj.create_metadata()
-    # cveobj.select_record_by_name('excel')
+    # print(cveobj.select_record_by_name('excel'))
 
 
 def call_main():

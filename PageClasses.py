@@ -8,6 +8,7 @@
 
 from tkinter import *
 from tkinter import ttk
+import tkinter as tk
 from tkinter_custom_button import TkinterCustomButton
 from Database import *
 from tkinter import filedialog

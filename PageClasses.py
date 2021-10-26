@@ -11,10 +11,12 @@ from tkinter import ttk
 from tkinter_custom_button import TkinterCustomButton
 from Database import *
 from tkinter import filedialog
+import tkinter as tk
+import os
 
 
 root = Tk()
-
+global files_list
 
 def move_app(e):
     root.geometry(f'+{e.x_root}+{e.y_root}')
@@ -47,6 +49,8 @@ def frame_mapped(e):
     root.update_idletasks()
     root.overrideredirect(True)
     root.state('normal')
+
+
 
 
 class MainWindow:
@@ -172,6 +176,7 @@ class ExpressScanConfirmPage:
         # Function for opening the
         # file explorer window
         def browseFiles():
+            global files_list
             filenames = filedialog.askopenfilenames(initialdir="C:\Program Files",
                                                   title="Select Files",
                                                   filetypes=(("all files",
@@ -202,18 +207,18 @@ class ExpressScanConfirmPage:
         root.configure(background="#2a3439")
 
         # Frame for scan confirmation dialog box
-        scan_confirm_frame = tk.Frame(root, bg="#2a3439")
+        scan_confirm_frame = Frame(root, bg="#2a3439")
         scan_confirm_frame.place(relx=0.5, rely=0.1, anchor="n")
         scan_confirm_frame.config(height=root.winfo_height(), width=root.winfo_width())
 
-        scan_confirm_label = tk.Label(scan_confirm_frame, text='What will be scanned:', font=14, bg="#2a3439", fg="white")
+        scan_confirm_label = Label(scan_confirm_frame, text='What will be scanned:', font=14, bg="#2a3439", fg="white")
         scan_confirm_label.place(relx=0.05, rely=0.05, anchor="w")
 
-        scan_confirm_canvas = tk.Canvas(scan_confirm_frame, height=350, width=900, bg="#2a3439")
+        scan_confirm_canvas = Canvas(scan_confirm_frame, height=350, width=900, bg="#2a3439")
         scan_confirm_canvas.place(relx=0.5, rely=0.1, anchor="n")
 
         # Container for files to be scanned
-        scan_confirm_container = tk.Frame(scan_confirm_canvas, bg="#1F262A", borderwidth=2)
+        scan_confirm_container = Frame(scan_confirm_canvas, bg="#1F262A", borderwidth=2)
         scan_confirm_container.place(relx=0.5, rely=0.1, anchor="n")
         scan_confirm_container.config(relief=RIDGE, height=350, width=900)
         scan_confirm_container.bind(
@@ -235,7 +240,7 @@ class ExpressScanConfirmPage:
                                                 width=200,
                                                 height=75,
                                                 hover=True,
-                                                command=lambda: ResultsPage())
+                                                command=lambda: ResultsPage.printResults(self))
         continue_button.place(relx=0.25, rely=0.8, anchor="center")
 
         add_files_button = TkinterCustomButton(master=scan_confirm_frame,
@@ -373,6 +378,24 @@ class ResultsPage:
         cancel_button.place(relx=0.70, rely=0.8, anchor="center")
         # </editor-fold>
 
+    def printResults(self):
+        cve = CVEDataFrame()
+        cve.create_metadata()
+        for record in files_list:
+            base = os.path.basename(record)
+            os.path.splitext(base)
+            os.path.splitext(base)[0]
+            base = base[:-4]
+            print(cve.select_record_by_name(base))
+
+        # results_example = Frame(results_container, bg="#2a3439")
+        # results_example.place(relx=0.5, rely=0.02, anchor="n")
+        # results_example.config(height=50, width=900)
+        # results_example1_label = Label(results_example, text= cve.select_record_by_name(base), font=14, bg="#2a3439", fg="#5B676D")
+        # results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
+
+
+
 
 class HelpPage:
 
@@ -382,31 +405,15 @@ class HelpPage:
         for widget in root.winfo_children()[1:]:
             widget.destroy()
 
-        # Everything Commented out is for adding a scroll bar
-
-        root.configure(background="#2a3439")
-
-        helper_frame = Frame(root, bg="#2a3439")
-        helper_frame.pack(fill=BOTH, expand=1)
-
-        helper_canvas = Canvas(helper_frame)
-        helper_canvas.pack(side=LEFT, fill=BOTH, expand=1)
-
-        helper_scrollbar = ttk.Scrollbar(helper_frame, orient=VERTICAL, command=helper_canvas.yview)
-        helper_scrollbar.pack(side=RIGHT, fill=Y)
-
-        helper_canvas.configure(yscrollcommand=helper_scrollbar.set)
-        helper_canvas.bind('<Configure>', lambda e: helper_canvas.configure(scrollregion=helper_canvas.bbox("all")))
-
         root.configure(background="#2a3439")
 
         # <editor-fold desc="Results GUI">
         # Frame for whole results page
-        help_frame = Frame(helper_frame, bg="#2a3439")
+        help_frame = Frame(root, bg="#2a3439")
         help_frame.place(relx=0.5, rely=0.1, anchor="n")
         help_frame.config(height=root.winfo_height(), width=root.winfo_width())
 
-        helper_canvas.create_window((0, 0), window=help_frame)
+
 
         # Container for results
         help_container = Frame(help_frame, bg="#1F262A", borderwidth=2)

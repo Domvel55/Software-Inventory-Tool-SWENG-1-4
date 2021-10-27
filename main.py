@@ -200,9 +200,7 @@ def create_window():
 
 
 def init_data():
-    cveobj = CVEDataFrame()
-    cveobj.create_metadata()
-    # print(cveobj.select_record_by_name('excel'))
+    CVEDataFrame().create_metadata()
 
 
 def call_main():

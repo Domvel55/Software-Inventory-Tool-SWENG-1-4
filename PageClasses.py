@@ -16,13 +16,12 @@ import tkinter as tk
 import os
 import datetime
 
-
-
 root = Tk()
 global files_list
 now = "Last Scanned: ----"
 global last_page
 last_page = ""
+
 
 def move_app(e):
     root.geometry(f'+{e.x_root}+{e.y_root}')
@@ -50,21 +49,24 @@ def maximize_me(e):
         root.maximized = not root.maximized
         # now it is not maximized
 
+
 def last_time_clicked():
     global now
     now = datetime.datetime.now().strftime("Last Scan: %b %d %Y, %I:%M:%S %p")
+
 
 def frame_mapped(e):
     root.update_idletasks()
     root.overrideredirect(True)
     root.state('normal')
 
-#ToolTip class for making tips that appear after hovering mouse over button for 0.5 seconds
+
+# ToolTip class for making tips that appear after hovering mouse over button for 0.5 seconds
 class ToolTip(object):
 
     def __init__(self, widget, text='widget info'):
-        self.waittime = 500     #miliseconds
-        self.wraplength = 180   #pixels
+        self.waittime = 500  # miliseconds
+        self.wraplength = 180  # pixels
         self.widget = widget
         self.text = text
         self.widget.bind("<Enter>", self.enter)
@@ -90,28 +92,28 @@ class ToolTip(object):
         if id:
             self.widget.after_cancel(id)
 
-    #Creates tip after 0.5 seconds
+    # Creates tip after 0.5 seconds
     def showtip(self, event=None):
         x = y = 0
         x, y, cx, cy = self.widget.bbox("insert")
         x += self.widget.winfo_rootx() + 25
         y += self.widget.winfo_rooty() + 20
-        #Makes frame for tip
+        # Makes frame for tip
         self.tw = Toplevel(self.widget)
-        #Gets rid of the window for the frame for tip
+        # Gets rid of the window for the frame for tip
         self.tw.wm_overrideredirect(True)
         self.tw.wm_geometry("+%d+%d" % (x, y))
-        #Tip customization
+        # Tip customization
         label = ttk.Label(self.tw, text=self.text, justify='left',
-                       background="#ffffff", relief='solid', borderwidth=1,
-                       wraplength = self.wraplength)
+                          background="#ffffff", relief='solid', borderwidth=1,
+                          wraplength=self.wraplength)
         label.pack(ipadx=1)
 
-    #Hides tip after taking mouse off the button
+    # Hides tip after taking mouse off the button
     def hidetip(self):
-       tw = self.tw
-       self.tw= None
-       if tw:
+        tw = self.tw
+        self.tw = None
+        if tw:
             tw.destroy()
 
 
@@ -134,7 +136,7 @@ class MainWindow:
             main_frame.place(relx=0.5, rely=0.1, anchor="n")
             main_frame.config(height=root.winfo_height(), width=root.winfo_width())
 
-            #LabelFrame that shows thew Last time some thing was scanned. Initialized as "Last Scanned: ----"
+            # LabelFrame that shows thew Last time some thing was scanned. Initialized as "Last Scanned: ----"
             scan_time_frame = LabelFrame(main_frame, bg="#2a3439", fg="white", font=10, text=now, relief=FLAT)
             scan_time_frame.place(relx=0.18, rely=0.1, anchor="n")
             scan_time_frame.config(height=40, width=340)
@@ -169,19 +171,20 @@ class MainWindow:
             express_scan_button.place(relx=.12)
 
             schedule_scan_button = TkinterCustomButton(master=main_frame,
-                                                      bg_color="#2a3439",
-                                                      fg_color="#1F262A",
-                                                      hover_color="#AAA9AD",
-                                                      text_font="Bold, 14",
-                                                      text="Schedule Scan",
-                                                      text_color="white",
-                                                      corner_radius=10,
-                                                      width=130,
-                                                      height=40,
-                                                      hover=True,
-                                                      command=lambda: ResultsPage())
+                                                       bg_color="#2a3439",
+                                                       fg_color="#1F262A",
+                                                       hover_color="#AAA9AD",
+                                                       text_font="Bold, 14",
+                                                       text="Schedule Scan",
+                                                       text_color="white",
+                                                       corner_radius=10,
+                                                       width=130,
+                                                       height=40,
+                                                       hover=True,
+                                                       command=lambda: ResultsPage())
             schedule_scan_button.place(relx=.27)
             # </editor-fold>
+
 
 class FullScanConfirmPage:
 
@@ -212,20 +215,20 @@ class FullScanConfirmPage:
             scan_confirm_container.config(relief=RIDGE, height=250, width=700)
 
             full_scan_dialog = tk.Label(scan_confirm_container, text='Full Scan: All Program Files Will Be Scanned.',
-                                          font=14, bg="#2a3439", fg="white")
+                                        font=14, bg="#2a3439", fg="white")
             full_scan_dialog.place(relx=0.5, rely=0.5, anchor="center")
 
             continue_button = TkinterCustomButton(master=scan_confirm_frame,
-                                                    fg_color="#848689",
-                                                    hover_color="#1F262A",
-                                                    text_font="Bold, 14",
-                                                    text="Continue",
-                                                    text_color="white",
-                                                    corner_radius=10,
-                                                    width=200,
-                                                    height=75,
-                                                    hover=True,
-                                                    command=lambda: [ResultsPage(), last_time_clicked()])
+                                                  fg_color="#848689",
+                                                  hover_color="#1F262A",
+                                                  text_font="Bold, 14",
+                                                  text="Continue",
+                                                  text_color="white",
+                                                  corner_radius=10,
+                                                  width=200,
+                                                  height=75,
+                                                  hover=True,
+                                                  command=lambda: [ResultsPage().printResults(), last_time_clicked()])
             continue_button.place(relx=0.25, rely=0.8, anchor="center")
 
             cancel_button = TkinterCustomButton(master=scan_confirm_frame,
@@ -240,6 +243,7 @@ class FullScanConfirmPage:
                                                 hover=True,
                                                 command=lambda: MainWindow())
             cancel_button.place(relx=0.70, rely=0.8, anchor="center")
+
 
 class ExpressScanConfirmPage:
 
@@ -258,11 +262,11 @@ class ExpressScanConfirmPage:
             def browseFiles():
                 global files_list
                 filenames = filedialog.askopenfilenames(initialdir="C:\Program Files",
-                                                      title="Select Files",
-                                                      filetypes=(("all files",
-                                                                  "*.*"),
-                                                                ("Text files",
-                                                                  "*.txt*")))
+                                                        title="Select Files",
+                                                        filetypes=(("all files",
+                                                                    "*.*"),
+                                                                   ("Text files",
+                                                                    "*.txt*")))
                 files_list = list(filenames)
                 ctr = 0
 
@@ -279,10 +283,9 @@ class ExpressScanConfirmPage:
 
                 if ctr > 6:
                     scan_confirim_sb = ttk.Scrollbar(scan_confirm_canvas, orient="vertical",
-                                                         command=scan_confirm_canvas.yview)
-                    scan_confirim_sb.place(relx=0.98, height = 350)
+                                                     command=scan_confirm_canvas.yview)
+                    scan_confirim_sb.place(relx=0.98, height=350)
                     scan_confirm_canvas.configure(yscrollcommand=scan_confirim_sb.set)
-
 
             root.configure(background="#2a3439")
 
@@ -291,7 +294,8 @@ class ExpressScanConfirmPage:
             scan_confirm_frame.place(relx=0.5, rely=0.1, anchor="n")
             scan_confirm_frame.config(height=root.winfo_height(), width=root.winfo_width())
 
-            scan_confirm_label = Label(scan_confirm_frame, text='What will be scanned:', font=14, bg="#2a3439", fg="white")
+            scan_confirm_label = Label(scan_confirm_frame, text='What will be scanned:', font=14, bg="#2a3439",
+                                       fg="white")
             scan_confirm_label.place(relx=0.05, rely=0.05, anchor="w")
 
             scan_confirm_canvas = Canvas(scan_confirm_frame, height=350, width=900, bg="#2a3439")
@@ -309,31 +313,30 @@ class ExpressScanConfirmPage:
             )
             scan_confirm_canvas.create_window((0, 0), window=scan_confirm_container, anchor="nw")
 
-
             continue_button = TkinterCustomButton(master=scan_confirm_frame,
-                                                    fg_color="#848689",
-                                                    hover_color="#1F262A",
-                                                    text_font="Bold, 14",
-                                                    text="Continue",
-                                                    text_color="white",
-                                                    corner_radius=10,
-                                                    width=200,
-                                                    height=75,
-                                                    hover=True,
-                                                    command=lambda: [last_time_clicked(), ResultsPage.printResults(self)])
+                                                  fg_color="#848689",
+                                                  hover_color="#1F262A",
+                                                  text_font="Bold, 14",
+                                                  text="Continue",
+                                                  text_color="white",
+                                                  corner_radius=10,
+                                                  width=200,
+                                                  height=75,
+                                                  hover=True,
+                                                  command=lambda: [last_time_clicked(), ResultsPage.printResults(self)])
             continue_button.place(relx=0.25, rely=0.8, anchor="center")
 
             add_files_button = TkinterCustomButton(master=scan_confirm_frame,
-                                                         fg_color="#8797AF",
-                                                         hover_color="#1F262A",
-                                                         text_font="Bold, 14",
-                                                         text="Add Files",
-                                                         text_color="white",
-                                                         corner_radius=10,
-                                                         width=200,
-                                                         height=75,
-                                                         hover=True,
-                                                         command=lambda: browseFiles())
+                                                   fg_color="#8797AF",
+                                                   hover_color="#1F262A",
+                                                   text_font="Bold, 14",
+                                                   text="Add Files",
+                                                   text_color="white",
+                                                   corner_radius=10,
+                                                   width=200,
+                                                   height=75,
+                                                   hover=True,
+                                                   command=lambda: browseFiles())
             add_files_button.place(relx=0.5, rely=0.8, anchor="center")
 
             cancel_button = TkinterCustomButton(master=scan_confirm_frame,
@@ -364,7 +367,15 @@ class ResultsPage:
 
             root.configure(background="#2a3439")
 
-            # <editor-fold desc="Results Buttons">
+            results_frame = Frame(root, bg="#2a3439")
+            results_frame.place(relx=0.5, rely=0.1, anchor="n")
+            results_frame.config(height=root.winfo_height(), width=root.winfo_width())
+
+            # Container for results
+            results_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
+            results_container.place(relx=0.5, rely=0.1, anchor="n")
+            results_container.config(relief=RIDGE)
+
             update_all_button = TkinterCustomButton(master=results_frame,
                                                     fg_color="#848689",
                                                     hover_color="#1F262A",
@@ -390,25 +401,25 @@ class ResultsPage:
                                                          hover=True,
                                                          command=lambda: None)
             update_selected_button.place(relx=0.5, rely=0.8, anchor="center")
-            
+
             cancel_button = TkinterCustomButton(master=results_frame,
-                                            fg_color="#5F4866",
-                                            hover_color="#1F262A",
-                                            text_font="Bold, 14",
-                                            text="Cancel",
-                                            text_color="white",
-                                            corner_radius=10,
-                                            width=100,
-                                            height=50,
-                                            hover=True,
-                                            command=lambda: None)
-          cancel_button.place(relx=0.70, rely=0.8, anchor="center")
-           # </editor-fold>
+                                                fg_color="#5F4866",
+                                                hover_color="#1F262A",
+                                                text_font="Bold, 14",
+                                                text="Cancel",
+                                                text_color="white",
+                                                corner_radius=10,
+                                                width=100,
+                                                height=50,
+                                                hover=True,
+                                                command=lambda: None)
+            cancel_button.place(relx=0.70, rely=0.8, anchor="center")
+            # </editor-fold>
 
     def printResults(self):
-        cve = CVEDataFrame()
-        cve.create_metadata()
+        global files_list
 
+        cve = CVEDataFrame()
         list_results = []
 
         results_frame = Frame(root, bg="#2a3439")
@@ -420,7 +431,6 @@ class ResultsPage:
         results_container.place(relx=0.5, rely=0.1, anchor="n")
         results_container.config(relief=RIDGE)
 
-
         for record in files_list:
             base = os.path.basename(record)
             os.path.splitext(base)
@@ -429,14 +439,53 @@ class ResultsPage:
             print(cve.select_record_by_name(base))
             list_results.append(cve.select_record_by_name(base))
 
+        for i in range(len(list_results)):
+            results_example = Frame(results_container, bg="#2a3439")
+            results_example.place(relx=0.5, rely=0.02, anchor="n")
+            results_example.config(height=50, width=900)
+            results_example1_label = Label(results_example, text=str(list_results[i]), font=14, bg="#2a3439", fg="#5B676D")
+            results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
+            results_example.grid(row=i, column=0, padx=10, pady=5)
 
-            for i in range(len(list_results)):
-                results_example = Frame(results_container, bg="#2a3439")
-                results_example.place(relx=0.5, rely=0.02, anchor="n")
-                results_example.config(height=50, width=900)
-                results_example1_label = Label(results_example, text= list_results[i], font=14, bg="#2a3439", fg="#5B676D")
-                results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
-                results_example.grid(row=i, column=0, padx=10, pady=5)
+        update_all_button = TkinterCustomButton(master=results_frame,
+                                                fg_color="#848689",
+                                                hover_color="#1F262A",
+                                                text_font="Bold, 14",
+                                                text="Update All",
+                                                text_color="white",
+                                                corner_radius=10,
+                                                width=200,
+                                                height=75,
+                                                hover=True,
+                                                command=lambda: None)
+        update_all_button.place(relx=0.25, rely=0.8, anchor="center")
+
+        update_selected_button = TkinterCustomButton(master=results_frame,
+                                                     fg_color="#8797AF",
+                                                     hover_color="#1F262A",
+                                                     text_font="Bold, 14",
+                                                     text="Update Selected",
+                                                     text_color="white",
+                                                     corner_radius=10,
+                                                     width=200,
+                                                     height=75,
+                                                     hover=True,
+                                                     command=lambda: None)
+        update_selected_button.place(relx=0.5, rely=0.8, anchor="center")
+
+        cancel_button = TkinterCustomButton(master=results_frame,
+                                            fg_color="#5F4866",
+                                            hover_color="#1F262A",
+                                            text_font="Bold, 14",
+                                            text="Cancel",
+                                            text_color="white",
+                                            corner_radius=10,
+                                            width=100,
+                                            height=50,
+                                            hover=True,
+                                            command=lambda: None)
+        cancel_button.place(relx=0.70, rely=0.8, anchor="center")
+        # </editor-fold>
 
 
 class HelpPage:
@@ -458,8 +507,6 @@ class HelpPage:
             help_frame = Frame(root, bg="#2a3439")
             help_frame.place(relx=0.5, rely=0.1, anchor="n")
             help_frame.config(height=root.winfo_height(), width=root.winfo_width())
-
-
 
             # Container for results
             help_container = Frame(help_frame, bg="#1F262A", borderwidth=2)
@@ -639,7 +686,8 @@ class LoginPage:
             login_page_label.place(relx=0.5, rely=0.15, anchor='center')
 
             # Login username and RSA token labels and entries
-            username_label = Label(login_inner_frame, text='Username', font=15, background="#2a3439", foreground="white")
+            username_label = Label(login_inner_frame, text='Username', font=15, background="#2a3439",
+                                   foreground="white")
             username_label.place(relx=0.5, rely=0.3, anchor="center")
             username_entry = Entry(login_inner_frame, background="#1F262A", foreground="white", font=15)
             username_entry.place(relx=0.5, rely=0.4, anchor='center')

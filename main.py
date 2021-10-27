@@ -6,8 +6,10 @@
     Version:10.20.2021
 '''
 
+
 from PageClasses import *
 from PageClasses import root as root
+
 
 def create_window():
     # Window background color

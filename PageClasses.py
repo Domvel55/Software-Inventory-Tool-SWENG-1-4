@@ -155,6 +155,7 @@ class MainWindow:
                                               hover=True,
                                               command=lambda: FullScanConfirmPage())
             scan_button.place(relx=.01)
+            ToolTip(scan_button, "Scans all the software files from list.")
 
             express_scan_button = TkinterCustomButton(master=main_frame,
                                                       bg_color="#2a3439",
@@ -169,6 +170,7 @@ class MainWindow:
                                                       hover=True,
                                                       command=lambda: ExpressScanConfirmPage())
             express_scan_button.place(relx=.12)
+            ToolTip(express_scan_button, "Scans the most important software files.")
 
             schedule_scan_button = TkinterCustomButton(master=main_frame,
                                                        bg_color="#2a3439",

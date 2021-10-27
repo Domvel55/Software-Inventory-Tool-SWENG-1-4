@@ -364,63 +364,6 @@ class ResultsPage:
 
             root.configure(background="#2a3439")
 
-            # <editor-fold desc="Results GUI">
-            # Frame for whole results page
-            results_frame = Frame(root, bg="#2a3439")
-            results_frame.place(relx=0.5, rely=0.1, anchor="n")
-            results_frame.config(height=root.winfo_height(), width=root.winfo_width())
-
-            # Container for results
-            results_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
-            results_container.place(relx=0.5, rely=0.1, anchor="n")
-            results_container.config(relief=RIDGE)
-
-            # Result examples
-            results_example1 = Frame(results_container, bg="#2a3439")
-            results_example1.place(relx=0.5, rely=0.02, anchor="n")
-            results_example1.config(height=50, width=900)
-            results_example1_label = Label(results_example1, text='Software 1', font=14, bg="#2a3439", fg="#5B676D")
-            results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
-
-            results_example2 = Frame(results_container, bg="#2a3439")
-            results_example2.place(relx=0.5, rely=0.02, anchor="n")
-            results_example2.config(height=50, width=900)
-            results_example2_label = Label(results_example2, text='Software 2', font=14, bg="#2a3439", fg="#5B676D")
-            results_example2_label.place(relx=0.01, rely=0.5, anchor="w")
-
-            results_example3 = Frame(results_container, bg="#2a3439")
-            results_example3.place(relx=0.5, rely=0.02, anchor="n")
-            results_example3.config(height=50, width=900)
-            results_example3_label = Label(results_example3, text='Software 3', font=14, bg="#2a3439", fg="#5B676D")
-            results_example3_label.place(relx=0.01, rely=0.5, anchor="w")
-
-            results_example4 = Frame(results_container, bg="#2a3439")
-            results_example4.place(relx=0.5, rely=0.02, anchor="n")
-            results_example4.config(height=50, width=900)
-            results_example4_label = Label(results_example4, text='Software 4', font=14, bg="#2a3439", fg="#5B676D")
-            results_example4_label.place(relx=0.01, rely=0.5, anchor="w")
-
-            results_example5 = Frame(results_container, bg="#2a3439")
-            results_example5.place(relx=0.5, rely=0.02, anchor="n")
-            results_example5.config(height=50, width=900)
-            results_example5_label = Label(results_example5, text='Software 5', font=14, bg="#2a3439", fg="#5B676D")
-            results_example5_label.place(relx=0.01, rely=0.5, anchor="w")
-
-            results_example6 = Frame(results_container, bg="#2a3439")
-            results_example6.place(relx=0.5, rely=0.02, anchor="n")
-            results_example6.config(height=50, width=900)
-            results_example6_label = Label(results_example6, text='Software 6', font=14, bg="#2a3439", fg="#5B676D")
-            results_example6_label.place(relx=0.01, rely=0.5, anchor="w")
-
-            # Align results in a grid
-            results_example1.grid(row=0, column=0, padx=10, pady=5)
-            results_example2.grid(row=1, column=0, padx=10, pady=5)
-            results_example3.grid(row=2, column=0, padx=10, pady=5)
-            results_example4.grid(row=3, column=0, padx=10, pady=5)
-            results_example5.grid(row=4, column=0, padx=10, pady=5)
-            results_example6.grid(row=5, column=0, padx=10, pady=5)
-            # </editor-fold>
-
             # <editor-fold desc="Results Buttons">
             update_all_button = TkinterCustomButton(master=results_frame,
                                                     fg_color="#848689",
@@ -447,38 +390,53 @@ class ResultsPage:
                                                          hover=True,
                                                          command=lambda: None)
             update_selected_button.place(relx=0.5, rely=0.8, anchor="center")
-
+            
             cancel_button = TkinterCustomButton(master=results_frame,
-                                                fg_color="#5F4866",
-                                                hover_color="#1F262A",
-                                                text_font="Bold, 14",
-                                                text="Cancel",
-                                                text_color="white",
-                                                corner_radius=10,
-                                                width=100,
-                                                height=50,
-                                                hover=True,
-                                                command=lambda: None)
-            cancel_button.place(relx=0.70, rely=0.8, anchor="center")
-            # </editor-fold>
+                                            fg_color="#5F4866",
+                                            hover_color="#1F262A",
+                                            text_font="Bold, 14",
+                                            text="Cancel",
+                                            text_color="white",
+                                            corner_radius=10,
+                                            width=100,
+                                            height=50,
+                                            hover=True,
+                                            command=lambda: None)
+          cancel_button.place(relx=0.70, rely=0.8, anchor="center")
+           # </editor-fold>
 
-            def printResults(self):
-                cve = CVEDataFrame()
-                cve.create_metadata()
-                for record in files_list:
-                    base = os.path.basename(record)
-                    os.path.splitext(base)
-                    os.path.splitext(base)[0]
-                    base = base[:-4]
-                    print(cve.select_record_by_name(base))
+    def printResults(self):
+        cve = CVEDataFrame()
+        cve.create_metadata()
 
-            # results_example = Frame(results_container, bg="#2a3439")
-            # results_example.place(relx=0.5, rely=0.02, anchor="n")
-            # results_example.config(height=50, width=900)
-            # results_example1_label = Label(results_example, text= cve.select_record_by_name(base), font=14, bg="#2a3439", fg="#5B676D")
-            # results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
+        list_results = []
+
+        results_frame = Frame(root, bg="#2a3439")
+        results_frame.place(relx=0.5, rely=0.1, anchor="n")
+        results_frame.config(height=root.winfo_height(), width=root.winfo_width())
+
+        # Container for results
+        results_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
+        results_container.place(relx=0.5, rely=0.1, anchor="n")
+        results_container.config(relief=RIDGE)
 
 
+        for record in files_list:
+            base = os.path.basename(record)
+            os.path.splitext(base)
+            os.path.splitext(base)[0]
+            base = base[:-4]
+            print(cve.select_record_by_name(base))
+            list_results.append(cve.select_record_by_name(base))
+
+
+            for i in range(len(list_results)):
+                results_example = Frame(results_container, bg="#2a3439")
+                results_example.place(relx=0.5, rely=0.02, anchor="n")
+                results_example.config(height=50, width=900)
+                results_example1_label = Label(results_example, text= list_results[i], font=14, bg="#2a3439", fg="#5B676D")
+                results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
+                results_example.grid(row=i, column=0, padx=10, pady=5)
 
 
 class HelpPage:

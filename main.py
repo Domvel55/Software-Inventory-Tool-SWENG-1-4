@@ -158,6 +158,10 @@ def create_window():
             expand_button.configure(text=" 🗗 ")
         maximize_me(e)
 
+    def refresh(self):
+        if self.frame is not None:
+            self.frame.destroy()
+
     def get_pos(e):  # this is executed when the title bar is clicked to move the window
 
         if not root.maximized:

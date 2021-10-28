@@ -361,6 +361,7 @@ class ResultsPage:
         global root
         global last_page
 
+        # Does a check to see if the page we are currently on to not reload page
         if last_page != "ResultsPage":
             last_page = "ResultsPage"
 
@@ -377,6 +378,54 @@ class ResultsPage:
             results_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
             results_container.place(relx=0.5, rely=0.1, anchor="n")
             results_container.config(relief=RIDGE)
+
+            # Creating Filler Results
+            # These will disappear once a scan happen
+            # These will reappear if clicking off the  Results page and coming back
+            results_example1 = Frame(results_container, bg="#2a3439")
+            results_example1.place(relx=0.5, rely=0.02, anchor="n")
+            results_example1.config(height=50, width=900)
+            results_example1_label = Label(results_example1, text='Software 1', font=14, bg="#2a3439", fg="#5B676D")
+            results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
+
+            results_example2 = Frame(results_container, bg="#2a3439")
+            results_example2.place(relx=0.5, rely=0.02, anchor="n")
+            results_example2.config(height=50, width=900)
+            results_example2_label = Label(results_example2, text='Software 2', font=14, bg="#2a3439", fg="#5B676D")
+            results_example2_label.place(relx=0.01, rely=0.5, anchor="w")
+
+            results_example3 = Frame(results_container, bg="#2a3439")
+            results_example3.place(relx=0.5, rely=0.02, anchor="n")
+            results_example3.config(height=50, width=900)
+            results_example3_label = Label(results_example3, text='Software 3', font=14, bg="#2a3439", fg="#5B676D")
+            results_example3_label.place(relx=0.01, rely=0.5, anchor="w")
+
+            results_example4 = Frame(results_container, bg="#2a3439")
+            results_example4.place(relx=0.5, rely=0.02, anchor="n")
+            results_example4.config(height=50, width=900)
+            results_example4_label = Label(results_example4, text='Software 4', font=14, bg="#2a3439", fg="#5B676D")
+            results_example4_label.place(relx=0.01, rely=0.5, anchor="w")
+
+            results_example5 = Frame(results_container, bg="#2a3439")
+            results_example5.place(relx=0.5, rely=0.02, anchor="n")
+            results_example5.config(height=50, width=900)
+            results_example5_label = Label(results_example5, text='Software 5', font=14, bg="#2a3439", fg="#5B676D")
+            results_example5_label.place(relx=0.01, rely=0.5, anchor="w")
+
+            results_example6 = Frame(results_container, bg="#2a3439")
+            results_example6.place(relx=0.5, rely=0.02, anchor="n")
+            results_example6.config(height=50, width=900)
+            results_example6_label = Label(results_example6, text='Software 6', font=14, bg="#2a3439", fg="#5B676D")
+            results_example6_label.place(relx=0.01, rely=0.5, anchor="w")
+
+            # Align results in a grid
+            results_example1.grid(row=0, column=0, padx=10, pady=5)
+            results_example2.grid(row=1, column=0, padx=10, pady=5)
+            results_example3.grid(row=2, column=0, padx=10, pady=5)
+            results_example4.grid(row=3, column=0, padx=10, pady=5)
+            results_example5.grid(row=4, column=0, padx=10, pady=5)
+            results_example6.grid(row=5, column=0, padx=10, pady=5)
+            # </editor-fold>
 
             update_all_button = TkinterCustomButton(master=results_frame,
                                                     fg_color="#848689",
@@ -434,17 +483,27 @@ class ResultsPage:
         results_container.place(relx=0.5, rely=0.1, anchor="n")
         results_container.config(relief=RIDGE)
 
+        # This will remove the path extension for all of the selected applications
+        # This will loop through all the Files, selected from the sub menu in Express Scan
         for record in files_list:
+            # This will reduce the name to a Application.exe
             base = os.path.basename(record)
+            # This will separate the Application.exe to a list of [Application, .exe]
             os.path.splitext(base)
+            # This will change base to just be the first index of the previous list
             os.path.splitext(base)[0]
             base = base[:-4]
             print(cve.select_record_by_name(base))
+            # This will not add an entry to the results list if nothing is found in the CVE Database
             if not cve.select_record_by_name(base):
                 pass
+            # This will add an entry to the results list with vulnerability from the CVE Database
             else:
                 list_results.append(cve.select_record_by_name(base))
 
+        # This loop will run for the amount of items that are found to have vulnerabilities in the Database
+        # It will send a Sting to the results page with the information
+        # It will only run as many times as vulnerabilities found
         for i in range(len(list_results)):
             results_example = Frame(results_container, bg="#2a3439")
             results_example.place(relx=0.5, rely=0.02, anchor="n")
@@ -520,15 +579,13 @@ class HelpPage:
 
             help_canvas.configure(yscrollcommand=help_sb.set)
             help_canvas.bind('<Configure>',
-                             lambda e: help_canvas.configure(scrollregion = help_canvas.bbox("all")))
-
-
+                             lambda e: help_canvas.configure(scrollregion=help_canvas.bbox("all")))
 
             # <editor-fold desc="Results GUI">
             # Frame for whole results page
             help_frame = Frame(help_canvas)
-            help_canvas.create_window((0,0), window=help_frame, anchor="nw")
-
+            help_frame.configure(bg="#1F262A")
+            help_canvas.create_window((0, 0), window=help_frame, anchor="nw")
 
             # Container for results
             help_container = Frame(help_frame, bg="#1F262A", borderwidth=2)

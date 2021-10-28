@@ -3,7 +3,7 @@
     This is the file that contains all the different functions to create/destroy the different
     windows that generate from clicking buttons on the GUI
     This file was entirely made by the Puffins Team
-    Version:10.20.2021
+    Version:10.27.2021
 """
 
 from tkinter import *
@@ -139,7 +139,7 @@ class MainWindow:
             # LabelFrame that shows thew Last time some thing was scanned. Initialized as "Last Scanned: ----"
             scan_time_frame = LabelFrame(main_frame, bg="#2a3439", fg="white", font=10, text=now, relief=FLAT)
             scan_time_frame.place(relx=0.18, rely=0.1, anchor="n")
-            scan_time_frame.config(height=40, width=340)
+            scan_time_frame.config(height=40, width=350)
 
             # <editor-fold desc="Results Buttons">
             scan_button = TkinterCustomButton(master=main_frame,
@@ -233,7 +233,6 @@ class FullScanConfirmPage:
                                                   command=lambda: [ResultsPage().print_results(), last_time_clicked()])
             continue_button.place(relx=0.25, rely=0.8, anchor="center")
 
-
             cancel_button = TkinterCustomButton(master=scan_confirm_frame,
                                                 fg_color="#5F4866",
                                                 hover_color="#1F262A",
@@ -273,6 +272,7 @@ class ExpressScanConfirmPage:
                 files_list = list(filenames)
                 ctr = 0
 
+                # Display selected files on confirm page
                 for file in files_list:
                     file_block = tk.Frame(scan_confirm_container, bg="#2a3439")
                     file_block.place(relx=0.5, rely=0.02, anchor="n")
@@ -284,6 +284,7 @@ class ExpressScanConfirmPage:
 
                     ctr = ctr + 1
 
+                # Scrollbar if more than 6 files are selected
                 if ctr > 6:
                     scan_confirim_sb = ttk.Scrollbar(scan_confirm_canvas, orient="vertical",
                                                      command=scan_confirm_canvas.yview)
@@ -308,6 +309,7 @@ class ExpressScanConfirmPage:
             scan_confirm_container = Frame(scan_confirm_canvas, bg="#1F262A", borderwidth=2)
             scan_confirm_container.place(relx=0.5, rely=0.1, anchor="n")
             scan_confirm_container.config(relief=RIDGE, height=350, width=900)
+            # Bind scrollbar to container
             scan_confirm_container.bind(
                 "<Configure>",
                 lambda e: scan_confirm_canvas.configure(
@@ -374,6 +376,22 @@ class ResultsPage:
             results_frame = Frame(root, bg="#2a3439")
             results_frame.place(relx=0.5, rely=0.1, anchor="n")
             results_frame.config(height=root.winfo_height(), width=root.winfo_width())
+
+            # Container for filter settings
+            filter_settings_container = tk.Frame(results_frame, bg="#1F262A", borderwidth=2)
+            filter_settings_container.place(relx=0.04, rely=0.0, anchor="nw")
+            filter_settings_container.config(relief=RIDGE)
+
+            sort_scan_label = tk.Label(filter_settings_container, text='Sort scan results...', font='2', bg='#2a3439',
+                                       fg="white")
+            sort_scan_label.grid(row=1, column=0, padx=50)
+            sort_order = StringVar()
+            sort_button_1 = ttk.Radiobutton(filter_settings_container, text='By severity', variable=sort_order,
+                                            value='severity')
+            sort_button_1.grid(row=1, column=2)
+            sort_button_2 = ttk.Radiobutton(filter_settings_container, text='In order discovered', variable=sort_order,
+                                            value='discovered')
+            sort_button_2.grid(row=2, column=2)
 
             # Container for results
             results_container = Frame(results_frame, bg="#1F262A", borderwidth=2)

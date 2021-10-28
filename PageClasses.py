@@ -572,6 +572,21 @@ class ResultsPage:
         cancel_button.place(relx=0.70, rely=0.8, anchor="center")
         # </editor-fold>
 
+        filter_settings_container = tk.Frame(results_frame, bg="#1F262A", borderwidth=2)
+        filter_settings_container.place(relx=0.04, rely=0.0, anchor="nw")
+        filter_settings_container.config(relief=RIDGE)
+
+        sort_scan_label = tk.Label(filter_settings_container, text='Sort scan results...', font='2', bg='#2a3439',
+                                   fg="white")
+        sort_scan_label.grid(row=1, column=0, padx=50)
+        sort_order = StringVar()
+        sort_button_1 = ttk.Radiobutton(filter_settings_container, text='By severity', variable=sort_order,
+                                        value='severity')
+        sort_button_1.grid(row=1, column=2)
+        sort_button_2 = ttk.Radiobutton(filter_settings_container, text='In order discovered', variable=sort_order,
+                                        value='discovered')
+        sort_button_2.grid(row=2, column=2)
+
 
 class HelpPage:
 
@@ -865,6 +880,7 @@ class RegisterPage:
             phone.place(relx=.17, rely=.66)
             phone_entry = Entry(register_frame, background="#2a3439", foreground="white", width=25, font=20)
             phone_entry.place(relx=.4, rely=.66)
+
 
             # Create Account Button (sends you to login page)
             create_button = TkinterCustomButton(master=register_frame,

@@ -646,7 +646,7 @@ class HelpPage:
                     egestas tellus ac lorem egestas, at elementum libero viverra. In volutpat rhoncus
                     dapibus. Morbi eu cursus felis. Mauris vel enim neque. Duis posuere rutrum varius.
                     Curabitur id vestibulum est, in scelerisque orci. Morbi vitae condimentum ante.""" \
-                .replace('\n', ' ').replace('                ', ' ')
+                .replace('\n', ' ').replace('                    ', '')
             help_example1_body_label = Label(help_example1, text=text1, font=20, bg="#2a3439", fg="#FFFFFF",
                                              wraplength=880, justify="left")
             help_example1_body_label.place(relx=0.01, rely=0.25, anchor="nw")
@@ -670,7 +670,7 @@ class HelpPage:
                     egestas tellus ac lorem egestas, at elementum libero viverra. In volutpat rhoncus
                     dapibus. Morbi eu cursus felis. Mauris vel enim neque. Duis posuere rutrum varius.
                     Curabitur id vestibulum est, in scelerisque orci. Morbi vitae condimentum ante.""" \
-                .replace('\n', ' ').replace('                ', ' ')
+                .replace('\n', ' ').replace('                    ', '')
             help_example2_body_label = Label(help_example2, text=text2, font=20, bg="#2a3439", fg="#FFFFFF",
                                              wraplength=880, justify="left")
             help_example2_body_label.place(relx=0.01, rely=0.25, anchor="nw")
@@ -682,19 +682,13 @@ class HelpPage:
                                                bg="#2a3439", fg="#FFFFFF")
             help_example3_header_label.place(relx=0.01, rely=0.1, anchor="nw")
 
-            text3 = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque semper, neque vitae 
-                    placerat interdum, orci nisl hendrerit erat, vel iaculis tellus lacus a nibh. Mauris
-                    consequat nunc non est sollicitudin efficitur. Fusce vestibulum eget est id euismod. Duis
-                    egestas tellus ac lorem egestas, at elementum libero viverra. In volutpat rhoncus
-                    dapibus. Morbi eu cursus felis. Mauris vel enim neque. Duis posuere rutrum varius.
-                    Curabitur id vestibulum est, in scelerisque orci. Morbi vitae condimentum ante.
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque semper, neque vitae 
-                    placerat interdum, orci nisl hendrerit erat, vel iaculis tellus lacus a nibh. Mauris
-                    consequat nunc non est sollicitudin efficitur. Fusce vestibulum eget est id euismod. Duis
-                    egestas tellus ac lorem egestas, at elementum libero viverra. In volutpat rhoncus
-                    dapibus. Morbi eu cursus felis. Mauris vel enim neque. Duis posuere rutrum varius.
-                    Curabitur id vestibulum est, in scelerisque orci. Morbi vitae condimentum ante.""" \
-                .replace('\n', ' ').replace('                ', ' ')
+            text3 = """In its current state, the Software Inventory Tool uses the CVE (Common
+                    Vulnerabilities and Exposures) Database to detect vulnerabilities in software.
+                    Further versions of the Software Inventory Tool may implement more than one
+                    database depending on performance using the CVE database and based on the
+                    availability of accessing other databases that may or may not exist or
+                    be available for public access.""" \
+                .replace('\n', ' ').replace('                    ', '')
             help_example3_body_label = Label(help_example3, text=text3, font=20, bg="#2a3439", fg="#FFFFFF",
                                              wraplength=880, justify="left")
             help_example3_body_label.place(relx=0.01, rely=0.25, anchor="nw")

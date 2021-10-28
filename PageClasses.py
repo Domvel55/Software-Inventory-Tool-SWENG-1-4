@@ -384,13 +384,20 @@ class ResultsPage:
 
             sort_scan_label = tk.Label(filter_settings_container, text='Sort scan results...', font='2', bg='#2a3439',
                                        fg="white")
+
+            s = ttk.Style()  # Creating style element
+            s.configure('Sort.TRadiobutton',  # First argument is the name of style. Needs to end with: .TRadiobutton
+                        background='#2a3439',  # Setting background to our specified color above
+                        foreground='white')
+
             sort_scan_label.grid(row=1, column=0, padx=50)
             sort_order = StringVar()
             sort_button_1 = ttk.Radiobutton(filter_settings_container, text='By severity', variable=sort_order,
-                                            value='severity')
+                                            value='severity', style='Sort.TRadiobutton')
+
             sort_button_1.grid(row=1, column=2)
             sort_button_2 = ttk.Radiobutton(filter_settings_container, text='In order discovered', variable=sort_order,
-                                            value='discovered')
+                                            value='discovered', style='Sort.TRadiobutton')
             sort_button_2.grid(row=2, column=2)
 
             # Container for results
@@ -576,15 +583,22 @@ class ResultsPage:
         filter_settings_container.place(relx=0.04, rely=0.0, anchor="nw")
         filter_settings_container.config(relief=RIDGE)
 
+        s = ttk.Style()  # Creating style element
+        s.configure('Sort.TRadiobutton',  # First argument is the name of style. Needs to end with: .TRadiobutton
+                    background='#2a3439',  # Setting background to our specified color above
+                    foreground='white')
+
         sort_scan_label = tk.Label(filter_settings_container, text='Sort scan results...', font='2', bg='#2a3439',
                                    fg="white")
+
         sort_scan_label.grid(row=1, column=0, padx=50)
         sort_order = StringVar()
         sort_button_1 = ttk.Radiobutton(filter_settings_container, text='By severity', variable=sort_order,
-                                        value='severity')
+                                        value='severity', style='Sort.TRadiobutton')
+
         sort_button_1.grid(row=1, column=2)
         sort_button_2 = ttk.Radiobutton(filter_settings_container, text='In order discovered', variable=sort_order,
-                                        value='discovered')
+                                        value='discovered', style='Sort.TRadiobutton')
         sort_button_2.grid(row=2, column=2)
 
 
@@ -605,7 +619,7 @@ class HelpPage:
             helper_frame = Frame(root, bg="#2a3439")
             helper_frame.pack(fill=BOTH, expand=1)
 
-            help_canvas = Canvas(helper_frame, bg="#2a3439")
+            help_canvas = Canvas(helper_frame, bg="#2a3439", highlightthickness=0)
             help_canvas.pack(side=LEFT, fill=BOTH, expand=1)
 
             help_sb = ttk.Scrollbar(helper_frame, orient=VERTICAL, command=help_canvas.yview)
@@ -634,18 +648,16 @@ class HelpPage:
                                                fg="#FFFFFF")
             help_example1_header_label.place(relx=0.01, rely=0.1, anchor="nw")
 
-            text1 = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque semper, neque vitae 
-                    placerat interdum, orci nisl hendrerit erat, vel iaculis tellus lacus a nibh. Mauris
-                    consequat nunc non est sollicitudin efficitur. Fusce vestibulum eget est id euismod. Duis
-                    egestas tellus ac lorem egestas, at elementum libero viverra. In volutpat rhoncus
-                    dapibus. Morbi eu cursus felis. Mauris vel enim neque. Duis posuere rutrum varius.
-                    Curabitur id vestibulum est, in scelerisque orci. Morbi vitae condimentum ante.
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque semper, neque vitae 
-                    placerat interdum, orci nisl hendrerit erat, vel iaculis tellus lacus a nibh. Mauris
-                    consequat nunc non est sollicitudin efficitur. Fusce vestibulum eget est id euismod. Duis
-                    egestas tellus ac lorem egestas, at elementum libero viverra. In volutpat rhoncus
-                    dapibus. Morbi eu cursus felis. Mauris vel enim neque. Duis posuere rutrum varius.
-                    Curabitur id vestibulum est, in scelerisque orci. Morbi vitae condimentum ante.""" \
+            text1 = """First after logging in, you have a choice of what to do. If choose to run a scan
+                    this can be done clicking onto the home page. From here you have the choice of what kind
+                    of scan you would like to run. Mousing over the options will give a brief description of 
+                    the differences between them. From there you will be directed to the Results Page. Here
+                    the applications that have vulnerabilities will be listed. If the user that is logged in
+                    has the permissions, they will be able to update the application from here. Otherwise they 
+                    will just be able to see the vulnerabilities. If instead the Results page is clicked, this will
+                    display the results from the scan that was last run. And lastly if the Settings Page is selected, 
+                    this will bring you to a page where you can change options such as font size and the way items are 
+                    sorted to make the tool as easy to use as possible.""" \
                 .replace('\n', ' ').replace('                    ', '')
             help_example1_body_label = Label(help_example1, text=text1, font=20, bg="#2a3439", fg="#FFFFFF",
                                              wraplength=880, justify="left")
@@ -874,7 +886,6 @@ class RegisterPage:
             phone.place(relx=.17, rely=.66)
             phone_entry = Entry(register_frame, background="#2a3439", foreground="white", width=25, font=20)
             phone_entry.place(relx=.4, rely=.66)
-
 
             # Create Account Button (sends you to login page)
             create_button = TkinterCustomButton(master=register_frame,

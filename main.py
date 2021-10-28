@@ -6,6 +6,7 @@
     Version:10.20.2021
 '''
 
+
 from PageClasses import *
 from PageClasses import root as root
 
@@ -157,6 +158,10 @@ def create_window():
             expand_button.configure(text=" 🗗 ")
         maximize_me(e)
 
+    def refresh(self):
+        if self.frame is not None:
+            self.frame.destroy()
+
     def get_pos(e):  # this is executed when the title bar is clicked to move the window
 
         if not root.maximized:
@@ -199,9 +204,7 @@ def create_window():
 
 
 def init_data():
-    cveobj = CVEDataFrame()
-    cveobj.create_metadata()
-    # cveobj.select_record_by_name('excel')
+    CVEDataFrame().create_metadata()
 
 
 def call_main():

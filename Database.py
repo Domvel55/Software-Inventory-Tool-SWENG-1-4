@@ -14,7 +14,6 @@ Name
 Status
 Vulnerability
 References
-Phase
 Comments
 """
 
@@ -47,11 +46,13 @@ class CVEDataFrame:
             f.close()
 
     def select_record_by_name(self, name: str):
+        query_list = []
         with open('cve.db.metadata', encoding='UTF-8') as f:
             for record in f:
                 if name.lower() in str(record).lower():
-                    print(record)
+                    query_list.append(record.split('~/~'))
         f.close()
+        return query_list
 
 
 if __name__ == '__main__':

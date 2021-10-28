@@ -280,4 +280,3 @@ class TkinterCustomButton(tkinter.Frame):
     def clicked(self, event=0):
         if self.function is not None:
             self.function()
-            self.on_leave()

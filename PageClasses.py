@@ -866,6 +866,7 @@ class RegisterPage:
             phone_entry = Entry(register_frame, background="#2a3439", foreground="white", width=25, font=20)
             phone_entry.place(relx=.4, rely=.66)
 
+
             # Create Account Button (sends you to login page)
             create_button = TkinterCustomButton(master=register_frame,
                                                 bg_color="#1F262A",

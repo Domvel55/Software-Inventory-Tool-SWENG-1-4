@@ -233,6 +233,7 @@ class FullScanConfirmPage:
                                                   command=lambda: [ResultsPage().print_results(), last_time_clicked()])
             continue_button.place(relx=0.25, rely=0.8, anchor="center")
 
+
             cancel_button = TkinterCustomButton(master=scan_confirm_frame,
                                                 fg_color="#5F4866",
                                                 hover_color="#1F262A",

@@ -14,7 +14,6 @@ Name
 Status
 Vulnerability
 References
-Phase
 Comments
 """
 

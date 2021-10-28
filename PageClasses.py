@@ -8,7 +8,6 @@
 
 from tkinter import *
 from tkinter import ttk
-import tkinter as tk
 from tkinter_custom_button import TkinterCustomButton
 from Database import *
 from tkinter import filedialog
@@ -42,6 +41,7 @@ def maximize_me(e):
         root.normal_size = root.geometry()
         root.geometry(f"{root.winfo_screenwidth()}x{root.winfo_screenheight()}+0+0")
         root.maximized = not root.maximized
+
         # now it's maximized
 
     else:  # if the window was maximized
@@ -230,7 +230,7 @@ class FullScanConfirmPage:
                                                   width=200,
                                                   height=75,
                                                   hover=True,
-                                                  command=lambda: [ResultsPage().printResults(), last_time_clicked()])
+                                                  command=lambda: [ResultsPage().print_results(), last_time_clicked()])
             continue_button.place(relx=0.25, rely=0.8, anchor="center")
 
             cancel_button = TkinterCustomButton(master=scan_confirm_frame,
@@ -261,7 +261,7 @@ class ExpressScanConfirmPage:
 
             # Function for opening the
             # file explorer window
-            def browseFiles():
+            def browse_files():
                 global files_list
                 filenames = filedialog.askopenfilenames(initialdir="C:\Program Files",
                                                         title="Select Files",
@@ -325,7 +325,7 @@ class ExpressScanConfirmPage:
                                                   width=200,
                                                   height=75,
                                                   hover=True,
-                                                  command=lambda: [last_time_clicked(), ResultsPage.printResults(self)])
+                                                  command=lambda: [last_time_clicked(), ResultsPage.print_results()])
             continue_button.place(relx=0.25, rely=0.8, anchor="center")
 
             add_files_button = TkinterCustomButton(master=scan_confirm_frame,
@@ -338,7 +338,7 @@ class ExpressScanConfirmPage:
                                                    width=200,
                                                    height=75,
                                                    hover=True,
-                                                   command=lambda: browseFiles())
+                                                   command=lambda: browse_files())
             add_files_button.place(relx=0.5, rely=0.8, anchor="center")
 
             cancel_button = TkinterCustomButton(master=scan_confirm_frame,
@@ -418,7 +418,8 @@ class ResultsPage:
             cancel_button.place(relx=0.70, rely=0.8, anchor="center")
             # </editor-fold>
 
-    def printResults(self):
+    @staticmethod
+    def print_results():
         global files_list
 
         cve = CVEDataFrame()
@@ -439,13 +440,17 @@ class ResultsPage:
             os.path.splitext(base)[0]
             base = base[:-4]
             print(cve.select_record_by_name(base))
-            list_results.append(cve.select_record_by_name(base))
+            if not cve.select_record_by_name(base):
+                pass
+            else:
+                list_results.append(cve.select_record_by_name(base))
 
         for i in range(len(list_results)):
             results_example = Frame(results_container, bg="#2a3439")
             results_example.place(relx=0.5, rely=0.02, anchor="n")
             results_example.config(height=50, width=900)
-            results_example1_label = Label(results_example, text=str(list_results[i]), font=14, bg="#2a3439", fg="#5B676D")
+            results_example1_label = Label(results_example, text=str(list_results[i]), font=14, bg="#2a3439",
+                                           fg="#5B676D")
             results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
             results_example.grid(row=i, column=0, padx=10, pady=5)
 
@@ -504,11 +509,26 @@ class HelpPage:
 
             root.configure(background="#2a3439")
 
+            helper_frame = Frame(root, bg="#2a3439")
+            helper_frame.pack(fill=BOTH, expand=1)
+
+            help_canvas = Canvas(helper_frame, bg="#2a3439")
+            help_canvas.pack(side=LEFT, fill=BOTH, expand=1)
+
+            help_sb = ttk.Scrollbar(helper_frame, orient=VERTICAL, command=help_canvas.yview)
+            help_sb.pack(side=RIGHT, fill=Y)
+
+            help_canvas.configure(yscrollcommand=help_sb.set)
+            help_canvas.bind('<Configure>',
+                             lambda e: help_canvas.configure(scrollregion = help_canvas.bbox("all")))
+
+
+
             # <editor-fold desc="Results GUI">
             # Frame for whole results page
-            help_frame = Frame(root, bg="#2a3439")
-            help_frame.place(relx=0.5, rely=0.1, anchor="n")
-            help_frame.config(height=root.winfo_height(), width=root.winfo_width())
+            help_frame = Frame(help_canvas)
+            help_canvas.create_window((0,0), window=help_frame, anchor="nw")
+
 
             # Container for results
             help_container = Frame(help_frame, bg="#1F262A", borderwidth=2)
@@ -516,7 +536,7 @@ class HelpPage:
             help_container.config(relief=RIDGE)
 
             # Help tip examples
-            help_example1 = Frame(help_container, bg="#2a3439")
+            help_example1 = Frame(help_frame, bg="#2a3439")
             help_example1.place(relx=0.5, rely=0.02, anchor="n")
             help_example1.config(height=200, width=900)
             help_example1_header_label = Label(help_example1, text='How to use the program:', font=24, bg="#2a3439",
@@ -540,7 +560,7 @@ class HelpPage:
                                              wraplength=880, justify="left")
             help_example1_body_label.place(relx=0.01, rely=0.25, anchor="nw")
 
-            help_example2 = Frame(help_container, bg="#2a3439")
+            help_example2 = Frame(help_frame, bg="#2a3439")
             help_example2.place(relx=0.5, rely=0.02, anchor="n")
             help_example2.config(height=200, width=900)
             help_example2_header_label = Label(help_example2, text='How the Vulnerabilities are scored:', font=24,
@@ -564,7 +584,7 @@ class HelpPage:
                                              wraplength=880, justify="left")
             help_example2_body_label.place(relx=0.01, rely=0.25, anchor="nw")
 
-            help_example3 = Frame(help_container, bg="#2a3439")
+            help_example3 = Frame(help_frame, bg="#2a3439")
             help_example3.place(relx=0.5, rely=0.02, anchor="n")
             help_example3.config(height=200, width=900)
             help_example3_header_label = Label(help_example3, text="What databases we're checking against:", font=24,

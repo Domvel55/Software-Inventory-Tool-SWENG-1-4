@@ -643,7 +643,7 @@ class HelpPage:
             # Help tip examples
             help_example1 = Frame(help_frame, bg="#2a3439")
             help_example1.place(relx=0.5, rely=0.02, anchor="n")
-            help_example1.config(height=200, width=900)
+            help_example1.config(height=285, width=900)
             help_example1_header_label = Label(help_example1, text='How to use the program:', font=24, bg="#2a3439",
                                                fg="#FFFFFF")
             help_example1_header_label.place(relx=0.01, rely=0.1, anchor="nw")

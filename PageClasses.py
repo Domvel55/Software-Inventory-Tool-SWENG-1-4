@@ -385,20 +385,20 @@ class ResultsPage:
             sort_scan_label = tk.Label(filter_settings_container, text='Sort scan results...', font='2', bg='#2a3439',
                                        fg="white")
 
-            s = ttk.Style()  # Creating style element
-            s.configure('Sort.TRadiobutton',  # First argument is the name of style. Needs to end with: .TRadiobutton
-                        background='#2a3439',  # Setting background to our specified color above
+            style_element = ttk.Style()  # Creating style element
+            style_element.configure('Sort.TRadiobutton',    # First argument is the name of style. Needs to end with: .TRadiobutton
+                        background='#2a3439',               # Setting background to our specified color above
                         foreground='white')
 
             sort_scan_label.grid(row=1, column=0, padx=50)
             sort_order = StringVar()
-            sort_button_1 = ttk.Radiobutton(filter_settings_container, text='By severity', variable=sort_order,
+            severity_button = ttk.Radiobutton(filter_settings_container, text='By severity', variable=sort_order,
                                             value='severity', style='Sort.TRadiobutton')
 
-            sort_button_1.grid(row=1, column=2)
-            sort_button_2 = ttk.Radiobutton(filter_settings_container, text='In order discovered', variable=sort_order,
+            severity_button.grid(row=1, column=2)
+            discover_button = ttk.Radiobutton(filter_settings_container, text='In order discovered', variable=sort_order,
                                             value='discovered', style='Sort.TRadiobutton')
-            sort_button_2.grid(row=2, column=2)
+            discover_button.grid(row=2, column=2)
 
             # Container for results
             results_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
@@ -408,49 +408,18 @@ class ResultsPage:
             # Creating Filler Results
             # These will disappear once a scan happen
             # These will reappear if clicking off the  Results page and coming back
-            results_example1 = Frame(results_container, bg="#2a3439")
-            results_example1.place(relx=0.5, rely=0.02, anchor="n")
-            results_example1.config(height=50, width=900)
-            results_example1_label = Label(results_example1, text='Software 1', font=14, bg="#2a3439", fg="#5B676D")
-            results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
+            results_files_frame = Frame(results_container, bg="#2a3439")
+            results_files_frame.place(relx=0.5, rely=0.02, anchor="n")
+            results_files_frame.config(height=50, width=900)
+            for i in range(6):
+                results_example = Frame(results_container, bg="#2a3439")
+                results_example.place(relx=0.5, rely=0.02, anchor="n")
+                results_example.config(height=50, width=900)
+                results_example1_label = Label(results_example, text=f'Software {i}', font=14, bg="#2a3439",
+                                               fg="#5B676D")
+                results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
+                results_example.grid(row=i, column=0, padx=10, pady=5)
 
-            results_example2 = Frame(results_container, bg="#2a3439")
-            results_example2.place(relx=0.5, rely=0.02, anchor="n")
-            results_example2.config(height=50, width=900)
-            results_example2_label = Label(results_example2, text='Software 2', font=14, bg="#2a3439", fg="#5B676D")
-            results_example2_label.place(relx=0.01, rely=0.5, anchor="w")
-
-            results_example3 = Frame(results_container, bg="#2a3439")
-            results_example3.place(relx=0.5, rely=0.02, anchor="n")
-            results_example3.config(height=50, width=900)
-            results_example3_label = Label(results_example3, text='Software 3', font=14, bg="#2a3439", fg="#5B676D")
-            results_example3_label.place(relx=0.01, rely=0.5, anchor="w")
-
-            results_example4 = Frame(results_container, bg="#2a3439")
-            results_example4.place(relx=0.5, rely=0.02, anchor="n")
-            results_example4.config(height=50, width=900)
-            results_example4_label = Label(results_example4, text='Software 4', font=14, bg="#2a3439", fg="#5B676D")
-            results_example4_label.place(relx=0.01, rely=0.5, anchor="w")
-
-            results_example5 = Frame(results_container, bg="#2a3439")
-            results_example5.place(relx=0.5, rely=0.02, anchor="n")
-            results_example5.config(height=50, width=900)
-            results_example5_label = Label(results_example5, text='Software 5', font=14, bg="#2a3439", fg="#5B676D")
-            results_example5_label.place(relx=0.01, rely=0.5, anchor="w")
-
-            results_example6 = Frame(results_container, bg="#2a3439")
-            results_example6.place(relx=0.5, rely=0.02, anchor="n")
-            results_example6.config(height=50, width=900)
-            results_example6_label = Label(results_example6, text='Software 6', font=14, bg="#2a3439", fg="#5B676D")
-            results_example6_label.place(relx=0.01, rely=0.5, anchor="w")
-
-            # Align results in a grid
-            results_example1.grid(row=0, column=0, padx=10, pady=5)
-            results_example2.grid(row=1, column=0, padx=10, pady=5)
-            results_example3.grid(row=2, column=0, padx=10, pady=5)
-            results_example4.grid(row=3, column=0, padx=10, pady=5)
-            results_example5.grid(row=4, column=0, padx=10, pady=5)
-            results_example6.grid(row=5, column=0, padx=10, pady=5)
             # </editor-fold>
 
             update_all_button = TkinterCustomButton(master=results_frame,
@@ -583,8 +552,8 @@ class ResultsPage:
         filter_settings_container.place(relx=0.04, rely=0.0, anchor="nw")
         filter_settings_container.config(relief=RIDGE)
 
-        s = ttk.Style()  # Creating style element
-        s.configure('Sort.TRadiobutton',  # First argument is the name of style. Needs to end with: .TRadiobutton
+        styleElement = ttk.Style()  # Creating style element
+        styleElement.configure('Sort.TRadiobutton',  # First argument is the name of style. Needs to end with: .TRadiobutton
                     background='#2a3439',  # Setting background to our specified color above
                     foreground='white')
 
@@ -593,13 +562,13 @@ class ResultsPage:
 
         sort_scan_label.grid(row=1, column=0, padx=50)
         sort_order = StringVar()
-        sort_button_1 = ttk.Radiobutton(filter_settings_container, text='By severity', variable=sort_order,
+        Severity_button = ttk.Radiobutton(filter_settings_container, text='By severity', variable=sort_order,
                                         value='severity', style='Sort.TRadiobutton')
 
-        sort_button_1.grid(row=1, column=2)
-        sort_button_2 = ttk.Radiobutton(filter_settings_container, text='In order discovered', variable=sort_order,
+        Severity_button.grid(row=1, column=2)
+        Discovered_button = ttk.Radiobutton(filter_settings_container, text='In order discovered', variable=sort_order,
                                         value='discovered', style='Sort.TRadiobutton')
-        sort_button_2.grid(row=2, column=2)
+        Discovered_button.grid(row=2, column=2)
 
 
 class HelpPage:
@@ -871,19 +840,19 @@ class RegisterPage:
                                    font="Bold, 25")
             register_title.place(relx=0.5, rely=.1, anchor='center')
             first_name = Label(register_frame, text="First Name", background="#1F262A", foreground="white", font=20)
-            first_name.place(relx=.17, rely=.3)
+            first_name.place(relx=.16003, rely=.3)
             first_name_entry = Entry(register_frame, background="#2a3439", foreground="white", width=25, font=20)
             first_name_entry.place(relx=.4, rely=.3)
             last_name = Label(register_frame, text="Last Name", background="#1F262A", foreground="white", font=20)
-            last_name.place(relx=.17, rely=.42)
+            last_name.place(relx=.16001, rely=.42)
             last_name_entry = Entry(register_frame, background="#2a3439", foreground="white", width=25, font=20)
             last_name_entry.place(relx=.4, rely=.42)
             username = Label(register_frame, text="Username", background="#1F262A", foreground="white", font=20)
-            username.place(relx=.17, rely=.54)
+            username.place(relx=.1703, rely=.54)
             username_entry = Entry(register_frame, background="#2a3439", foreground="white", width=25, font=20)
             username_entry.place(relx=.4, rely=.54)
             phone = Label(register_frame, text="Phone Number", background="#1F262A", foreground="white", font=20)
-            phone.place(relx=.17, rely=.66)
+            phone.place(relx=.088, rely=.66)
             phone_entry = Entry(register_frame, background="#2a3439", foreground="white", width=25, font=20)
             phone_entry.place(relx=.4, rely=.66)
 

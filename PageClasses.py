@@ -65,8 +65,8 @@ def frame_mapped(e):
 class ToolTip(object):
 
     def __init__(self, widget, text='widget info'):
-        self.waittime = 500  # miliseconds
-        self.wraplength = 180  # pixels
+        self.wait_time = 500  # milliseconds
+        self.wrap_length = 180  # pixels
         self.widget = widget
         self.text = text
         self.widget.bind("<Enter>", self.enter)
@@ -230,7 +230,7 @@ class FullScanConfirmPage:
                                                   width=200,
                                                   height=75,
                                                   hover=True,
-                                                  command=lambda: [ResultsPage().print_results(), last_time_clicked()])
+                                                  command=lambda: [last_time_clicked(), scan()])
             continue_button.place(relx=0.25, rely=0.8, anchor="center")
 
             cancel_button = TkinterCustomButton(master=scan_confirm_frame,
@@ -246,8 +246,42 @@ class FullScanConfirmPage:
                                                 command=lambda: MainWindow())
             cancel_button.place(relx=0.70, rely=0.8, anchor="center")
 
+            # This will scan the Database for the software we selected
+            def scan():
+                list_results = []
+                cve = CVEDataFrame()
+                # Makes a progress bar
+                progressbar_style_element = ttk.Style()
+                progressbar_style_element.theme_use('alt')
+                progressbar_style_element.configure("red.Horizontal.TProgressbar", foreground='red', bg='red')
+                results_progressbar = ttk.Progressbar(root, orient=HORIZONTAL, length=500, mode='determinate',
+                                                      style="red.Horizontal.TProgressbar")
+                results_progressbar.place(relx=0.5, rely=0.8, anchor="center")
 
-class ExpressScanConfirmPage:
+                # This will remove the path extension for all of the selected applications
+                # This will loop through all the Files, selected from the sub menu in Express Scan
+                for record in files_list:
+                    # This will reduce the name to a Application.exe
+                    base = os.path.basename(record)
+                    # This will separate the Application.exe to a list of [Application, .exe]
+                    os.path.splitext(base)
+                    base = base[:-4]
+                    # This will actively update the progress bar an appropriate amount of times
+                    results_progressbar['value'] += (100 / len(files_list))
+                    root.update_idletasks()
+
+                    # This will not add an entry to the results list if nothing is found in the CVE Database
+                    if not cve.select_record_by_name(base):
+                        pass
+                    # This will add an entry to the results list with vulnerability from the CVE Database
+                    else:
+                        list_results.append(cve.select_record_by_name(base))
+
+                results_progressbar.destroy()
+                ResultsPage.print_results(list_results)
+
+
+class ExpressScanConfirmPage():
 
     def __init__(self):
         global root
@@ -261,6 +295,7 @@ class ExpressScanConfirmPage:
 
             # Function for opening the
             # file explorer window
+
             def browse_files():
                 global files_list
                 filenames = filedialog.askopenfilenames(initialdir="C:\Program Files",
@@ -285,11 +320,11 @@ class ExpressScanConfirmPage:
                     ctr = ctr + 1
 
                 # Scrollbar if more than 6 files are selected
-                if ctr > 6:
-                    scan_confirim_sb = ttk.Scrollbar(scan_confirm_canvas, orient="vertical",
-                                                     command=scan_confirm_canvas.yview)
-                    scan_confirim_sb.place(relx=0.98, height=350)
-                    scan_confirm_canvas.configure(yscrollcommand=scan_confirim_sb.set)
+                if ctr > 5:
+                    scan_confirm_sb = ttk.Scrollbar(scan_confirm_canvas, orient="vertical",
+                                                    command=scan_confirm_canvas.yview)
+                    scan_confirm_sb.place(relx=0.98, height=350)
+                    scan_confirm_canvas.configure(yscrollcommand=scan_confirm_sb.set)
 
             root.configure(background="#2a3439")
 
@@ -302,7 +337,7 @@ class ExpressScanConfirmPage:
                                        fg="white")
             scan_confirm_label.place(relx=0.05, rely=0.05, anchor="w")
 
-            scan_confirm_canvas = Canvas(scan_confirm_frame, height=350, width=900, bg="#2a3439")
+            scan_confirm_canvas = Canvas(scan_confirm_frame, height=300, width=900, bg="#2a3439")
             scan_confirm_canvas.place(relx=0.5, rely=0.1, anchor="n")
 
             # Container for files to be scanned
@@ -328,7 +363,7 @@ class ExpressScanConfirmPage:
                                                   width=200,
                                                   height=75,
                                                   hover=True,
-                                                  command=lambda: [last_time_clicked(), ResultsPage.print_results()])
+                                                  command=lambda: [last_time_clicked(), scan()])
             continue_button.place(relx=0.25, rely=0.8, anchor="center")
 
             add_files_button = TkinterCustomButton(master=scan_confirm_frame,
@@ -357,6 +392,40 @@ class ExpressScanConfirmPage:
                                                 command=lambda: MainWindow())
             cancel_button.place(relx=0.70, rely=0.8, anchor="center")
 
+        # This will scan the Database for the software we selected
+        def scan():
+            list_results = []
+            cve = CVEDataFrame()
+            # Makes a progress bar
+            progressbar_style_element = ttk.Style()
+            progressbar_style_element.theme_use('alt')
+            progressbar_style_element.configure("red.Horizontal.TProgressbar", foreground='red', bg='red')
+            results_progressbar = ttk.Progressbar(root, orient=HORIZONTAL, length=500, mode='determinate',
+                                                  style="red.Horizontal.TProgressbar")
+            results_progressbar.place(relx=0.5, rely=0.8, anchor="center")
+
+            # This will remove the path extension for all of the selected applications
+            # This will loop through all the Files, selected from the sub menu in Express Scan
+            for record in files_list:
+                # This will reduce the name to a Application.exe
+                base = os.path.basename(record)
+                # This will separate the Application.exe to a list of [Application, .exe]
+                os.path.splitext(base)
+                base = base[:-4]
+                # This will actively update the progress bar an appropriate amount of times
+                results_progressbar['value'] += (100 / len(files_list))
+                root.update_idletasks()
+
+                # This will not add an entry to the results list if nothing is found in the CVE Database
+                if not cve.select_record_by_name(base):
+                    pass
+                # This will add an entry to the results list with vulnerability from the CVE Database
+                else:
+                    list_results.append(cve.select_record_by_name(base))
+
+            results_progressbar.destroy()
+            ResultsPage.print_results(list_results)
+
 
 class ResultsPage:
 
@@ -377,6 +446,8 @@ class ResultsPage:
             results_frame.place(relx=0.5, rely=0.1, anchor="n")
             results_frame.config(height=root.winfo_height(), width=root.winfo_width())
 
+            ResultsPage.create_update_buttons(results_frame)
+
             # Container for filter settings
             filter_settings_container = tk.Frame(results_frame, bg="#1F262A", borderwidth=2)
             filter_settings_container.place(relx=0.04, rely=0.0, anchor="nw")
@@ -386,18 +457,20 @@ class ResultsPage:
                                        fg="white")
 
             style_element = ttk.Style()  # Creating style element
-            style_element.configure('Sort.TRadiobutton',    # First argument is the name of style. Needs to end with: .TRadiobutton
-                        background='#2a3439',               # Setting background to our specified color above
-                        foreground='white')
+            style_element.configure('Sort.TRadiobutton',
+                                    # First argument is the name of style. Needs to end with: .TRadiobutton
+                                    background='#2a3439',  # Setting background to our specified color above
+                                    foreground='white')
 
             sort_scan_label.grid(row=1, column=0, padx=50)
             sort_order = StringVar()
             severity_button = ttk.Radiobutton(filter_settings_container, text='By severity', variable=sort_order,
-                                            value='severity', style='Sort.TRadiobutton')
+                                              value='severity', style='Sort.TRadiobutton')
 
             severity_button.grid(row=1, column=2)
-            discover_button = ttk.Radiobutton(filter_settings_container, text='In order discovered', variable=sort_order,
-                                            value='discovered', style='Sort.TRadiobutton')
+            discover_button = ttk.Radiobutton(filter_settings_container, text='In order discovered',
+                                              variable=sort_order,
+                                              value='discovered', style='Sort.TRadiobutton')
             discover_button.grid(row=2, column=2)
 
             # Container for results
@@ -422,92 +495,8 @@ class ResultsPage:
 
             # </editor-fold>
 
-            update_all_button = TkinterCustomButton(master=results_frame,
-                                                    fg_color="#848689",
-                                                    hover_color="#1F262A",
-                                                    text_font="Bold, 14",
-                                                    text="Update All",
-                                                    text_color="white",
-                                                    corner_radius=10,
-                                                    width=200,
-                                                    height=75,
-                                                    hover=True,
-                                                    command=lambda: None)
-            update_all_button.place(relx=0.25, rely=0.8, anchor="center")
-
-            update_selected_button = TkinterCustomButton(master=results_frame,
-                                                         fg_color="#8797AF",
-                                                         hover_color="#1F262A",
-                                                         text_font="Bold, 14",
-                                                         text="Update Selected",
-                                                         text_color="white",
-                                                         corner_radius=10,
-                                                         width=200,
-                                                         height=75,
-                                                         hover=True,
-                                                         command=lambda: None)
-            update_selected_button.place(relx=0.5, rely=0.8, anchor="center")
-
-            cancel_button = TkinterCustomButton(master=results_frame,
-                                                fg_color="#5F4866",
-                                                hover_color="#1F262A",
-                                                text_font="Bold, 14",
-                                                text="Cancel",
-                                                text_color="white",
-                                                corner_radius=10,
-                                                width=100,
-                                                height=50,
-                                                hover=True,
-                                                command=lambda: None)
-            cancel_button.place(relx=0.70, rely=0.8, anchor="center")
-            # </editor-fold>
-
-    @staticmethod
-    def print_results():
-        global files_list
-
-        cve = CVEDataFrame()
-        list_results = []
-
-        results_frame = Frame(root, bg="#2a3439")
-        results_frame.place(relx=0.5, rely=0.1, anchor="n")
-        results_frame.config(height=root.winfo_height(), width=root.winfo_width())
-
-        # Container for results
-        results_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
-        results_container.place(relx=0.5, rely=0.1, anchor="n")
-        results_container.config(relief=RIDGE)
-
-        # This will remove the path extension for all of the selected applications
-        # This will loop through all the Files, selected from the sub menu in Express Scan
-        for record in files_list:
-            # This will reduce the name to a Application.exe
-            base = os.path.basename(record)
-            # This will separate the Application.exe to a list of [Application, .exe]
-            os.path.splitext(base)
-            # This will change base to just be the first index of the previous list
-            os.path.splitext(base)[0]
-            base = base[:-4]
-            print(cve.select_record_by_name(base))
-            # This will not add an entry to the results list if nothing is found in the CVE Database
-            if not cve.select_record_by_name(base):
-                pass
-            # This will add an entry to the results list with vulnerability from the CVE Database
-            else:
-                list_results.append(cve.select_record_by_name(base))
-
-        # This loop will run for the amount of items that are found to have vulnerabilities in the Database
-        # It will send a Sting to the results page with the information
-        # It will only run as many times as vulnerabilities found
-        for i in range(len(list_results)):
-            results_example = Frame(results_container, bg="#2a3439")
-            results_example.place(relx=0.5, rely=0.02, anchor="n")
-            results_example.config(height=50, width=900)
-            results_example1_label = Label(results_example, text=str(list_results[i]), font=14, bg="#2a3439",
-                                           fg="#5B676D")
-            results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
-            results_example.grid(row=i, column=0, padx=10, pady=5)
-
+    # Function to create the update buttons before and after have results
+    def create_update_buttons(results_frame):
         update_all_button = TkinterCustomButton(master=results_frame,
                                                 fg_color="#848689",
                                                 hover_color="#1F262A",
@@ -548,27 +537,31 @@ class ResultsPage:
         cancel_button.place(relx=0.70, rely=0.8, anchor="center")
         # </editor-fold>
 
-        filter_settings_container = tk.Frame(results_frame, bg="#1F262A", borderwidth=2)
-        filter_settings_container.place(relx=0.04, rely=0.0, anchor="nw")
-        filter_settings_container.config(relief=RIDGE)
+    @staticmethod
+    def print_results(list_results):
+        results_frame = Frame(root, bg="#2a3439")
+        results_frame.place(relx=0.5, rely=0.1, anchor="n")
+        results_frame.config(height=root.winfo_height(), width=root.winfo_width())
 
-        styleElement = ttk.Style()  # Creating style element
-        styleElement.configure('Sort.TRadiobutton',  # First argument is the name of style. Needs to end with: .TRadiobutton
-                    background='#2a3439',  # Setting background to our specified color above
-                    foreground='white')
+        # Container for results
+        results_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
+        results_container.place(relx=0.5, rely=0.1, anchor="n")
+        results_container.config(relief=RIDGE)
 
-        sort_scan_label = tk.Label(filter_settings_container, text='Sort scan results...', font='2', bg='#2a3439',
-                                   fg="white")
+        # This loop will run for the amount of items that are found to have vulnerabilities in the Database
+        # It will send a Sting to the results page with the information
+        # It will only run as many times as vulnerabilities found
+        for i in range(len(list_results)):
+            results_example = Frame(results_container, bg="#2a3439")
+            results_example.place(relx=0.5, rely=0.02, anchor="n")
+            results_example.config(height=50, width=900)
+            results_example1_label = Label(results_example, text=str(list_results[i]), font=14, bg="#2a3439",
+                                           fg="#5B676D")
+            results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
+            results_example.grid(row=i, column=0, padx=10, pady=5)
 
-        sort_scan_label.grid(row=1, column=0, padx=50)
-        sort_order = StringVar()
-        Severity_button = ttk.Radiobutton(filter_settings_container, text='By severity', variable=sort_order,
-                                        value='severity', style='Sort.TRadiobutton')
-
-        Severity_button.grid(row=1, column=2)
-        Discovered_button = ttk.Radiobutton(filter_settings_container, text='In order discovered', variable=sort_order,
-                                        value='discovered', style='Sort.TRadiobutton')
-        Discovered_button.grid(row=2, column=2)
+        # Calls function to put the update buttons back on the screen with the results
+        ResultsPage.create_update_buttons(results_frame)
 
 
 class HelpPage:

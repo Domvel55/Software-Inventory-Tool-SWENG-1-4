@@ -22,6 +22,7 @@ global last_page
 last_page = ""
 
 
+
 def move_app(e):
     root.geometry(f'+{e.x_root}+{e.y_root}')
 
@@ -65,8 +66,8 @@ def frame_mapped(e):
 class ToolTip(object):
 
     def __init__(self, widget, text='widget info'):
-        self.wait_time = 500  # milliseconds
-        self.wrap_length = 180  # pixels
+        self.waittime = 500  # miliseconds
+        self.wraplength = 180  # pixels
         self.widget = widget
         self.text = text
         self.widget.bind("<Enter>", self.enter)
@@ -132,9 +133,18 @@ class MainWindow:
 
             root.configure(background="#2a3439")
 
+
             main_frame = Frame(root, bg="#2a3439")
             main_frame.place(relx=0.5, rely=0.1, anchor="n")
             main_frame.config(height=root.winfo_height(), width=root.winfo_width())
+
+            style = ttk.Style(root)
+            style.theme_use('classic')
+            style.configure('Test.TSizegrip', background="#1F262A")
+            root_sizeGrip = ttk.Sizegrip(root)
+
+            root_sizeGrip.configure(style="Test.TSizegrip")
+            root_sizeGrip.pack(side="right", anchor=SE)
 
             # LabelFrame that shows thew Last time some thing was scanned. Initialized as "Last Scanned: ----"
             scan_time_frame = LabelFrame(main_frame, bg="#2a3439", fg="white", font=10, text=now, relief=FLAT)
@@ -280,6 +290,14 @@ class FullScanConfirmPage:
                 results_progressbar.destroy()
                 ResultsPage.print_results(list_results)
 
+        style = ttk.Style(root)
+        style.theme_use('classic')
+        style.configure('Test.TSizegrip', background="#1F262A")
+        root_sizeGrip = ttk.Sizegrip(root)
+
+        root_sizeGrip.configure(style="Test.TSizegrip")
+        root_sizeGrip.pack(side="right", anchor=SE)
+
 
 class ExpressScanConfirmPage():
 
@@ -392,6 +410,14 @@ class ExpressScanConfirmPage():
                                                 command=lambda: MainWindow())
             cancel_button.place(relx=0.70, rely=0.8, anchor="center")
 
+            style = ttk.Style(root)
+            style.theme_use('classic')
+            style.configure('Test.TSizegrip', background="#1F262A")
+            root_sizeGrip = ttk.Sizegrip(root)
+
+            root_sizeGrip.configure(style="Test.TSizegrip")
+            root_sizeGrip.pack(side="right", anchor=SE)
+
         # This will scan the Database for the software we selected
         def scan():
             list_results = []
@@ -441,6 +467,7 @@ class ResultsPage:
                 widget.destroy()
 
             root.configure(background="#2a3439")
+
 
             results_frame = Frame(root, bg="#2a3439")
             results_frame.place(relx=0.5, rely=0.1, anchor="n")
@@ -535,6 +562,14 @@ class ResultsPage:
                                             hover=True,
                                             command=lambda: None)
         cancel_button.place(relx=0.70, rely=0.8, anchor="center")
+
+        style = ttk.Style(root)
+        style.theme_use('classic')
+        style.configure('Test.TSizegrip', background="#1F262A")
+        root_sizeGrip = ttk.Sizegrip(root)
+
+        root_sizeGrip.configure(style="Test.TSizegrip")
+        root_sizeGrip.pack(side="right", anchor=SE)
         # </editor-fold>
 
     @staticmethod
@@ -576,7 +611,13 @@ class HelpPage:
             for widget in root.winfo_children()[1:]:
                 widget.destroy()
 
-            root.configure(background="#2a3439")
+            style = ttk.Style(root)
+            style.theme_use('classic')
+            style.configure('Test.TSizegrip', background="#1F262A")
+            root_sizeGrip = ttk.Sizegrip(root)
+
+            root_sizeGrip.configure(style="Test.TSizegrip")
+            root_sizeGrip.pack(side="right", anchor=SE)
 
             helper_frame = Frame(root, bg="#2a3439")
             helper_frame.pack(fill=BOTH, expand=1)
@@ -685,7 +726,13 @@ class SettingsPage:
             for widget in root.winfo_children()[1:]:
                 widget.destroy()
 
-            root.configure(background="#2a3439")
+            style = ttk.Style(root)
+            style.theme_use('classic')
+            style.configure('Test.TSizegrip', background="#1F262A")
+            root_sizeGrip = ttk.Sizegrip(root)
+
+            root_sizeGrip.configure(style="Test.TSizegrip")
+            root_sizeGrip.pack(side="right", anchor=SE)
 
             settings_frame = tk.Frame(root)
             settings_frame.place(relx=0.5, rely=0.5, anchor='center')
@@ -746,11 +793,18 @@ class LoginPage:
         if last_page != "LoginPage":
             last_page = "LoginPage"
 
+
+
             for widget in root.winfo_children()[1:]:
                 widget.destroy()
 
-            root.configure(background="#2a3439")
+            style = ttk.Style(root)
+            style.theme_use('classic')
+            style.configure('Test.TSizegrip', background="#1F262A")
+            root_sizeGrip = ttk.Sizegrip(root)
 
+            root_sizeGrip.configure(style="Test.TSizegrip")
+            root_sizeGrip.pack(side="right", anchor=SE)
             # Login page outer frame
             login_outer_frame = Frame(root, bg='#1F262A')
             login_outer_frame.place(relx=0.5, rely=0.5, anchor='center')
@@ -821,6 +875,13 @@ class RegisterPage:
                 widget.destroy()
 
             root.configure(background="#2a3439")
+            style = ttk.Style(root)
+            style.theme_use('classic')
+            style.configure('Test.TSizegrip', background="#1F262A")
+            root_sizeGrip = ttk.Sizegrip(root)
+
+            root_sizeGrip.configure(style="Test.TSizegrip")
+            root_sizeGrip.pack(side="right", anchor=SE)
 
             # Register page frame
             register_frame = Frame(root, bg='#1F262A')

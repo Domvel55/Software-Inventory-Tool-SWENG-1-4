@@ -6,7 +6,6 @@
     Version:10.20.2021
 '''
 
-
 from PageClasses import *
 from PageClasses import root as root
 
@@ -24,11 +23,14 @@ def create_window():
     y = (screen_height / 2) - (app_height / 2)
     root.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
 
+    root.resizable(True, True)
+
     # Changes the default tkinter to our Sieve logo when minimized
     root.iconbitmap('logo.ico')
 
     # Change the text after minimizing the tool to task bar
     root.title("Sieve")
+
 
     # remove title bar
     root.overrideredirect(True)
@@ -38,6 +40,10 @@ def create_window():
     # Create New Title Bar
     title_bar = Frame(root, bg="#1F262A", relief="raised", bd=1)
     title_bar.pack(fill=X)
+
+
+
+
 
     # 'Binding the title bar
     title_bar.bind("<Map>", frame_mapped)
@@ -122,6 +128,7 @@ def create_window():
     title_bar_title = Label(title_bar, text="Software Inventory Tool", bg="#1f262A", bd=0, fg='white',
                             font=("helvetica", 10),
                             highlightthickness=0)
+    root_sizegrip = ttk.Sizegrip(master=root)
     minimize_button.bind("<Button-1>", minimizer)
     expand_button.bind("<Button-1>", maximize_me)
 
@@ -158,9 +165,8 @@ def create_window():
             expand_button.configure(text=" 🗗 ")
         maximize_me(e)
 
-    def refresh(self):
-        if self.frame is not None:
-            self.frame.destroy()
+
+
 
     def get_pos(e):  # this is executed when the title bar is clicked to move the window
 

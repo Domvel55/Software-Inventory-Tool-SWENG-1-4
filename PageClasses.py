@@ -492,26 +492,9 @@ class ResultsPage:
 
             sort_scan_label.grid(row=1, column=0, padx=50)
             sort_order = StringVar()
-            severity_button = ttk.Radiobutton(filter_settings_container, text='By severity', variable=sort_order,
-                                              value='severity', style='Sort.TRadiobutton')
 
-            severity_button.grid(row=1, column=2)
-            discover_button = ttk.Radiobutton(filter_settings_container, text='In order discovered',
-                                              variable=sort_order,
-                                              value='discovered', style='Sort.TRadiobutton')
-            discover_button.grid(row=2, column=2)
 
-            alphabetical_button = ttk.Radiobutton(filter_settings_container, text='Alphabetical',
-                                             variable=sort_order,
-                                             value='Alphabetical', style='Sort.TRadiobutton')
-            alphabetical_button.grid(row=2, column=3)
-
-            time_button = ttk.Radiobutton(filter_settings_container, text='By time',
-                                                 variable=sort_order,
-                                                  value='time', style='Sort.TRadiobutton')
-            time_button.grid(row=1, column=3)
-
-            # commented out because it breaks the page
+            #Settings dropdown window
             OptionList = [
                 "By Severity",
                 "By Time",
@@ -519,14 +502,14 @@ class ResultsPage:
                 "In Order Discovered"
             ]
 
-            SettingsMenu = results_frame
+            SettingsMenu = filter_settings_container
 
             variable = tk.StringVar(SettingsMenu)
             variable.set(OptionList[0])
 
-            opt = tk.OptionMenu(results_frame, variable, *OptionList)
+            opt = tk.OptionMenu(filter_settings_container, variable, *OptionList)
             opt.config(background="#1F262A", foreground="white", width=15, font=('Bold', 12))
-            opt.pack()
+            opt.grid()
 
             SettingsMenu.mainloop()
 

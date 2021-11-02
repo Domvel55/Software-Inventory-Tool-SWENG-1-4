@@ -475,13 +475,14 @@ class ResultsPage:
 
             ResultsPage.create_update_buttons(results_frame)
 
+
             # Container for filter settings
             filter_settings_container = tk.Frame(results_frame, bg="#1F262A", borderwidth=2)
             filter_settings_container.place(relx=0.04, rely=0.0, anchor="nw")
             filter_settings_container.config(relief=RIDGE)
 
             sort_scan_label = tk.Label(filter_settings_container, text='Sort scan results...', font='2', bg='#2a3439',
-                                       fg="white")
+                                      fg="white")
 
             style_element = ttk.Style()  # Creating style element
             style_element.configure('Sort.TRadiobutton',
@@ -501,14 +502,33 @@ class ResultsPage:
             discover_button.grid(row=2, column=2)
 
             alphabetical_button = ttk.Radiobutton(filter_settings_container, text='Alphabetical',
-                                              variable=sort_order,
-                                              value='Alphabetical', style='Sort.TRadiobutton')
+                                             variable=sort_order,
+                                             value='Alphabetical', style='Sort.TRadiobutton')
             alphabetical_button.grid(row=2, column=3)
 
             time_button = ttk.Radiobutton(filter_settings_container, text='By time',
-                                                  variable=sort_order,
+                                                 variable=sort_order,
                                                   value='time', style='Sort.TRadiobutton')
             time_button.grid(row=1, column=3)
+
+            # commented out because it breaks the page.
+            OptionList = [
+                "By Severity",
+                "By Time",
+                "Alphabetical",
+                "In Order Discovered"
+            ]
+
+            SettingsMenu = results_frame
+
+            variable = tk.StringVar(SettingsMenu)
+            variable.set(OptionList[0])
+
+            opt = tk.OptionMenu(results_frame, variable, *OptionList)
+            opt.config(width=15, font=('Helvetica', 12))
+            opt.pack()
+
+            SettingsMenu.mainloop()
 
             # Container for results
             results_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
@@ -572,6 +592,7 @@ class ResultsPage:
                                             hover=True,
                                             command=lambda: None)
         cancel_button.place(relx=0.70, rely=0.8, anchor="center")
+
 
         style = ttk.Style(root)
         style.theme_use('classic')

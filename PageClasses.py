@@ -20,7 +20,7 @@ global files_list
 now = "Last Scanned: ----"
 global last_page
 last_page = ""
-
+user_list = []
 
 
 def move_app(e):
@@ -799,6 +799,8 @@ class LoginPage:
     def __init__(self):
         global root
         global last_page
+        username_var = tk.StringVar(value="")
+        token_var = tk.StringVar(value="")
 
         if last_page != "LoginPage":
             last_page = "LoginPage"
@@ -834,11 +836,11 @@ class LoginPage:
             username_label = Label(login_inner_frame, text='Username', font=15, background="#2a3439",
                                    foreground="white")
             username_label.place(relx=0.5, rely=0.3, anchor="center")
-            username_entry = Entry(login_inner_frame, background="#1F262A", foreground="white", font=15)
+            username_entry = Entry(login_inner_frame, textvariable=username_var, background="#1F262A", foreground="white", font=15)
             username_entry.place(relx=0.5, rely=0.4, anchor='center')
             token_label = Label(login_inner_frame, text='RSA Token', font=15, background="#2a3439", foreground="white")
             token_label.place(relx=0.5, rely=0.53, anchor='center')
-            token_entry = Entry(login_inner_frame, background="#1F262A", foreground="white", font=15)
+            token_entry = Entry(login_inner_frame, textvariable=token_var, background="#1F262A", foreground="white", font=15)
             token_entry.place(relx=0.5, rely=0.63, anchor='center')
 
             # Login Button (sends you to home page)
@@ -853,7 +855,7 @@ class LoginPage:
                                                width=80,
                                                height=40,
                                                hover=True,
-                                               command=lambda: None)
+                                               command=lambda: MainWindow() if check_login() else login_error())
             login_button.place(relx=0.4, rely=0.85, anchor='center')
 
             # Registration Button (Sends you to register page)
@@ -871,12 +873,35 @@ class LoginPage:
                                                   command=lambda: RegisterPage())
             register_button.place(relx=0.6, rely=0.85, anchor='center')
 
+        #Search through user list. Return True if user and token are correct.
+        def check_login():
+            global user_list
+            username = username_entry.get()
+            token = token_entry.get()
+            exists = False
+            for i in range(len(user_list)):
+                if user_list[i][2] == username and user_list[i][4] == token:
+                    exists = True
+            return exists
+
+        #Make error message for login
+        def login_error():
+            error_message = LabelFrame(login_inner_frame, bg="#2a3439", fg="red", font=10, text="Wrong Username or RSA Token.", relief=FLAT)
+            error_message.place(relx=0.5, rely=0.68, anchor="n")
+            error_message.config(height=19, width=240)
+
 
 class RegisterPage:
 
     def __init__(self):
         global root
         global last_page
+
+        #Initialize input variables
+        first_name_var = tk.StringVar(value="")
+        last_name_var = tk.StringVar(value="")
+        username_var = tk.StringVar(value="")
+        phone_var = tk.StringVar(value="")
 
         if last_page != "ResultsPage":
             last_page = "ResultsPage"
@@ -900,25 +925,29 @@ class RegisterPage:
             register_frame.config(relief=RAISED)
 
             # Register page entries and labels
-            register_title = Label(register_frame, text="Register", background="#1F262A", foreground="white",
-                                   font="Bold, 25")
+            register_title = Label(register_frame, text="Register", background="#1F262A", foreground="white", font="Bold, 25")
             register_title.place(relx=0.5, rely=.1, anchor='center')
-            first_name = Label(register_frame, text="First Name", background="#1F262A", foreground="white", font=20)
-            first_name.place(relx=.16003, rely=.3)
-            first_name_entry = Entry(register_frame, background="#2a3439", foreground="white", width=25, font=20)
+
+            first_name_frame = Label(register_frame, text="First Name", background="#1F262A", foreground="white", font=20)
+            first_name_frame.place(relx=.16003, rely=.3)
+            first_name_entry = Entry(register_frame, textvariable=first_name_var, background="#2a3439", foreground="white", width=25, font=20)
             first_name_entry.place(relx=.4, rely=.3)
-            last_name = Label(register_frame, text="Last Name", background="#1F262A", foreground="white", font=20)
-            last_name.place(relx=.16001, rely=.42)
-            last_name_entry = Entry(register_frame, background="#2a3439", foreground="white", width=25, font=20)
+
+            last_name_frame = Label(register_frame, text="Last Name", background="#1F262A", foreground="white", font=20)
+            last_name_frame.place(relx=.16001, rely=.42)
+            last_name_entry = Entry(register_frame, textvariable=last_name_var, background="#2a3439", foreground="white", width=25, font=20)
             last_name_entry.place(relx=.4, rely=.42)
-            username = Label(register_frame, text="Username", background="#1F262A", foreground="white", font=20)
-            username.place(relx=.1703, rely=.54)
-            username_entry = Entry(register_frame, background="#2a3439", foreground="white", width=25, font=20)
+
+            username_frame = Label(register_frame, text="Username", background="#1F262A", foreground="white", font=20)
+            username_frame.place(relx=.1703, rely=.54)
+            username_entry = Entry(register_frame, textvariable=username_var, background="#2a3439", foreground="white", width=25, font=20)
             username_entry.place(relx=.4, rely=.54)
-            phone = Label(register_frame, text="Phone Number", background="#1F262A", foreground="white", font=20)
-            phone.place(relx=.088, rely=.66)
-            phone_entry = Entry(register_frame, background="#2a3439", foreground="white", width=25, font=20)
+
+            phone_frame = Label(register_frame, text="Phone Number", background="#1F262A", foreground="white", font=20)
+            phone_frame.place(relx=.088, rely=.66)
+            phone_entry = Entry(register_frame, textvariable=phone_var, background="#2a3439", foreground="white", width=25, font=20)
             phone_entry.place(relx=.4, rely=.66)
+
 
             # Create Account Button (sends you to login page)
             create_button = TkinterCustomButton(master=register_frame,
@@ -932,5 +961,21 @@ class RegisterPage:
                                                 width=100,
                                                 height=30,
                                                 hover=True,
-                                                command=lambda: LoginPage())
+                                                command=lambda: [new_register(), LoginPage()])
             create_button.place(relx=0.5, rely=0.85, anchor='center')
+
+        #Register new user
+        def new_register():
+            global user_list
+
+            #Get new users info
+            first_name = first_name_entry.get()
+            last_name = last_name_entry.get()
+            username = username_entry.get()
+            phone = phone_entry.get()
+
+            #Add new user to user list
+            new_account = [first_name, last_name, username, phone, "123456"]
+            user_list.append(new_account)
+
+

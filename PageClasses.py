@@ -500,6 +500,16 @@ class ResultsPage:
                                               value='discovered', style='Sort.TRadiobutton')
             discover_button.grid(row=2, column=2)
 
+            alphabetical_button = ttk.Radiobutton(filter_settings_container, text='Alphabetical',
+                                              variable=sort_order,
+                                              value='Alphabetical', style='Sort.TRadiobutton')
+            alphabetical_button.grid(row=2, column=3)
+
+            time_button = ttk.Radiobutton(filter_settings_container, text='By time',
+                                                  variable=sort_order,
+                                                  value='time', style='Sort.TRadiobutton')
+            time_button.grid(row=1, column=3)
+
             # Container for results
             results_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
             results_container.place(relx=0.5, rely=0.1, anchor="n")

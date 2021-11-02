@@ -133,7 +133,6 @@ class MainWindow:
 
             root.configure(background="#2a3439")
 
-
             main_frame = Frame(root, bg="#2a3439")
             main_frame.place(relx=0.5, rely=0.1, anchor="n")
             main_frame.config(height=root.winfo_height(), width=root.winfo_width())
@@ -141,10 +140,10 @@ class MainWindow:
             style = ttk.Style(root)
             style.theme_use('classic')
             style.configure('Test.TSizegrip', background="#1F262A")
-            root_sizeGrip = ttk.Sizegrip(root)
+            root_size_grip = ttk.Sizegrip(root)
 
-            root_sizeGrip.configure(style="Test.TSizegrip")
-            root_sizeGrip.pack(side="right", anchor=SE)
+            root_size_grip.configure(style="Test.TSizegrip")
+            root_size_grip.pack(side="right", anchor=SE)
 
             # LabelFrame that shows thew Last time some thing was scanned. Initialized as "Last Scanned: ----"
             scan_time_frame = LabelFrame(main_frame, bg="#2a3439", fg="white", font=10, text=now, relief=FLAT)
@@ -163,7 +162,7 @@ class MainWindow:
                                               width=90,
                                               height=40,
                                               hover=True,
-                                              command=lambda: FullScanConfirmPage())
+                                              command=lambda: ScanConfirmPage.make_full_scan_config(self))
             scan_button.place(relx=.01)
             ToolTip(scan_button, "Scans all the software files from list.")
 
@@ -178,7 +177,7 @@ class MainWindow:
                                                       width=130,
                                                       height=40,
                                                       hover=True,
-                                                      command=lambda: ExpressScanConfirmPage())
+                                                      command=lambda: ScanConfirmPage.make_express_config(self))
             express_scan_button.place(relx=.12)
             ToolTip(express_scan_button, "Scans the most important software files.")
 
@@ -198,17 +197,19 @@ class MainWindow:
             # </editor-fold>
 
 
-class FullScanConfirmPage:
+# This class will create the scan page
+# This will be different whether the full scan or express scan options were selected
+# Picking one of the options will load up the proper buttons for that configuration
+class ScanConfirmPage:
 
     def __init__(self):
         global root
         global last_page
 
-        if last_page != "FullScanConfirmPage":
-            last_page = "FullScanConfirmPage"
-
-            for widget in root.winfo_children()[1:]:
-                widget.destroy()
+    # This will setup the button for the Full Scan configuration
+    def make_full_scan_config(self):
+        for widget in root.winfo_children()[1:]:
+            widget.destroy()
 
             root.configure(background="#2a3439")
 
@@ -240,7 +241,7 @@ class FullScanConfirmPage:
                                                   width=200,
                                                   height=75,
                                                   hover=True,
-                                                  command=lambda: [last_time_clicked(), scan()])
+                                                  command=lambda: [last_time_clicked(), ScanConfirmPage.scan(self)])
             continue_button.place(relx=0.25, rely=0.8, anchor="center")
 
             cancel_button = TkinterCustomButton(master=scan_confirm_frame,
@@ -256,203 +257,141 @@ class FullScanConfirmPage:
                                                 command=lambda: MainWindow())
             cancel_button.place(relx=0.70, rely=0.8, anchor="center")
 
-            # This will scan the Database for the software we selected
-            def scan():
-                list_results = []
-                cve = CVEDataFrame()
-                # Makes a progress bar
-                progressbar_style_element = ttk.Style()
-                progressbar_style_element.theme_use('alt')
-                progressbar_style_element.configure("red.Horizontal.TProgressbar", foreground='red', bg='red')
-                results_progressbar = ttk.Progressbar(root, orient=HORIZONTAL, length=500, mode='determinate',
-                                                      style="red.Horizontal.TProgressbar")
-                results_progressbar.place(relx=0.5, rely=0.8, anchor="center")
+    # This will setup the buttons for the Express Scan Function
+    def make_express_config(self):
+        def browse_files():
+            global files_list
+            filenames = filedialog.askopenfilenames(initialdir="C:\Program Files",
+                                                    title="Select Files",
+                                                    filetypes=(("all files",
+                                                                "*.*"),
+                                                               ("Text files",
+                                                                "*.txt*")))
+            files_list = list(filenames)
+            ctr = 0
 
-                # This will remove the path extension for all of the selected applications
-                # This will loop through all the Files, selected from the sub menu in Express Scan
-                for record in files_list:
-                    # This will reduce the name to a Application.exe
-                    base = os.path.basename(record)
-                    # This will separate the Application.exe to a list of [Application, .exe]
-                    os.path.splitext(base)
-                    base = base[:-4]
-                    # This will actively update the progress bar an appropriate amount of times
-                    results_progressbar['value'] += (100 / len(files_list))
-                    root.update_idletasks()
+            # Display selected files on confirm page
+            for file in files_list:
+                file_block = tk.Frame(scan_confirm_container, bg="#2a3439")
+                file_block.place(relx=0.5, rely=0.02, anchor="n")
+                file_block.config(height=50, width=860)
+                file_label = tk.Label(file_block, text=files_list[ctr], font=14, bg="#2a3439", fg="white",
+                                      wraplength=845, justify='left')
+                file_label.place(relx=0.01, rely=0.5, anchor="w")
+                file_block.grid(row=ctr, column=0, padx=10, pady=5)
 
-                    # This will not add an entry to the results list if nothing is found in the CVE Database
-                    if not cve.select_record_by_name(base):
-                        pass
-                    # This will add an entry to the results list with vulnerability from the CVE Database
-                    else:
-                        list_results.append(cve.select_record_by_name(base))
+                ctr = ctr + 1
 
-                results_progressbar.destroy()
-                ResultsPage.print_results(list_results)
+            # Scrollbar if more than 6 files are selected
+            if ctr > 5:
+                scan_confirm_sb = ttk.Scrollbar(scan_confirm_canvas, orient="vertical",
+                                                command=scan_confirm_canvas.yview)
+                scan_confirm_sb.place(relx=0.98, height=350)
+                scan_confirm_canvas.configure(yscrollcommand=scan_confirm_sb.set)
 
-        style = ttk.Style(root)
-        style.theme_use('classic')
-        style.configure('Test.TSizegrip', background="#1F262A")
-        root_sizeGrip = ttk.Sizegrip(root)
+        root.configure(background="#2a3439")
 
-        root_sizeGrip.configure(style="Test.TSizegrip")
-        root_sizeGrip.pack(side="right", anchor=SE)
+        # Frame for scan confirmation dialog box
+        scan_confirm_frame = Frame(root, bg="#2a3439")
+        scan_confirm_frame.place(relx=0.5, rely=0.1, anchor="n")
+        scan_confirm_frame.config(height=root.winfo_height(), width=root.winfo_width())
 
+        scan_confirm_label = Label(scan_confirm_frame, text='What will be scanned:', font=14, bg="#2a3439",
+                                   fg="white")
+        scan_confirm_label.place(relx=0.05, rely=0.05, anchor="w")
 
-class ExpressScanConfirmPage():
+        scan_confirm_canvas = Canvas(scan_confirm_frame, height=300, width=900, bg="#2a3439")
+        scan_confirm_canvas.place(relx=0.5, rely=0.1, anchor="n")
 
-    def __init__(self):
-        global root
-        global last_page
-
-        if last_page != "ExpressScanConfirmPage":
-            last_page = "ExpressScanConfirmPage"
-
-            for widget in root.winfo_children()[1:]:
-                widget.destroy()
-
-            # Function for opening the
-            # file explorer window
-
-            def browse_files():
-                global files_list
-                filenames = filedialog.askopenfilenames(initialdir="C:\Program Files",
-                                                        title="Select Files",
-                                                        filetypes=(("all files",
-                                                                    "*.*"),
-                                                                   ("Text files",
-                                                                    "*.txt*")))
-                files_list = list(filenames)
-                ctr = 0
-
-                # Display selected files on confirm page
-                for file in files_list:
-                    file_block = tk.Frame(scan_confirm_container, bg="#2a3439")
-                    file_block.place(relx=0.5, rely=0.02, anchor="n")
-                    file_block.config(height=50, width=860)
-                    file_label = tk.Label(file_block, text=files_list[ctr], font=14, bg="#2a3439", fg="white",
-                                          wraplength=845, justify='left')
-                    file_label.place(relx=0.01, rely=0.5, anchor="w")
-                    file_block.grid(row=ctr, column=0, padx=10, pady=5)
-
-                    ctr = ctr + 1
-
-                # Scrollbar if more than 6 files are selected
-                if ctr > 5:
-                    scan_confirm_sb = ttk.Scrollbar(scan_confirm_canvas, orient="vertical",
-                                                    command=scan_confirm_canvas.yview)
-                    scan_confirm_sb.place(relx=0.98, height=350)
-                    scan_confirm_canvas.configure(yscrollcommand=scan_confirm_sb.set)
-
-            root.configure(background="#2a3439")
-
-            # Frame for scan confirmation dialog box
-            scan_confirm_frame = Frame(root, bg="#2a3439")
-            scan_confirm_frame.place(relx=0.5, rely=0.1, anchor="n")
-            scan_confirm_frame.config(height=root.winfo_height(), width=root.winfo_width())
-
-            scan_confirm_label = Label(scan_confirm_frame, text='What will be scanned:', font=14, bg="#2a3439",
-                                       fg="white")
-            scan_confirm_label.place(relx=0.05, rely=0.05, anchor="w")
-
-            scan_confirm_canvas = Canvas(scan_confirm_frame, height=300, width=900, bg="#2a3439")
-            scan_confirm_canvas.place(relx=0.5, rely=0.1, anchor="n")
-
-            # Container for files to be scanned
-            scan_confirm_container = Frame(scan_confirm_canvas, bg="#1F262A", borderwidth=2)
-            scan_confirm_container.place(relx=0.5, rely=0.1, anchor="n")
-            scan_confirm_container.config(relief=RIDGE, height=350, width=900)
-            # Bind scrollbar to container
-            scan_confirm_container.bind(
-                "<Configure>",
-                lambda e: scan_confirm_canvas.configure(
-                    scrollregion=scan_confirm_canvas.bbox("all")
-                )
+        # Container for files to be scanned
+        scan_confirm_container = Frame(scan_confirm_canvas, bg="#1F262A", borderwidth=2)
+        scan_confirm_container.place(relx=0.5, rely=0.1, anchor="n")
+        scan_confirm_container.config(relief=RIDGE, height=350, width=900)
+        # Bind scrollbar to container
+        scan_confirm_container.bind(
+            "<Configure>",
+            lambda e: scan_confirm_canvas.configure(
+                scrollregion=scan_confirm_canvas.bbox("all")
             )
-            scan_confirm_canvas.create_window((0, 0), window=scan_confirm_container, anchor="nw")
+        )
+        scan_confirm_canvas.create_window((0, 0), window=scan_confirm_container, anchor="nw")
 
-            continue_button = TkinterCustomButton(master=scan_confirm_frame,
-                                                  fg_color="#848689",
-                                                  hover_color="#1F262A",
-                                                  text_font="Bold, 14",
-                                                  text="Continue",
-                                                  text_color="white",
-                                                  corner_radius=10,
-                                                  width=200,
-                                                  height=75,
-                                                  hover=True,
-                                                  command=lambda: [last_time_clicked(), scan()])
-            continue_button.place(relx=0.25, rely=0.8, anchor="center")
+        continue_button = TkinterCustomButton(master=scan_confirm_frame,
+                                              fg_color="#848689",
+                                              hover_color="#1F262A",
+                                              text_font="Bold, 14",
+                                              text="Continue",
+                                              text_color="white",
+                                              corner_radius=10,
+                                              width=200,
+                                              height=75,
+                                              hover=True,
+                                              command=lambda: [last_time_clicked(), ScanConfirmPage.scan(self)])
+        continue_button.place(relx=0.25, rely=0.8, anchor="center")
 
-            add_files_button = TkinterCustomButton(master=scan_confirm_frame,
-                                                   fg_color="#8797AF",
-                                                   hover_color="#1F262A",
-                                                   text_font="Bold, 14",
-                                                   text="Add Files",
-                                                   text_color="white",
-                                                   corner_radius=10,
-                                                   width=200,
-                                                   height=75,
-                                                   hover=True,
-                                                   command=lambda: browse_files())
-            add_files_button.place(relx=0.5, rely=0.8, anchor="center")
+        add_files_button = TkinterCustomButton(master=scan_confirm_frame,
+                                               fg_color="#8797AF",
+                                               hover_color="#1F262A",
+                                               text_font="Bold, 14",
+                                               text="Add Files",
+                                               text_color="white",
+                                               corner_radius=10,
+                                               width=200,
+                                               height=75,
+                                               hover=True,
+                                               command=lambda: browse_files())
+        add_files_button.place(relx=0.5, rely=0.8, anchor="center")
 
-            cancel_button = TkinterCustomButton(master=scan_confirm_frame,
-                                                fg_color="#5F4866",
-                                                hover_color="#1F262A",
-                                                text_font="Bold, 14",
-                                                text="Cancel",
-                                                text_color="white",
-                                                corner_radius=10,
-                                                width=100,
-                                                height=50,
-                                                hover=True,
-                                                command=lambda: MainWindow())
-            cancel_button.place(relx=0.70, rely=0.8, anchor="center")
+        cancel_button = TkinterCustomButton(master=scan_confirm_frame,
+                                            fg_color="#5F4866",
+                                            hover_color="#1F262A",
+                                            text_font="Bold, 14",
+                                            text="Cancel",
+                                            text_color="white",
+                                            corner_radius=10,
+                                            width=100,
+                                            height=50,
+                                            hover=True,
+                                            command=lambda: MainWindow())
+        cancel_button.place(relx=0.70, rely=0.8, anchor="center")
 
-            style = ttk.Style(root)
-            style.theme_use('classic')
-            style.configure('Test.TSizegrip', background="#1F262A")
-            root_sizeGrip = ttk.Sizegrip(root)
+    # This will scan the Database
+    # This function will be called no matter which config is decided on
+    def scan(self):
+        list_results = []
+        cve = CVEDataFrame()
+        # Makes a progress bar
+        progressbar_style_element = ttk.Style()
+        progressbar_style_element.theme_use('alt')
+        progressbar_style_element.configure("red.Horizontal.TProgressbar", foreground='red', bg='red')
+        results_progressbar = ttk.Progressbar(root, orient=HORIZONTAL, length=500, mode='determinate',
+                                              style="red.Horizontal.TProgressbar")
+        results_progressbar.place(relx=0.5, rely=0.8, anchor="center")
 
-            root_sizeGrip.configure(style="Test.TSizegrip")
-            root_sizeGrip.pack(side="right", anchor=SE)
+        # This will remove the path extension for all of the selected applications
+        # This will loop through all the Files, selected from the sub menu in Express Scan
+        for record in files_list:
+            # This will reduce the name to a Application.exe
+            base = os.path.basename(record)
+            # This will separate the Application.exe to a list of [Application, .exe]
+            os.path.splitext(base)
+            base = base[:-4]
+            # This will actively update the progress bar an appropriate amount of times
+            results_progressbar['value'] += (100 / len(files_list))
+            root.update_idletasks()
 
-        # This will scan the Database for the software we selected
-        def scan():
-            list_results = []
-            cve = CVEDataFrame()
-            # Makes a progress bar
-            progressbar_style_element = ttk.Style()
-            progressbar_style_element.theme_use('alt')
-            progressbar_style_element.configure("red.Horizontal.TProgressbar", foreground='red', bg='red')
-            results_progressbar = ttk.Progressbar(root, orient=HORIZONTAL, length=500, mode='determinate',
-                                                  style="red.Horizontal.TProgressbar")
-            results_progressbar.place(relx=0.5, rely=0.8, anchor="center")
+            # This will not add an entry to the results list if nothing is found in the CVE Database
+            if not cve.select_record_by_name(base):
+                pass
+            # This will add an entry to the results list with vulnerability from the CVE Database
+            else:
+                list_results.append(cve.select_record_by_name(base))
 
-            # This will remove the path extension for all of the selected applications
-            # This will loop through all the Files, selected from the sub menu in Express Scan
-            for record in files_list:
-                # This will reduce the name to a Application.exe
-                base = os.path.basename(record)
-                # This will separate the Application.exe to a list of [Application, .exe]
-                os.path.splitext(base)
-                base = base[:-4]
-                # This will actively update the progress bar an appropriate amount of times
-                results_progressbar['value'] += (100 / len(files_list))
-                root.update_idletasks()
-
-                # This will not add an entry to the results list if nothing is found in the CVE Database
-                if not cve.select_record_by_name(base):
-                    pass
-                # This will add an entry to the results list with vulnerability from the CVE Database
-                else:
-                    list_results.append(cve.select_record_by_name(base))
-
-            results_progressbar.destroy()
-            ResultsPage.print_results(list_results)
+        results_progressbar.destroy()
+        ResultsPage.print_results(self, list_results)
 
 
+# This will create the results page
 class ResultsPage:
 
     def __init__(self):
@@ -468,13 +407,11 @@ class ResultsPage:
 
             root.configure(background="#2a3439")
 
-
             results_frame = Frame(root, bg="#2a3439")
             results_frame.place(relx=0.5, rely=0.1, anchor="n")
             results_frame.config(height=root.winfo_height(), width=root.winfo_width())
 
-            ResultsPage.create_update_buttons(results_frame)
-
+            ResultsPage.create_update_buttons(self, results_frame)
 
             # Container for filter settings
             filter_settings_container = tk.Frame(results_frame, bg="#1F262A", borderwidth=2)
@@ -482,7 +419,7 @@ class ResultsPage:
             filter_settings_container.config(relief=RIDGE)
 
             sort_scan_label = tk.Label(filter_settings_container, text='Sort scan results...', font='2', bg='#2a3439',
-                                      fg="white")
+                                       fg="white")
 
             style_element = ttk.Style()  # Creating style element
             style_element.configure('Sort.TRadiobutton',
@@ -493,25 +430,24 @@ class ResultsPage:
             sort_scan_label.grid(row=1, column=0, padx=50)
             sort_order = StringVar()
 
-
-            #Settings dropdown window
-            OptionList = [
+            # Settings dropdown window
+            option_list = [
                 "By Severity",
                 "By Time",
                 "Alphabetical",
                 "In Order Discovered"
             ]
 
-            SettingsMenu = filter_settings_container
+            settings_menu = filter_settings_container
 
-            variable = tk.StringVar(SettingsMenu)
-            variable.set(OptionList[0])
+            variable = tk.StringVar(settings_menu)
+            variable.set(option_list[0])
 
-            opt = tk.OptionMenu(filter_settings_container, variable, *OptionList)
+            opt = tk.OptionMenu(filter_settings_container, variable, *option_list)
             opt.config(background="#1F262A", foreground="white", width=15, font=('Bold', 12))
             opt.grid()
 
-            SettingsMenu.mainloop()
+            settings_menu.mainloop()
 
             # Container for results
             results_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
@@ -536,7 +472,7 @@ class ResultsPage:
             # </editor-fold>
 
     # Function to create the update buttons before and after have results
-    def create_update_buttons(results_frame):
+    def create_update_buttons(self, results_frame):
         update_all_button = TkinterCustomButton(master=results_frame,
                                                 fg_color="#848689",
                                                 hover_color="#1F262A",
@@ -576,6 +512,21 @@ class ResultsPage:
                                             command=lambda: None)
         cancel_button.place(relx=0.70, rely=0.8, anchor="center")
 
+        filter_settings_container = tk.Frame(results_frame, bg="#1F262A", borderwidth=2)
+        filter_settings_container.place(relx=0.04, rely=0.0, anchor="nw")
+        filter_settings_container.config(relief=RIDGE)
+
+        sort_scan_label = tk.Label(filter_settings_container, text='Sort scan results...', font='2', bg='#2a3439',
+                                   fg="white")
+
+        style_element = ttk.Style()  # Creating style element
+        style_element.configure('Sort.TRadiobutton',
+                                # First argument is the name of style. Needs to end with: .TRadiobutton
+                                background='#2a3439',  # Setting background to our specified color above
+                                foreground='white')
+
+        sort_scan_label.grid(row=1, column=0, padx=50)
+        sort_order = StringVar()
 
         style = ttk.Style(root)
         style.theme_use('classic')
@@ -586,8 +537,7 @@ class ResultsPage:
         root_sizeGrip.pack(side="right", anchor=SE)
         # </editor-fold>
 
-    @staticmethod
-    def print_results(list_results):
+    def print_results(self, list_results):
         results_frame = Frame(root, bg="#2a3439")
         results_frame.place(relx=0.5, rely=0.1, anchor="n")
         results_frame.config(height=root.winfo_height(), width=root.winfo_width())
@@ -610,7 +560,7 @@ class ResultsPage:
             results_example.grid(row=i, column=0, padx=10, pady=5)
 
         # Calls function to put the update buttons back on the screen with the results
-        ResultsPage.create_update_buttons(results_frame)
+        ResultsPage.create_update_buttons(self, results_frame)
 
 
 class HelpPage:
@@ -628,10 +578,10 @@ class HelpPage:
             style = ttk.Style(root)
             style.theme_use('classic')
             style.configure('Test.TSizegrip', background="#1F262A")
-            root_sizeGrip = ttk.Sizegrip(root)
+            root_size_grip = ttk.Sizegrip(root)
 
-            root_sizeGrip.configure(style="Test.TSizegrip")
-            root_sizeGrip.pack(side="right", anchor=SE)
+            root_size_grip.configure(style="Test.TSizegrip")
+            root_size_grip.pack(side="right", anchor=SE)
 
             helper_frame = Frame(root, bg="#2a3439")
             helper_frame.pack(fill=BOTH, expand=1)
@@ -687,18 +637,12 @@ class HelpPage:
                                                bg="#2a3439", fg="#FFFFFF")
             help_example2_header_label.place(relx=0.01, rely=0.1, anchor="nw")
 
-            text2 = """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque semper, neque vitae 
-                    placerat interdum, orci nisl hendrerit erat, vel iaculis tellus lacus a nibh. Mauris
-                    consequat nunc non est sollicitudin efficitur. Fusce vestibulum eget est id euismod. Duis
-                    egestas tellus ac lorem egestas, at elementum libero viverra. In volutpat rhoncus
-                    dapibus. Morbi eu cursus felis. Mauris vel enim neque. Duis posuere rutrum varius.
-                    Curabitur id vestibulum est, in scelerisque orci. Morbi vitae condimentum ante.
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque semper, neque vitae 
-                    placerat interdum, orci nisl hendrerit erat, vel iaculis tellus lacus a nibh. Mauris
-                    consequat nunc non est sollicitudin efficitur. Fusce vestibulum eget est id euismod. Duis
-                    egestas tellus ac lorem egestas, at elementum libero viverra. In volutpat rhoncus
-                    dapibus. Morbi eu cursus felis. Mauris vel enim neque. Duis posuere rutrum varius.
-                    Curabitur id vestibulum est, in scelerisque orci. Morbi vitae condimentum ante.""" \
+            text2 = """ To score the vulnerabilities we will be interfacing with the a CVSS 2.0 scorer.
+                    CVSS or better known as the Common Vulnerability Scoring System will take in a number of parameters
+                    in order to delivery an accurate threat score. Some of the items taken into account when calculating
+                    a score are the Access Vector, Access Complexity, Authentication, Confidentiality Impact, Integrity Impact, 
+                    and lastly the Availability Impact.
+            """ \
                 .replace('\n', ' ').replace('                    ', '')
             help_example2_body_label = Label(help_example2, text=text2, font=20, bg="#2a3439", fg="#FFFFFF",
                                              wraplength=880, justify="left")
@@ -809,18 +753,16 @@ class LoginPage:
         if last_page != "LoginPage":
             last_page = "LoginPage"
 
-
-
             for widget in root.winfo_children()[1:]:
                 widget.destroy()
 
             style = ttk.Style(root)
             style.theme_use('classic')
             style.configure('Test.TSizegrip', background="#1F262A")
-            root_sizeGrip = ttk.Sizegrip(root)
+            root_size_grip = ttk.Sizegrip(root)
 
-            root_sizeGrip.configure(style="Test.TSizegrip")
-            root_sizeGrip.pack(side="right", anchor=SE)
+            root_size_grip.configure(style="Test.TSizegrip")
+            root_size_grip.pack(side="right", anchor=SE)
             # Login page outer frame
             login_outer_frame = Frame(root, bg='#1F262A')
             login_outer_frame.place(relx=0.5, rely=0.5, anchor='center')
@@ -840,11 +782,13 @@ class LoginPage:
             username_label = Label(login_inner_frame, text='Username', font=15, background="#2a3439",
                                    foreground="white")
             username_label.place(relx=0.5, rely=0.3, anchor="center")
-            username_entry = Entry(login_inner_frame, textvariable=username_var, background="#1F262A", foreground="white", font=15)
+            username_entry = Entry(login_inner_frame, textvariable=username_var, background="#1F262A",
+                                   foreground="white", font=15)
             username_entry.place(relx=0.5, rely=0.4, anchor='center')
             token_label = Label(login_inner_frame, text='RSA Token', font=15, background="#2a3439", foreground="white")
             token_label.place(relx=0.5, rely=0.53, anchor='center')
-            token_entry = Entry(login_inner_frame, textvariable=token_var, background="#1F262A", foreground="white", font=15)
+            token_entry = Entry(login_inner_frame, textvariable=token_var, background="#1F262A", foreground="white",
+                                font=15)
             token_entry.place(relx=0.5, rely=0.63, anchor='center')
 
             # Login Button (sends you to home page)
@@ -877,7 +821,7 @@ class LoginPage:
                                                   command=lambda: RegisterPage())
             register_button.place(relx=0.6, rely=0.85, anchor='center')
 
-        #Search through user list. Return True if user and token are correct.
+        # Search through user list. Return True if user and token are correct.
         def check_login():
             global user_list
             username = username_entry.get()
@@ -888,9 +832,10 @@ class LoginPage:
                     exists = True
             return exists
 
-        #Make error message for login
+        # Make error message for login
         def login_error():
-            error_message = LabelFrame(login_inner_frame, bg="#2a3439", fg="red", font=10, text="Wrong Username or RSA Token.", relief=FLAT)
+            error_message = LabelFrame(login_inner_frame, bg="#2a3439", fg="red", font=10,
+                                       text="Wrong Username or RSA Token.", relief=FLAT)
             error_message.place(relx=0.5, rely=0.68, anchor="n")
             error_message.config(height=19, width=240)
 
@@ -901,7 +846,7 @@ class RegisterPage:
         global root
         global last_page
 
-        #Initialize input variables
+        # Initialize input variables
         first_name_var = tk.StringVar(value="")
         last_name_var = tk.StringVar(value="")
         username_var = tk.StringVar(value="")
@@ -917,10 +862,10 @@ class RegisterPage:
             style = ttk.Style(root)
             style.theme_use('classic')
             style.configure('Test.TSizegrip', background="#1F262A")
-            root_sizeGrip = ttk.Sizegrip(root)
+            root_size_grip = ttk.Sizegrip(root)
 
-            root_sizeGrip.configure(style="Test.TSizegrip")
-            root_sizeGrip.pack(side="right", anchor=SE)
+            root_size_grip.configure(style="Test.TSizegrip")
+            root_size_grip.pack(side="right", anchor=SE)
 
             # Register page frame
             register_frame = Frame(root, bg='#1F262A')
@@ -929,29 +874,34 @@ class RegisterPage:
             register_frame.config(relief=RAISED)
 
             # Register page entries and labels
-            register_title = Label(register_frame, text="Register", background="#1F262A", foreground="white", font="Bold, 25")
+            register_title = Label(register_frame, text="Register", background="#1F262A", foreground="white",
+                                   font="Bold, 25")
             register_title.place(relx=0.5, rely=.1, anchor='center')
 
-            first_name_frame = Label(register_frame, text="First Name", background="#1F262A", foreground="white", font=20)
+            first_name_frame = Label(register_frame, text="First Name", background="#1F262A", foreground="white",
+                                     font=20)
             first_name_frame.place(relx=.16003, rely=.3)
-            first_name_entry = Entry(register_frame, textvariable=first_name_var, background="#2a3439", foreground="white", width=25, font=20)
+            first_name_entry = Entry(register_frame, textvariable=first_name_var, background="#2a3439",
+                                     foreground="white", width=25, font=20)
             first_name_entry.place(relx=.4, rely=.3)
 
             last_name_frame = Label(register_frame, text="Last Name", background="#1F262A", foreground="white", font=20)
             last_name_frame.place(relx=.16001, rely=.42)
-            last_name_entry = Entry(register_frame, textvariable=last_name_var, background="#2a3439", foreground="white", width=25, font=20)
+            last_name_entry = Entry(register_frame, textvariable=last_name_var, background="#2a3439",
+                                    foreground="white", width=25, font=20)
             last_name_entry.place(relx=.4, rely=.42)
 
             username_frame = Label(register_frame, text="Username", background="#1F262A", foreground="white", font=20)
             username_frame.place(relx=.1703, rely=.54)
-            username_entry = Entry(register_frame, textvariable=username_var, background="#2a3439", foreground="white", width=25, font=20)
+            username_entry = Entry(register_frame, textvariable=username_var, background="#2a3439", foreground="white",
+                                   width=25, font=20)
             username_entry.place(relx=.4, rely=.54)
 
             phone_frame = Label(register_frame, text="Phone Number", background="#1F262A", foreground="white", font=20)
             phone_frame.place(relx=.088, rely=.66)
-            phone_entry = Entry(register_frame, textvariable=phone_var, background="#2a3439", foreground="white", width=25, font=20)
+            phone_entry = Entry(register_frame, textvariable=phone_var, background="#2a3439", foreground="white",
+                                width=25, font=20)
             phone_entry.place(relx=.4, rely=.66)
-
 
             # Create Account Button (sends you to login page)
             create_button = TkinterCustomButton(master=register_frame,
@@ -968,18 +918,16 @@ class RegisterPage:
                                                 command=lambda: [new_register(), LoginPage()])
             create_button.place(relx=0.5, rely=0.85, anchor='center')
 
-        #Register new user
+        # Register new user
         def new_register():
             global user_list
 
-            #Get new users info
+            # Get new users info
             first_name = first_name_entry.get()
             last_name = last_name_entry.get()
             username = username_entry.get()
             phone = phone_entry.get()
 
-            #Add new user to user list
+            # Add new user to user list
             new_account = [first_name, last_name, username, phone, "123456"]
             user_list.append(new_account)
-
-

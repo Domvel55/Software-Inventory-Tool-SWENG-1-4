@@ -511,7 +511,7 @@ class ResultsPage:
                                                   value='time', style='Sort.TRadiobutton')
             time_button.grid(row=1, column=3)
 
-            # commented out because it breaks the page.
+            # commented out because it breaks the page
             OptionList = [
                 "By Severity",
                 "By Time",
@@ -525,7 +525,7 @@ class ResultsPage:
             variable.set(OptionList[0])
 
             opt = tk.OptionMenu(results_frame, variable, *OptionList)
-            opt.config(width=15, font=('Helvetica', 12))
+            opt.config(background="#2a3439", foreground="white", width=15, font=('Bold', 12))
             opt.pack()
 
             SettingsMenu.mainloop()

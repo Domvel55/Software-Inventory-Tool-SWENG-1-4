@@ -510,7 +510,7 @@ class ResultsPage:
                                                   value='time', style='Sort.TRadiobutton')
             time_button.grid(row=1, column=3)
 
-            # Container for results
+            # Container for results.
             results_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
             results_container.place(relx=0.5, rely=0.1, anchor="n")
             results_container.config(relief=RIDGE)

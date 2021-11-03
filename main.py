@@ -31,8 +31,7 @@ def create_window():
     # Change the text after minimizing the tool to task bar
     root.title("Sieve")
 
-
-    # remove title bar
+    # Removes title bar
     root.overrideredirect(True)
     root.minimized = False  # only to know if root is minimized
     root.maximized = False  # only to know if root is maximized
@@ -40,10 +39,6 @@ def create_window():
     # Create New Title Bar
     title_bar = Frame(root, bg="#1F262A", relief="raised", bd=1)
     title_bar.pack(fill=X)
-
-
-
-
 
     # 'Binding the title bar
     title_bar.bind("<Map>", frame_mapped)
@@ -164,9 +159,6 @@ def create_window():
         else:
             expand_button.configure(text=" 🗗 ")
         maximize_me(e)
-
-
-
 
     def get_pos(e):  # this is executed when the title bar is clicked to move the window
 

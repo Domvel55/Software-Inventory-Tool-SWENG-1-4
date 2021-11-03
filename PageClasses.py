@@ -14,6 +14,7 @@ from tkinter import filedialog
 import tkinter as tk
 import os
 import datetime
+from plyer import notification
 
 root = Tk()
 global files_list
@@ -388,7 +389,15 @@ class ScanConfirmPage:
                 list_results.append(cve.select_record_by_name(base))
 
         results_progressbar.destroy()
+
         ResultsPage.print_results(self, list_results)
+        title = 'A scan has been completed!'
+        message = 'Please return to the Software Inventory Tool to view results.'
+        notification.notify(title=title,
+                            message=message,
+                            app_icon='logo.ico',
+                            timeout=10,
+                            toast=False)
 
 
 # This will create the results page

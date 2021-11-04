@@ -420,43 +420,12 @@ class ResultsPage:
             results_frame.place(relx=0.5, rely=0.1, anchor="n")
             results_frame.config(height=root.winfo_height(), width=root.winfo_width())
 
-            ResultsPage.create_update_buttons(self, results_frame)
+            ResultsPage.create_update_buttons(results_frame)
 
             # Container for filter settings
             filter_settings_container = tk.Frame(results_frame, bg="#1F262A", borderwidth=2)
             filter_settings_container.place(relx=0.04, rely=0.0, anchor="nw")
             filter_settings_container.config(relief=RIDGE)
-
-            sort_scan_label = tk.Label(filter_settings_container, text='Sort scan results...', font='2', bg='#2a3439',
-                                       fg="white")
-
-            style_element = ttk.Style()  # Creating style element
-            style_element.configure('Sort.TRadiobutton',
-                                    # First argument is the name of style. Needs to end with: .TRadiobutton
-                                    background='#2a3439',  # Setting background to our specified color above
-                                    foreground='white')
-
-            sort_scan_label.grid(row=1, column=0, padx=50)
-            sort_order = StringVar()
-
-            # Settings dropdown window
-            option_list = [
-                "By Severity",
-                "By Time",
-                "Alphabetical",
-                "In Order Discovered"
-            ]
-
-            settings_menu = filter_settings_container
-
-            variable = tk.StringVar(settings_menu)
-            variable.set(option_list[0])
-
-            opt = tk.OptionMenu(filter_settings_container, variable, *option_list)
-            opt.config(background="#1F262A", foreground="white", width=15, font=('Bold', 12))
-            opt.grid()
-
-            settings_menu.mainloop()
 
             # Container for results
             results_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
@@ -469,6 +438,7 @@ class ResultsPage:
             results_files_frame = Frame(results_container, bg="#2a3439")
             results_files_frame.place(relx=0.5, rely=0.02, anchor="n")
             results_files_frame.config(height=50, width=900)
+
             for i in range(6):
                 results_example = Frame(results_container, bg="#2a3439")
                 results_example.place(relx=0.5, rely=0.02, anchor="n")
@@ -477,11 +447,11 @@ class ResultsPage:
                                                fg="#5B676D")
                 results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
                 results_example.grid(row=i, column=0, padx=10, pady=5)
-
             # </editor-fold>
 
     # Function to create the update buttons before and after have results
-    def create_update_buttons(self, results_frame):
+    @staticmethod
+    def create_update_buttons(results_frame):
         update_all_button = TkinterCustomButton(master=results_frame,
                                                 fg_color="#848689",
                                                 hover_color="#1F262A",
@@ -537,14 +507,33 @@ class ResultsPage:
         sort_scan_label.grid(row=1, column=0, padx=50)
         sort_order = StringVar()
 
+        # Settings dropdown window
+        option_list = [
+            "By Severity",
+            "By Time",
+            "Alphabetical",
+            "In Order Discovered"
+        ]
+
+        settings_menu = filter_settings_container
+
+        variable = tk.StringVar(settings_menu)
+        variable.set(option_list[0])
+
+        opt = tk.OptionMenu(filter_settings_container, variable, *option_list)
+        opt.config(background="#1F262A", foreground="white", width=15, font=('Bold', 12))
+        opt.grid()
+
         style = ttk.Style(root)
         style.theme_use('classic')
         style.configure('Test.TSizegrip', background="#1F262A")
-        root_sizeGrip = ttk.Sizegrip(root)
+        root_size_grip = ttk.Sizegrip(root)
 
-        root_sizeGrip.configure(style="Test.TSizegrip")
-        root_sizeGrip.pack(side="right", anchor=SE)
+        root_size_grip.configure(style="Test.TSizegrip")
+        root_size_grip.pack(side="right", anchor=SE)
         # </editor-fold>
+    # This will take the software found from a scan
+    # And print them to the results page
 
     def print_results(self, list_results):
         results_frame = Frame(root, bg="#2a3439")
@@ -569,7 +558,7 @@ class ResultsPage:
             results_example.grid(row=i, column=0, padx=10, pady=5)
 
         # Calls function to put the update buttons back on the screen with the results
-        ResultsPage.create_update_buttons(self, results_frame)
+        ResultsPage.create_update_buttons(results_frame)
 
 
 class HelpPage:

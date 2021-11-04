@@ -8,6 +8,8 @@
 
 from tkinter import *
 from tkinter import ttk
+
+
 from tkinter_custom_button import TkinterCustomButton
 from Database import *
 from tkinter import filedialog
@@ -22,6 +24,12 @@ now = "Last Scanned: ----"
 global last_page
 last_page = ""
 user_list = []
+
+global logged_in
+logged_in = False
+
+title_bar = Frame(root, bg="#1F262A", relief="raised", bd=1)
+title_bar.pack(fill=X)
 
 
 def move_app(e):
@@ -119,12 +127,73 @@ class ToolTip(object):
             tw.destroy()
 
 
+class MakeWindow:
+    def nav_buttons(self):
+        # Navigation Buttons
+        home_button = TkinterCustomButton(master=title_bar, bg_color=None,
+                                          fg_color="#1F262A",
+                                          hover_color="#2a3439",
+                                          text_font="Bold, 12",
+                                          text="Home",
+                                          text_color="white",
+                                          corner_radius=0,
+                                          width=50,
+                                          height=40,
+                                          hover=True,
+                                          command=lambda: MainWindow())
+        home_button.pack(side=LEFT, padx=5)
+
+        # Results Button here
+        results_button = TkinterCustomButton(master=title_bar, bg_color=None,
+                                             fg_color="#1F262A",
+                                             hover_color="#2a3439",
+                                             text_font="Bold, 12",
+                                             text="Results",
+                                             text_color="white",
+                                             corner_radius=0,
+                                             width=65,
+                                             height=40,
+                                             hover=True,
+                                             command=lambda: ResultsPage())
+        results_button.pack(side=LEFT, padx=5)
+
+        # Create Settings Button
+        settings_button = TkinterCustomButton(master=title_bar, bg_color=None,
+                                              fg_color="#1F262A",
+                                              hover_color="#2a3439",
+                                              text_font="Bold, 12",
+                                              text="Settings",
+                                              text_color="white",
+                                              corner_radius=0,
+                                              width=70,
+                                              height=40,
+                                              hover=True,
+                                              command=lambda: SettingsPage())
+        settings_button.pack(side=LEFT, padx=5)
+
+        # Create Help Button
+        help_button = TkinterCustomButton(master=title_bar, bg_color=None,
+                                          fg_color="#1F262A",
+                                          hover_color="#2a3439",
+                                          text_font="Bold, 12",
+                                          text="Help",
+                                          text_color="white",
+                                          corner_radius=0,
+                                          width=40,
+                                          height=40,
+                                          hover=True,
+                                          command=lambda: HelpPage())
+        help_button.pack(side=LEFT, padx=5)
+
+
+
 class MainWindow:
 
     def __init__(self):
         global root
         global now
         global last_page
+        global title_bar
 
         if last_page != "HomePage":
             last_page = "HomePage"
@@ -532,6 +601,7 @@ class ResultsPage:
         root_size_grip.configure(style="Test.TSizegrip")
         root_size_grip.pack(side="right", anchor=SE)
         # </editor-fold>
+
     # This will take the software found from a scan
     # And print them to the results page
 
@@ -745,6 +815,7 @@ class LoginPage:
     def __init__(self):
         global root
         global last_page
+        global logged_in
         username_var = tk.StringVar(value="")
         token_var = tk.StringVar(value="")
 
@@ -801,7 +872,7 @@ class LoginPage:
                                                width=80,
                                                height=40,
                                                hover=True,
-                                               command=lambda: MainWindow() if check_login() else login_error())
+                                               command=lambda: [MainWindow() if check_login() else login_error()])
             login_button.place(relx=0.4, rely=0.85, anchor='center')
 
             # Registration Button (Sends you to register page)
@@ -828,6 +899,9 @@ class LoginPage:
             for i in range(len(user_list)):
                 if user_list[i][2] == username and user_list[i][4] == token:
                     exists = True
+                    logged_in = True
+                    MakeWindow.nav_buttons(self)
+
             return exists
 
         # Make error message for login

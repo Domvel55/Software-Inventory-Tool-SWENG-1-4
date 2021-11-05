@@ -9,7 +9,6 @@
 from tkinter import *
 from tkinter import ttk
 
-
 from tkinter_custom_button import TkinterCustomButton
 from Database import *
 from tkinter import filedialog
@@ -184,7 +183,6 @@ class MakeWindow:
                                           hover=True,
                                           command=lambda: HelpPage())
         help_button.pack(side=LEFT, padx=5)
-
 
 
 class MainWindow:
@@ -755,10 +753,10 @@ class SettingsPage:
             style = ttk.Style(root)
             style.theme_use('classic')
             style.configure('Test.TSizegrip', background="#1F262A")
-            root_sizeGrip = ttk.Sizegrip(root)
+            root_size_grip = ttk.Sizegrip(root)
 
-            root_sizeGrip.configure(style="Test.TSizegrip")
-            root_sizeGrip.pack(side="right", anchor=SE)
+            root_size_grip.configure(style="Test.TSizegrip")
+            root_size_grip.pack(side="right", anchor=SE)
 
             settings_frame = tk.Frame(root)
             settings_frame.place(relx=0.5, rely=0.5, anchor='center')
@@ -911,6 +909,14 @@ class LoginPage:
             error_message.place(relx=0.5, rely=0.68, anchor="n")
             error_message.config(height=19, width=240)
 
+        def enter_login(e):
+            if check_login():
+                MainWindow()
+            else:
+                login_error()
+
+        root.bind('<Return>', enter_login)
+
 
 class RegisterPage:
 
@@ -922,7 +928,7 @@ class RegisterPage:
         first_name_var = tk.StringVar(value="")
         last_name_var = tk.StringVar(value="")
         username_var = tk.StringVar(value="")
-        phone_var = tk.StringVar(value="")
+        role_var = tk.StringVar(value="")
 
         if last_page != "ResultsPage":
             last_page = "ResultsPage"
@@ -969,11 +975,11 @@ class RegisterPage:
                                    width=25, font=20)
             username_entry.place(relx=.4, rely=.54)
 
-            phone_frame = Label(register_frame, text="Phone Number", background="#1F262A", foreground="white", font=20)
-            phone_frame.place(relx=.088, rely=.66)
-            phone_entry = Entry(register_frame, textvariable=phone_var, background="#2a3439", foreground="white",
+            role_frame = Label(register_frame, text="Role", background="#1F262A", foreground="white", font=20)
+            role_frame.place(relx=.25, rely=.66)
+            role_entry = Entry(register_frame, textvariable=role_var, background="#2a3439", foreground="white",
                                 width=25, font=20)
-            phone_entry.place(relx=.4, rely=.66)
+            role_entry.place(relx=.4, rely=.66)
 
             # Create Account Button (sends you to login page)
             create_button = TkinterCustomButton(master=register_frame,
@@ -998,8 +1004,14 @@ class RegisterPage:
             first_name = first_name_entry.get()
             last_name = last_name_entry.get()
             username = username_entry.get()
-            phone = phone_entry.get()
+            role = role_entry.get()
 
             # Add new user to user list
-            new_account = [first_name, last_name, username, phone, "123456"]
+            new_account = [first_name, last_name, username, role, "123456"]
             user_list.append(new_account)
+
+        def enter_register(e):
+            new_register()
+            LoginPage()
+
+        root.bind('<Return>', enter_register)

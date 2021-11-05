@@ -912,6 +912,7 @@ class LoginPage:
         def enter_login(e):
             if check_login():
                 MainWindow()
+                root.unbind('<Return>', None)
             else:
                 login_error()
 

@@ -3,7 +3,7 @@
     This is the file that contains all the different functions to create/destroy the different
     windows that generate from clicking buttons on the GUI
     This file was entirely made by the Puffins Team
-    Version:10.27.2021
+    Version:11.5.2021
 """
 
 from tkinter import *
@@ -269,6 +269,8 @@ class MainWindow:
 # This will be different whether the full scan or express scan options were selected
 # Picking one of the options will load up the proper buttons for that configuration
 class ScanConfirmPage:
+    global files_list
+    files_list = []
 
     def __init__(self):
         global root
@@ -280,6 +282,10 @@ class ScanConfirmPage:
             widget.destroy()
 
             root.configure(background="#2a3439")
+
+            # This lets scan() know whether to scan all program files or just selected files
+            global scan_type
+            scan_type = "Full Scan"
 
             # Frame for scan confirmation dialog box
             scan_confirm_frame = tk.Frame(root, bg="#2a3439")
@@ -327,6 +333,10 @@ class ScanConfirmPage:
 
     # This will setup the buttons for the Express Scan Function
     def make_express_config(self):
+        global scan_type
+        # This lets scan() know whether to scan all program files or just selected files
+        scan_type = "Express Scan"
+
         def browse_files():
             global files_list
             filenames = filedialog.askopenfilenames(initialdir="C:\Program Files",
@@ -335,7 +345,8 @@ class ScanConfirmPage:
                                                                 "*.*"),
                                                                ("Text files",
                                                                 "*.txt*")))
-            files_list = list(filenames)
+            # Additional files selected after first selection will be appended to list
+            files_list = files_list + list(filenames)
             ctr = 0
 
             # Display selected files on confirm page
@@ -350,11 +361,11 @@ class ScanConfirmPage:
 
                 ctr = ctr + 1
 
-            # Scrollbar if more than 6 files are selected
+            # Scrollbar if more than 5 files are selected
             if ctr > 5:
                 scan_confirm_sb = ttk.Scrollbar(scan_confirm_canvas, orient="vertical",
                                                 command=scan_confirm_canvas.yview)
-                scan_confirm_sb.place(relx=0.98, height=350)
+                scan_confirm_sb.place(relx=0.98, height=scan_confirm_canvas.winfo_height())
                 scan_confirm_canvas.configure(yscrollcommand=scan_confirm_sb.set)
 
         root.configure(background="#2a3439")
@@ -426,6 +437,7 @@ class ScanConfirmPage:
     # This will scan the Database
     # This function will be called no matter which config is decided on
     def scan(self):
+        global files_list
         list_results = []
         cve = CVEDataFrame()
         # Makes a progress bar
@@ -435,6 +447,12 @@ class ScanConfirmPage:
         results_progressbar = ttk.Progressbar(root, orient=HORIZONTAL, length=500, mode='determinate',
                                               style="red.Horizontal.TProgressbar")
         results_progressbar.place(relx=0.5, rely=0.8, anchor="center")
+
+        if scan_type == "Full Scan":
+            # Get all files from Start Menu folder
+            for dirpath, dirnames, files in os.walk("C:\ProgramData\Microsoft\Windows\Start Menu"):
+                for file in files:
+                    files_list.append(os.path.join(dirpath, file))
 
         # This will remove the path extension for all of the selected applications
         # This will loop through all the Files, selected from the sub menu in Express Scan

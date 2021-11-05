@@ -7,6 +7,32 @@
 
 import os.path
 import pandas as pd
+import bs4
+import requests
+
+
+class CVSSScorer:
+
+    def __init__(self):
+        pass
+
+    # Retrieves NVD CVE html text string from link with certain id
+    def website_query(self, id):
+        # Requests is used to retrieve the link to a webpage
+        result = requests.get(f'https://services.nvd.nist.gov/rest/json/cve/1.0/{id}')
+        # BS4 is beautiful soup which is used to parse html from the above request
+        # lxml is the type of html parser used. Must pip install lxml to work
+        soup = bs4.BeautifulSoup(result.text, 'lxml')
+        query = soup.find()
+        return self.get_scoring(query)
+
+    # Parses through above query and returns CVSS score
+    def get_scoring(self, query):
+        # Retrieves the body text and finds the base cvss score
+        text_chain = query.find('p').get_text()
+        find = text_chain.find('baseScore')
+        return text_chain[find+11:find+14]
+
 
 """
 Columns:
@@ -58,4 +84,7 @@ class CVEDataFrame:
 if __name__ == '__main__':
     cve = CVEDataFrame()
     cve.create_metadata()
-    cve.select_record_by_name('excel')
+    # cve.select_record_by_name('excel')
+    # Create a CVSSScorer() obj and call .website_query wit the CVE tag as shown below to parse the cvss score
+    cvss = CVSSScorer()
+    print(cvss.website_query('CVE-2021-41303'))

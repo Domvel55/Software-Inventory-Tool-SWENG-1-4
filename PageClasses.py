@@ -3,11 +3,12 @@
     This is the file that contains all the different functions to create/destroy the different
     windows that generate from clicking buttons on the GUI
     This file was entirely made by the Puffins Team
-    Version:10.27.2021
+    Version:11.5.2021
 """
 
 from tkinter import *
 from tkinter import ttk
+
 from tkinter_custom_button import TkinterCustomButton
 from Database import *
 from tkinter import filedialog
@@ -22,6 +23,12 @@ now = "Last Scanned: ----"
 global last_page
 last_page = ""
 user_list = []
+
+global logged_in
+logged_in = False
+
+title_bar = Frame(root, bg="#1F262A", relief="raised", bd=1)
+title_bar.pack(fill=X)
 
 
 def move_app(e):
@@ -119,12 +126,72 @@ class ToolTip(object):
             tw.destroy()
 
 
+class MakeWindow:
+    def nav_buttons(self):
+        # Navigation Buttons
+        home_button = TkinterCustomButton(master=title_bar, bg_color=None,
+                                          fg_color="#1F262A",
+                                          hover_color="#2a3439",
+                                          text_font="Bold, 12",
+                                          text="Home",
+                                          text_color="white",
+                                          corner_radius=0,
+                                          width=50,
+                                          height=40,
+                                          hover=True,
+                                          command=lambda: MainWindow())
+        home_button.pack(side=LEFT, padx=5)
+
+        # Results Button here
+        results_button = TkinterCustomButton(master=title_bar, bg_color=None,
+                                             fg_color="#1F262A",
+                                             hover_color="#2a3439",
+                                             text_font="Bold, 12",
+                                             text="Results",
+                                             text_color="white",
+                                             corner_radius=0,
+                                             width=65,
+                                             height=40,
+                                             hover=True,
+                                             command=lambda: ResultsPage())
+        results_button.pack(side=LEFT, padx=5)
+
+        # Create Settings Button
+        settings_button = TkinterCustomButton(master=title_bar, bg_color=None,
+                                              fg_color="#1F262A",
+                                              hover_color="#2a3439",
+                                              text_font="Bold, 12",
+                                              text="Settings",
+                                              text_color="white",
+                                              corner_radius=0,
+                                              width=70,
+                                              height=40,
+                                              hover=True,
+                                              command=lambda: SettingsPage())
+        settings_button.pack(side=LEFT, padx=5)
+
+        # Create Help Button
+        help_button = TkinterCustomButton(master=title_bar, bg_color=None,
+                                          fg_color="#1F262A",
+                                          hover_color="#2a3439",
+                                          text_font="Bold, 12",
+                                          text="Help",
+                                          text_color="white",
+                                          corner_radius=0,
+                                          width=40,
+                                          height=40,
+                                          hover=True,
+                                          command=lambda: HelpPage())
+        help_button.pack(side=LEFT, padx=5)
+
+
 class MainWindow:
 
     def __init__(self):
         global root
         global now
         global last_page
+        global title_bar
 
         if last_page != "HomePage":
             last_page = "HomePage"
@@ -202,6 +269,8 @@ class MainWindow:
 # This will be different whether the full scan or express scan options were selected
 # Picking one of the options will load up the proper buttons for that configuration
 class ScanConfirmPage:
+    global files_list
+    files_list = []
 
     def __init__(self):
         global root
@@ -264,13 +333,9 @@ class ScanConfirmPage:
 
     # This will setup the buttons for the Express Scan Function
     def make_express_config(self):
-
         global scan_type
         # This lets scan() know whether to scan all program files or just selected files
         scan_type = "Express Scan"
-
-        global files_list
-        files_list = []
 
         def browse_files():
             global files_list
@@ -296,7 +361,7 @@ class ScanConfirmPage:
 
                 ctr = ctr + 1
 
-            # Scrollbar if more than 6 files are selected
+            # Scrollbar if more than 5 files are selected
             if ctr > 5:
                 scan_confirm_sb = ttk.Scrollbar(scan_confirm_canvas, orient="vertical",
                                                 command=scan_confirm_canvas.yview)
@@ -372,6 +437,7 @@ class ScanConfirmPage:
     # This will scan the Database
     # This function will be called no matter which config is decided on
     def scan(self):
+        global files_list
         list_results = []
         cve = CVEDataFrame()
         # Makes a progress bar
@@ -383,12 +449,10 @@ class ScanConfirmPage:
         results_progressbar.place(relx=0.5, rely=0.8, anchor="center")
 
         if scan_type == "Full Scan":
-            # Get all .exe files from Program Files folder
-            for file_root, dirs, files in os.walk("C:\ProgramData\Microsoft\Windows\Start Menu"):
+            # Get all files from Start Menu folder
+            for dirpath, dirnames, files in os.walk("C:\ProgramData\Microsoft\Windows\Start Menu"):
                 for file in files:
-                    if file.endswith(".exe"):
-                        global files_list
-                        files_list = os.path.join(file_root, file)
+                    files_list.append(os.path.join(dirpath, file))
 
         # This will remove the path extension for all of the selected applications
         # This will loop through all the Files, selected from the sub menu in Express Scan
@@ -538,7 +602,6 @@ class ResultsPage:
 
         settings_menu = filter_settings_container
 
-        global variable
         variable = tk.StringVar(settings_menu)
         variable.set(option_list[0])
 
@@ -554,6 +617,7 @@ class ResultsPage:
         root_size_grip.configure(style="Test.TSizegrip")
         root_size_grip.pack(side="right", anchor=SE)
         # </editor-fold>
+
     # This will take the software found from a scan
     # And print them to the results page
 
@@ -707,10 +771,10 @@ class SettingsPage:
             style = ttk.Style(root)
             style.theme_use('classic')
             style.configure('Test.TSizegrip', background="#1F262A")
-            root_sizeGrip = ttk.Sizegrip(root)
+            root_size_grip = ttk.Sizegrip(root)
 
-            root_sizeGrip.configure(style="Test.TSizegrip")
-            root_sizeGrip.pack(side="right", anchor=SE)
+            root_size_grip.configure(style="Test.TSizegrip")
+            root_size_grip.pack(side="right", anchor=SE)
 
             settings_frame = tk.Frame(root)
             settings_frame.place(relx=0.5, rely=0.5, anchor='center')
@@ -767,6 +831,7 @@ class LoginPage:
     def __init__(self):
         global root
         global last_page
+        global logged_in
         username_var = tk.StringVar(value="")
         token_var = tk.StringVar(value="")
 
@@ -823,7 +888,7 @@ class LoginPage:
                                                width=80,
                                                height=40,
                                                hover=True,
-                                               command=lambda: MainWindow() if check_login() else login_error())
+                                               command=lambda: [MainWindow() if check_login() else login_error()])
             login_button.place(relx=0.4, rely=0.85, anchor='center')
 
             # Registration Button (Sends you to register page)
@@ -850,6 +915,9 @@ class LoginPage:
             for i in range(len(user_list)):
                 if user_list[i][2] == username and user_list[i][4] == token:
                     exists = True
+                    logged_in = True
+                    MakeWindow.nav_buttons(self)
+
             return exists
 
         # Make error message for login
@@ -858,6 +926,15 @@ class LoginPage:
                                        text="Wrong Username or RSA Token.", relief=FLAT)
             error_message.place(relx=0.5, rely=0.68, anchor="n")
             error_message.config(height=19, width=240)
+
+        def enter_login(e):
+            if check_login():
+                MainWindow()
+                root.unbind('<Return>', None)
+            else:
+                login_error()
+
+        root.bind('<Return>', enter_login)
 
 
 class RegisterPage:
@@ -870,7 +947,7 @@ class RegisterPage:
         first_name_var = tk.StringVar(value="")
         last_name_var = tk.StringVar(value="")
         username_var = tk.StringVar(value="")
-        phone_var = tk.StringVar(value="")
+        role_var = tk.StringVar(value="")
 
         if last_page != "ResultsPage":
             last_page = "ResultsPage"
@@ -917,11 +994,11 @@ class RegisterPage:
                                    width=25, font=20)
             username_entry.place(relx=.4, rely=.54)
 
-            phone_frame = Label(register_frame, text="Phone Number", background="#1F262A", foreground="white", font=20)
-            phone_frame.place(relx=.088, rely=.66)
-            phone_entry = Entry(register_frame, textvariable=phone_var, background="#2a3439", foreground="white",
+            role_frame = Label(register_frame, text="Role", background="#1F262A", foreground="white", font=20)
+            role_frame.place(relx=.25, rely=.66)
+            role_entry = Entry(register_frame, textvariable=role_var, background="#2a3439", foreground="white",
                                 width=25, font=20)
-            phone_entry.place(relx=.4, rely=.66)
+            role_entry.place(relx=.4, rely=.66)
 
             # Create Account Button (sends you to login page)
             create_button = TkinterCustomButton(master=register_frame,
@@ -946,8 +1023,14 @@ class RegisterPage:
             first_name = first_name_entry.get()
             last_name = last_name_entry.get()
             username = username_entry.get()
-            phone = phone_entry.get()
+            role = role_entry.get()
 
             # Add new user to user list
-            new_account = [first_name, last_name, username, phone, "123456"]
+            new_account = [first_name, last_name, username, role, "123456"]
             user_list.append(new_account)
+
+        def enter_register(e):
+            new_register()
+            LoginPage()
+
+        root.bind('<Return>', enter_register)

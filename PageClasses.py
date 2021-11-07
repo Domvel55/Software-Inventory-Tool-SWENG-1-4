@@ -343,8 +343,8 @@ class ScanConfirmPage:
                                                     title="Select Files",
                                                     filetypes=(("all files",
                                                                 "*.*"),
-                                                               ("Text files",
-                                                                "*.txt*")))
+                                                               ("Executable files",
+                                                                "*.exe*")))
             # Additional files selected after first selection will be appended to list
             files_list = files_list + list(filenames)
             ctr = 0
@@ -352,7 +352,6 @@ class ScanConfirmPage:
             # Display selected files on confirm page
             for file in files_list:
                 file_block = tk.Frame(scan_confirm_container, bg="#2a3439")
-                file_block.place(relx=0.5, rely=0.02, anchor="n")
                 file_block.config(height=50, width=860)
                 file_label = tk.Label(file_block, text=files_list[ctr], font=14, bg="#2a3439", fg="white",
                                       wraplength=845, justify='left')
@@ -526,7 +525,6 @@ class ResultsPage:
 
             for i in range(6):
                 results_example = Frame(results_container, bg="#2a3439")
-                results_example.place(relx=0.5, rely=0.02, anchor="n")
                 results_example.config(height=50, width=900)
                 results_example1_label = Label(results_example, text=f'Software {i}', font=14, bg="#2a3439",
                                                fg="#5B676D")
@@ -590,22 +588,19 @@ class ResultsPage:
                                 foreground='white')
 
         sort_scan_label.grid(row=1, column=0, padx=50)
-        sort_order = StringVar()
 
         # Settings dropdown window
         option_list = [
             "By Severity",
             "By Time",
-            "Alphabetical",
-            "In Order Discovered"
+            "Alphabetically"
         ]
+        global sort_variable
+        sort_variable = tk.StringVar(filter_settings_container)
+        # Default sorting is by severity
+        sort_variable.set("By Severity")
 
-        settings_menu = filter_settings_container
-
-        variable = tk.StringVar(settings_menu)
-        variable.set(option_list[0])
-
-        opt = tk.OptionMenu(filter_settings_container, variable, *option_list)
+        opt = tk.OptionMenu(filter_settings_container, sort_variable, *option_list)
         opt.config(background="#1F262A", foreground="white", width=15, font=('Bold', 12))
         opt.grid()
 
@@ -620,31 +615,48 @@ class ResultsPage:
 
     # This will take the software found from a scan
     # And print them to the results page
-
     def print_results(self, list_results):
+
         results_frame = Frame(root, bg="#2a3439")
         results_frame.place(relx=0.5, rely=0.1, anchor="n")
         results_frame.config(height=root.winfo_height(), width=root.winfo_width())
+        # Calls function to put the update buttons back on the screen with the results
+        ResultsPage.create_update_buttons(results_frame)
+
+        results_canvas = Canvas(results_frame, height=300, width=900, bg="#2a3439")
+        results_canvas.place(relx=0.5, rely=0.15, anchor="n")
 
         # Container for results
-        results_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
+        results_container = Frame(results_canvas, bg="#1F262A", borderwidth=2)
         results_container.place(relx=0.5, rely=0.1, anchor="n")
-        results_container.config(relief=RIDGE)
+        results_container.config(relief=RIDGE, height=350, width=900)
+
+        # Bind scrollbar to container
+        results_container.bind(
+            "<Configure>",
+            lambda e: results_canvas.configure(
+                scrollregion=results_canvas.bbox("all")
+            )
+        )
+        results_canvas.create_window((0, 0), window=results_container, anchor="nw")
+
 
         # This loop will run for the amount of items that are found to have vulnerabilities in the Database
         # It will send a Sting to the results page with the information
         # It will only run as many times as vulnerabilities found
         for i in range(len(list_results)):
             results_example = Frame(results_container, bg="#2a3439")
-            results_example.place(relx=0.5, rely=0.02, anchor="n")
-            results_example.config(height=50, width=900)
+            results_example.config(height=50, width=860)
             results_example1_label = Label(results_example, text=str(list_results[i]), font=14, bg="#2a3439",
                                            fg="#5B676D")
             results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
             results_example.grid(row=i, column=0, padx=10, pady=5)
 
-        # Calls function to put the update buttons back on the screen with the results
-        ResultsPage.create_update_buttons(results_frame)
+        # Scrollbar if more than 5 results are displayed
+            if len(list_results) > 5:
+                results_sb = ttk.Scrollbar(results_canvas, orient="vertical", command=results_canvas.yview)
+                results_sb.place(relx=0.98, height=results_canvas.winfo_height())
+                results_canvas.configure(yscrollcommand=results_sb.set)
 
 
 class HelpPage:

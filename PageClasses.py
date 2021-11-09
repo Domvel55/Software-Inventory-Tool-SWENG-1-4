@@ -657,6 +657,38 @@ class ResultsPage:
             results_example.bind("<Button-1>", new_page)
             results_example.grid(row=i, column=0, padx=10, pady=5)
 
+            #Getting the score and changing the color to match the
+            for i in list_results[i]:
+                print(i[0])
+                rate = CVSSScorer()
+                rating = rate.website_query(i[0])
+                #print(rating)
+                rating = float(rating)
+                print(rating)
+                if rating < 4:
+                    color = "limegreen"
+                    rating = "Low"
+                elif rating >= 4 and rating < 7:
+                    color = "yellow"
+                    rating = "Medium"
+                elif rating >= 7 and rating < 9:
+                    color = "orange"
+                    rating = "High"
+                else:
+                    color = "red"
+                    rating = "Critical"
+
+            #Label for Rating
+            rating_label = Label(results_example, text=rating, font=14, bg=color, fg="black")
+            rating_label.config(height=2, width=7)
+            rating_label.place(relx=0.92, rely=0.5, anchor="w")
+            results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
+
+            #Design around each result
+            rate_frame1 = Frame(results_example, bg=color)
+            rate_frame1.config(height=4, width=860)
+            rate_frame1.place(relx=0.5, rely=0.95, anchor="s")
+
         # Scrollbar if more than 5 results are displayed
             if len(list_results) > 5:
                 results_sb = ttk.Scrollbar(results_canvas, orient="vertical", command=results_canvas.yview)

@@ -681,13 +681,13 @@ class ResultsPage:
             #Label for Rating
             rating_label = Label(results_example, text=rating, font=14, bg=color, fg="black")
             rating_label.config(height=2, width=7)
-            rating_label.place(relx=0.92, rely=0.5, anchor="w")
+            rating_label.place(relx=0.904, rely=0.5, anchor="w")
             results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
 
             #Design around each result
             rate_frame1 = Frame(results_example, bg=color)
-            rate_frame1.config(height=4, width=860)
-            rate_frame1.place(relx=0.5, rely=0.95, anchor="s")
+            rate_frame1.config(height=5, width=860)
+            rate_frame1.place(relx=0.5, rely=0.99, anchor="s")
 
         # Scrollbar if more than 5 results are displayed
             if len(list_results) > 5:

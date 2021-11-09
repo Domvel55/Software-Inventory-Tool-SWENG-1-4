@@ -467,7 +467,7 @@ class ScanConfirmPage:
 
             # This will not add an entry to the results list if nothing is found in the CVE Database
             if not cve.select_record_by_name(base):
-                pass
+                files_list.remove(record)
             # This will add an entry to the results list with vulnerability from the CVE Database
             else:
                 list_results.append(cve.select_record_by_name(base))
@@ -647,9 +647,10 @@ class ResultsPage:
         for i in range(len(list_results)):
             results_example = Frame(results_container, bg="#2a3439")
             results_example.config(height=50, width=860)
-            results_example1_label = Label(results_example, text=str(list_results[i]), font=14, bg="#2a3439",
-                                           fg="#5B676D")
+            results_example1_label = Label(results_example, text=str(files_list[i].split('/')[-1]), font=14,
+                                           bg="#2a3439", fg="#FFFFFF")
             results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
+            results_example.bind("<Button-1>", newPage)
             results_example.grid(row=i, column=0, padx=10, pady=5)
 
         # Scrollbar if more than 5 results are displayed
@@ -1046,3 +1047,60 @@ class RegisterPage:
             LoginPage()
 
         root.bind('<Return>', enter_register)
+
+
+def newPage(e):
+    ApplicationResultsPage()
+
+
+class ApplicationResultsPage:
+
+    def __init__(self):
+        # Toplevel object which will
+        # be treated as a new window
+        newWindow = Toplevel(root)
+
+        # Toplevel widget
+        newWindow.title("New Window")
+
+        # Window background color
+        newWindow.configure(background="#2a3439")
+
+        # Scaling UI to user's screen
+        app_width = 1064
+        app_height = 600
+        screen_width = newWindow.winfo_screenwidth()
+        screen_height = newWindow.winfo_screenheight()
+        x = (screen_width / 2) - (app_width / 2)
+        y = (screen_height / 2) - (app_height / 2)
+        newWindow.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
+
+        newWindow.resizable(True, True)
+
+        # Changes the default tkinter to our Sieve logo when minimized
+        newWindow.iconbitmap('logo.ico')
+
+        # Change the text after minimizing the tool to task bar
+        newWindow.title("Sieve")
+
+        # Removes title bar
+        # newWindow.overrideredirect(True)
+        # newWindow.minimized = False  # only to know if root is minimized
+        # newWindow.maximized = False  # only to know if root is maximized
+
+        main_frame = Frame(newWindow, bg="#2a3439")
+        main_frame.place(relx=0.5, rely=0.1, anchor="n")
+        main_frame.config(height=newWindow.winfo_height(), width=newWindow.winfo_width())
+
+        style = ttk.Style(newWindow)
+        style.theme_use('classic')
+        style.configure('Test.TSizegrip', background="#1F262A")
+        root_size_grip = ttk.Sizegrip(newWindow)
+
+        root_size_grip.configure(style="Test.TSizegrip")
+        root_size_grip.pack(side="right", anchor=SE)
+
+        # Login username and RSA token labels and entries
+        username_label = Label(main_frame, text=files_list, font=15, background="#2a3439",
+                               foreground="white")
+        username_label.place(relx=0.5, rely=0.3, anchor="center")

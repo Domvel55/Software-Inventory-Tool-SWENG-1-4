@@ -59,6 +59,10 @@ def maximize_me(e):
         # now it is not maximized
 
 
+def new_page(e):
+    ApplicationResultsPage(e.widget.grid_info()['row'])
+
+
 def last_time_clicked():
     global now
     now = datetime.datetime.now().strftime("Last Scan: %b %d %Y, %I:%M:%S %p")
@@ -650,7 +654,7 @@ class ResultsPage:
             results_example1_label = Label(results_example, text=str(files_list[i].split('/')[-1]), font=14,
                                            bg="#2a3439", fg="#FFFFFF")
             results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
-            results_example.bind("<Button-1>", newPage)
+            results_example.bind("<Button-1>", new_page)
             results_example.grid(row=i, column=0, padx=10, pady=5)
 
         # Scrollbar if more than 5 results are displayed
@@ -1049,13 +1053,9 @@ class RegisterPage:
         root.bind('<Return>', enter_register)
 
 
-def newPage(e):
-    ApplicationResultsPage()
-
-
 class ApplicationResultsPage:
 
-    def __init__(self):
+    def __init__(self, result_num):
         # Toplevel object which will
         # be treated as a new window
         newWindow = Toplevel(root)
@@ -1101,6 +1101,6 @@ class ApplicationResultsPage:
         root_size_grip.pack(side="right", anchor=SE)
 
         # Login username and RSA token labels and entries
-        username_label = Label(main_frame, text=files_list, font=15, background="#2a3439",
+        username_label = Label(main_frame, text=files_list[result_num], font=15, background="#2a3439",
                                foreground="white")
         username_label.place(relx=0.5, rely=0.3, anchor="center")

@@ -644,6 +644,7 @@ class ResultsPage:
         )
         results_canvas.create_window((0, 0), window=results_container, anchor="nw")
 
+        rate = CVSSScorer()
 
         # This loop will run for the amount of items that are found to have vulnerabilities in the Database
         # It will send a Sting to the results page with the information
@@ -660,7 +661,6 @@ class ResultsPage:
             #Getting the score and changing the color to match the
             for i in list_results[i]:
                 print(i[0])
-                rate = CVSSScorer()
                 rating = rate.website_query(i[0])
                 #print(rating)
                 rating = float(rating)

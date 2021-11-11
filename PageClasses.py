@@ -927,7 +927,7 @@ class LoginPage:
         global last_page
         global logged_in
         username_var = tk.StringVar(value="")
-        token_var = tk.StringVar(value="")
+        password_var = tk.StringVar(value="")
 
         if last_page != "LoginPage":
             last_page = "LoginPage"
@@ -964,11 +964,14 @@ class LoginPage:
             username_entry = Entry(login_inner_frame, textvariable=username_var, background="#1F262A",
                                    foreground="white", font=15)
             username_entry.place(relx=0.5, rely=0.4, anchor='center')
-            token_label = Label(login_inner_frame, text='RSA Token', font=15, background="#2a3439", foreground="white")
-            token_label.place(relx=0.5, rely=0.53, anchor='center')
-            token_entry = Entry(login_inner_frame, textvariable=token_var, background="#1F262A", foreground="white",
-                                font=15)
-            token_entry.place(relx=0.5, rely=0.63, anchor='center')
+
+            password_label = Label(login_inner_frame, text='Password', font=15, background="#2a3439",
+                                   foreground="white")
+            password_label.place(relx=0.5, rely=0.53, anchor='center')
+            password_entry = Entry(login_inner_frame, textvariable=password_var, background="#1F262A",
+                                   foreground="white",
+                                   font=15)
+            password_entry.place(relx=0.5, rely=0.63, anchor='center')
 
             # Login Button (sends you to home page)
             login_button = TkinterCustomButton(master=login_inner_frame,
@@ -1004,10 +1007,10 @@ class LoginPage:
         def check_login():
             global user_list
             username = username_entry.get()
-            token = token_entry.get()
+            password = password_entry.get()
             exists = False
             for i in range(len(user_list)):
-                if user_list[i][2] == username and user_list[i][4] == token:
+                if user_list[i][2] == username and user_list[i][3] == password:
                     exists = True
                     logged_in = True
                     MakeWindow.make_nav_buttons(self)
@@ -1017,7 +1020,7 @@ class LoginPage:
         # Make error message for login
         def login_error():
             error_message = LabelFrame(login_inner_frame, bg="#2a3439", fg="red", font=10,
-                                       text="Wrong Username or RSA Token.", relief=FLAT)
+                                       text="Wrong Username or Password.", relief=FLAT)
             error_message.place(relx=0.5, rely=0.68, anchor="n")
             error_message.config(height=19, width=240)
 

@@ -25,8 +25,7 @@ global last_page
 last_page = ""
 user_list = []
 
-global logged_in
-logged_in = False
+
 
 title_bar = Frame(root, bg="#1F262A", relief="raised", bd=1)
 title_bar.pack(fill=X)
@@ -695,23 +694,20 @@ class ResultsPage:
 
             # Getting the score and changing the color to match the
             for i in list_results[i]:
-                print(i[0])
                 rating = rate.website_query(i[0])
-                print(rating)
                 rating = float(rating)
-                # print(rating)
-                if rating < 4:
-                    color = "limegreen"
-                    rating = "Low"
-                elif rating >= 4 and rating < 7:
-                    color = "yellow"
-                    rating = "Medium"
-                elif rating >= 7 and rating < 9:
-                    color = "orange"
-                    rating = "High"
-                else:
-                    color = "red"
-                    rating = "Critical"
+            if rating < 4:
+                color = "limegreen"
+                rating = "Low"
+            elif 4 <= rating < 7:
+                color = "yellow"
+                rating = "Medium"
+            elif 7 <= rating < 9:
+                color = "orange"
+                rating = "High"
+            else:
+                color = "red"
+                rating = "Critical"
 
             # Label for Rating
             rating_label = Label(results_example, text=rating, font=14, bg=color, fg="black")
@@ -794,7 +790,7 @@ class HelpPage:
                     this will bring you to a page where you can change options such as font size and the way items are 
                     sorted to make the tool as easy to use as possible.""" \
                 .replace('\n', ' ').replace('                    ', '')
-            help_example1_body_label = Label(help_example1, text=text1, font=20, bg="#2a3439", fg="#FFFFFF",
+            help_example1_body_label = Label(help_example1, text=text1, font=16, bg="#2a3439", fg="#FFFFFF",
                                              wraplength=880, justify="left")
             help_example1_body_label.place(relx=0.01, rely=0.25, anchor="nw")
 
@@ -812,7 +808,7 @@ class HelpPage:
                     and lastly the Availability Impact.
             """ \
                 .replace('\n', ' ').replace('                    ', '')
-            help_example2_body_label = Label(help_example2, text=text2, font=20, bg="#2a3439", fg="#FFFFFF",
+            help_example2_body_label = Label(help_example2, text=text2, font=16, bg="#2a3439", fg="#FFFFFF",
                                              wraplength=880, justify="left")
             help_example2_body_label.place(relx=0.01, rely=0.25, anchor="nw")
 
@@ -830,7 +826,7 @@ class HelpPage:
                     availability of accessing other databases that may or may not exist or
                     be available for public access.""" \
                 .replace('\n', ' ').replace('                    ', '')
-            help_example3_body_label = Label(help_example3, text=text3, font=20, bg="#2a3439", fg="#FFFFFF",
+            help_example3_body_label = Label(help_example3, text=text3, font=16, bg="#2a3439", fg="#FFFFFF",
                                              wraplength=880, justify="left")
             help_example3_body_label.place(relx=0.01, rely=0.25, anchor="nw")
             # Align tips in a grid
@@ -927,7 +923,6 @@ class LoginPage:
     def __init__(self):
         global root
         global last_page
-        global logged_in
         username_var = tk.StringVar(value="")
         password_var = tk.StringVar(value="")
 
@@ -1014,7 +1009,6 @@ class LoginPage:
             for i in range(len(user_list)):
                 if user_list[i][2] == username and user_list[i][3] == password:
                     exists = True
-                    logged_in = True
                     MakeWindow.make_nav_buttons(self)
 
             return exists
@@ -1144,6 +1138,7 @@ class RegisterPage:
 
 
 class ApplicationResultsPage:
+    global list_results
 
     def __init__(self, result_num):
         # Toplevel object which will
@@ -1194,3 +1189,19 @@ class ApplicationResultsPage:
         file_name_label = Label(main_frame, text=files_list[result_num], font=15, background="#2a3439",
                                 foreground="white")
         file_name_label.grid(row=0, column=0)
+
+        rate = CVSSScorer()
+
+        for i in range(len(list_results)):
+            count = 1
+            for j in list_results[result_num]:
+                cvss_name_label = Label(main_frame, text=j[0], font=15, background="#2a3439",
+                                        foreground="white")
+                cvss_name_label.grid(row=count, column=0)
+
+                rating = rate.website_query(j[0])
+
+                cvss_score_label = Label(main_frame, text=rating, font=15, background="#2a3439",
+                                         foreground="white")
+                cvss_score_label.grid(row=count, column=1)
+                count += 1

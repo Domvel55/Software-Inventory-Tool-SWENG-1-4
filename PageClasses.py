@@ -882,7 +882,7 @@ class LoginPage:
         global last_page
         global logged_in
         username_var = tk.StringVar(value="")
-        token_var = tk.StringVar(value="")
+        password_var = tk.StringVar(value="")
 
         if last_page != "LoginPage":
             last_page = "LoginPage"
@@ -919,11 +919,12 @@ class LoginPage:
             username_entry = Entry(login_inner_frame, textvariable=username_var, background="#1F262A",
                                    foreground="white", font=15)
             username_entry.place(relx=0.5, rely=0.4, anchor='center')
-            token_label = Label(login_inner_frame, text='RSA Token', font=15, background="#2a3439", foreground="white")
-            token_label.place(relx=0.5, rely=0.53, anchor='center')
-            token_entry = Entry(login_inner_frame, textvariable=token_var, background="#1F262A", foreground="white",
+
+            password_label = Label(login_inner_frame, text='Password', font=15, background="#2a3439", foreground="white")
+            password_label.place(relx=0.5, rely=0.53, anchor='center')
+            password_entry = Entry(login_inner_frame, textvariable=password_var, background="#1F262A", foreground="white",
                                 font=15)
-            token_entry.place(relx=0.5, rely=0.63, anchor='center')
+            password_entry.place(relx=0.5, rely=0.63, anchor='center')
 
             # Login Button (sends you to home page)
             login_button = TkinterCustomButton(master=login_inner_frame,
@@ -959,10 +960,10 @@ class LoginPage:
         def check_login():
             global user_list
             username = username_entry.get()
-            token = token_entry.get()
+            password = password_entry.get()
             exists = False
             for i in range(len(user_list)):
-                if user_list[i][2] == username and user_list[i][4] == token:
+                if user_list[i][2] == username and user_list[i][3] == password:
                     exists = True
                     logged_in = True
                     MakeWindow.nav_buttons(self)
@@ -972,7 +973,7 @@ class LoginPage:
         # Make error message for login
         def login_error():
             error_message = LabelFrame(login_inner_frame, bg="#2a3439", fg="red", font=10,
-                                       text="Wrong Username or RSA Token.", relief=FLAT)
+                                       text="Wrong Username or Password.", relief=FLAT)
             error_message.place(relx=0.5, rely=0.68, anchor="n")
             error_message.config(height=19, width=240)
 
@@ -996,7 +997,9 @@ class RegisterPage:
         first_name_var = tk.StringVar(value="")
         last_name_var = tk.StringVar(value="")
         username_var = tk.StringVar(value="")
+        password_var = tk.StringVar(value="")
         role_var = tk.StringVar(value="")
+
 
         if last_page != "ResultsPage":
             last_page = "ResultsPage"
@@ -1026,28 +1029,34 @@ class RegisterPage:
 
             first_name_frame = Label(register_frame, text="First Name", background="#1F262A", foreground="white",
                                      font=20)
-            first_name_frame.place(relx=.16003, rely=.3)
+            first_name_frame.place(relx=.16003, rely=.25)
             first_name_entry = Entry(register_frame, textvariable=first_name_var, background="#2a3439",
                                      foreground="white", width=25, font=20)
-            first_name_entry.place(relx=.4, rely=.3)
+            first_name_entry.place(relx=.4, rely=.25)
 
             last_name_frame = Label(register_frame, text="Last Name", background="#1F262A", foreground="white", font=20)
-            last_name_frame.place(relx=.16001, rely=.42)
+            last_name_frame.place(relx=.16001, rely=.35)
             last_name_entry = Entry(register_frame, textvariable=last_name_var, background="#2a3439",
                                     foreground="white", width=25, font=20)
-            last_name_entry.place(relx=.4, rely=.42)
+            last_name_entry.place(relx=.4, rely=.35)
 
             username_frame = Label(register_frame, text="Username", background="#1F262A", foreground="white", font=20)
-            username_frame.place(relx=.1703, rely=.54)
+            username_frame.place(relx=.1703, rely=.45)
             username_entry = Entry(register_frame, textvariable=username_var, background="#2a3439", foreground="white",
                                    width=25, font=20)
-            username_entry.place(relx=.4, rely=.54)
+            username_entry.place(relx=.4, rely=.45)
+
+            password_frame = Label(register_frame, text="Password", background="#1F262A", foreground="white", font=20)
+            password_frame.place(relx=.1703, rely=.55)
+            password_entry = Entry(register_frame, textvariable=password_var, background="#2a3439", foreground="white",
+                                   width=25, font=20)
+            password_entry.place(relx=.4, rely=.55)
 
             role_frame = Label(register_frame, text="Role", background="#1F262A", foreground="white", font=20)
-            role_frame.place(relx=.25, rely=.66)
+            role_frame.place(relx=.25, rely=.65)
             role_entry = Entry(register_frame, textvariable=role_var, background="#2a3439", foreground="white",
                                 width=25, font=20)
-            role_entry.place(relx=.4, rely=.66)
+            role_entry.place(relx=.4, rely=.65)
 
             # Create Account Button (sends you to login page)
             create_button = TkinterCustomButton(master=register_frame,
@@ -1072,10 +1081,11 @@ class RegisterPage:
             first_name = first_name_entry.get()
             last_name = last_name_entry.get()
             username = username_entry.get()
+            password = password_entry.get()
             role = role_entry.get()
 
             # Add new user to user list
-            new_account = [first_name, last_name, username, role, "123456"]
+            new_account = [first_name, last_name, username, password, role]
             user_list.append(new_account)
 
         def enter_register(e):

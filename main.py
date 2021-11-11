@@ -148,4 +148,4 @@ def call_main():
 
 if __name__ == '__main__':
     call_main()
-    root.mainloop()
+    threading.Thread(target=root.mainloop(), args=(2,)).start()

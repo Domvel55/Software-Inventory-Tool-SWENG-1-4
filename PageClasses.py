@@ -131,8 +131,7 @@ class ToolTip(object):
 
 
 class MakeWindow:
-    def nav_buttons(self):
-        # Navigation Buttons
+    def make_nav_buttons(self):
         home_button = TkinterCustomButton(master=title_bar, bg_color=None,
                                           fg_color="#1F262A",
                                           hover_color="#2a3439",
@@ -143,7 +142,7 @@ class MakeWindow:
                                           width=50,
                                           height=40,
                                           hover=True,
-                                          command=lambda: MainWindow())
+                                          command=lambda: [MainWindow(), change_home_button()])
         home_button.pack(side=LEFT, padx=5)
 
         # Results Button here
@@ -157,7 +156,7 @@ class MakeWindow:
                                              width=65,
                                              height=40,
                                              hover=True,
-                                             command=lambda: ResultsPage())
+                                             command=lambda: [ResultsPage(), change_results_button()])
         results_button.pack(side=LEFT, padx=5)
 
         # Create Settings Button
@@ -171,7 +170,7 @@ class MakeWindow:
                                               width=70,
                                               height=40,
                                               hover=True,
-                                              command=lambda: SettingsPage())
+                                              command=lambda: [SettingsPage(), change_settings_button()])
         settings_button.pack(side=LEFT, padx=5)
 
         # Create Help Button
@@ -182,11 +181,43 @@ class MakeWindow:
                                           text="Help",
                                           text_color="white",
                                           corner_radius=0,
-                                          width=40,
+                                          width=45,
                                           height=40,
                                           hover=True,
-                                          command=lambda: HelpPage())
+                                          command=lambda: [HelpPage(), change_help_button()])
         help_button.pack(side=LEFT, padx=5)
+
+        # This will change the color of the home button when clicked on
+        # This will also change the color of all the other buttons back to default
+        def change_home_button():
+            home_button.configure_color(fg_color="#5F4B66", text_color="white")
+            results_button.configure_color(fg_color="#1F262A", text_color="white")
+            settings_button.configure_color(fg_color="#1F262A", text_color="white")
+            help_button.configure_color(fg_color="#1F262A", text_color="white")
+
+        # This will change the color of the results button when clicked on
+        # This will also change the color of all the other buttons back to default
+        def change_results_button():
+            home_button.configure_color(fg_color="#1F262A", text_color="white")
+            results_button.configure_color(fg_color="#5F4B66", text_color="white")
+            settings_button.configure_color(fg_color="#1F262A", text_color="white")
+            help_button.configure_color(fg_color="#1F262A", text_color="white")
+
+        # This will change the color of the settings button when clicked on
+        # This will also change the color of all the other buttons back to default
+        def change_settings_button():
+            home_button.configure_color(fg_color="#1F262A", text_color="white")
+            results_button.configure_color(fg_color="#1F262A", text_color="white")
+            settings_button.configure_color(fg_color="#5F4B66", text_color="white")
+            help_button.configure_color(fg_color="#1F262A", text_color="white")
+
+        # This will change the color of the help button when clicked on
+        # This will also change the color of all the other buttons back to default
+        def change_help_button():
+            home_button.configure_color(fg_color="#1F262A", text_color="white")
+            results_button.configure_color(fg_color="#1F262A", text_color="white")
+            settings_button.configure_color(fg_color="#1F262A", text_color="white")
+            help_button.configure_color(fg_color="#5F4B66", text_color="white")
 
 
 class MainWindow:
@@ -441,6 +472,7 @@ class ScanConfirmPage:
     # This function will be called no matter which config is decided on
     def scan(self):
         global files_list
+        global list_results
         list_results = []
         cve = CVEDataFrame()
         # Makes a progress bar
@@ -471,7 +503,8 @@ class ScanConfirmPage:
 
             # This will not add an entry to the results list if nothing is found in the CVE Database
             if not cve.select_record_by_name(base):
-                files_list.remove(record)
+                pass
+                # files_list.remove(record)
             # This will add an entry to the results list with vulnerability from the CVE Database
             else:
                 list_results.append(cve.select_record_by_name(base))
@@ -658,13 +691,13 @@ class ResultsPage:
             results_example.bind("<Button-1>", new_page)
             results_example.grid(row=i, column=0, padx=10, pady=5)
 
-            #Getting the score and changing the color to match the
+            # Getting the score and changing the color to match the
             for i in list_results[i]:
                 print(i[0])
                 rating = rate.website_query(i[0])
-                #print(rating)
-                rating = float(rating)
                 print(rating)
+                rating = float(rating)
+                # print(rating)
                 if rating < 4:
                     color = "limegreen"
                     rating = "Low"
@@ -678,18 +711,18 @@ class ResultsPage:
                     color = "red"
                     rating = "Critical"
 
-            #Label for Rating
+            # Label for Rating
             rating_label = Label(results_example, text=rating, font=14, bg=color, fg="black")
             rating_label.config(height=2, width=7)
             rating_label.place(relx=0.904, rely=0.5, anchor="w")
             results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
 
-            #Design around each result
+            # Design around each result
             rate_frame1 = Frame(results_example, bg=color)
             rate_frame1.config(height=5, width=860)
             rate_frame1.place(relx=0.5, rely=0.99, anchor="s")
 
-        # Scrollbar if more than 5 results are displayed
+            # Scrollbar if more than 5 results are displayed
             if len(list_results) > 5:
                 results_sb = ttk.Scrollbar(results_canvas, orient="vertical", command=results_canvas.yview)
                 results_sb.place(relx=0.98, height=results_canvas.winfo_height())
@@ -828,50 +861,61 @@ class SettingsPage:
             settings_frame = tk.Frame(root)
             settings_frame.place(relx=0.5, rely=0.5, anchor='center')
             settings_frame.config(height=500, width=700)
-            settings_frame.config(relief=RIDGE)
+            settings_frame.config(relief=RIDGE, background="#1F262A")
 
-            settings_page_label = ttk.Label(settings_frame, text='Settings Page')
+            settings_page_label = ttk.Label(settings_frame, text='Settings Page', background="#1F262A",
+                                            foreground="white")
             settings_page_label.place(relx=0.5, rely=0.15, anchor='center')
+
+            frame_style = ttk.Style()
+            frame_style.configure("BW.TFrame", background="#1F262A")
 
             set_options_frame = ttk.Frame(settings_frame)
             set_options_frame.place(relx=0.5, rely=0.5, anchor='center')
-            set_options_frame.config(height=300, width=500)
+            set_options_frame.config(height=300, width=500, style="BW.TFrame")
             set_options_frame.config(relief=RIDGE)
             set_options_frame.config(padding=(30, 15))
 
-            text_size_label = ttk.Label(set_options_frame, text='Text size')
+            text_size_label = ttk.Label(set_options_frame, text='Text size', background="#1F262A", foreground="white")
             text_size_label.grid(row=0, column=0, padx=50, pady=30)
-            decrease_txt_size_button = ttk.Button(set_options_frame, text='-')
+            decrease_txt_size_button = Button(set_options_frame, text='-',  bg="#2a3439", fg="white")
             decrease_txt_size_button.grid(row=0, column=1)
             txt_size_entry = ttk.Entry(set_options_frame, width=5)
             txt_size_entry.grid(row=0, column=2)
             txt_size_entry.insert(0, '12')
-            increase_txt_size_button = ttk.Button(set_options_frame, text='+')
+            increase_txt_size_button = Button(set_options_frame, text='+',  bg="#2a3439", fg="white")
             increase_txt_size_button.grid(row=0, column=3)
 
-            ignore_directories_label = ttk.Label(set_options_frame, text='Choose directories to ignore:')
+            ignore_directories_label = ttk.Label(set_options_frame, text='Choose directories to ignore:',
+                                                 background="#1F262A", foreground="white")
             ignore_directories_label.grid(row=1, column=0, padx=50, pady=30)
-            browse_button = ttk.Button(set_options_frame, text='Browse...')
+            browse_button = Button(set_options_frame, text='Browse...', bg="#2a3439", fg="white")
             browse_button.grid(row=1, column=2)
 
-            set_3_label = ttk.Label(set_options_frame, text='When scan finishes...')
+            set_3_label = ttk.Label(set_options_frame, text='When scan finishes...', background="#1F262A",
+                                    foreground="white")
             set_3_label.grid(row=2, column=0, padx=50)
             after_scan = StringVar()
-            set_3_button_1 = ttk.Radiobutton(set_options_frame, text='Do Nothing', variable=after_scan, value='nothing')
+
+            frame_style = ttk.Style()
+            frame_style.configure("BW.TRadiobutton", background="#1F262A", foreground="white", highlightthickness=0)
+
+            set_3_button_1 = ttk.Radiobutton(set_options_frame, text='Do Nothing', variable=after_scan, value='nothing', style="BW.TRadiobutton")
             set_3_button_1.grid(row=2, column=2)
             set_3_button_2 = ttk.Radiobutton(set_options_frame, text='Close the program', variable=after_scan,
-                                             value='close')
+                                             style="BW.TRadiobutton", value='close')
             set_3_button_2.grid(row=3, column=2)
             set_3_button_3 = ttk.Radiobutton(set_options_frame, text='Shut down computer', variable=after_scan,
-                                             value='shut_down')
+                                             style="BW.TRadiobutton", value='shut_down')
             set_3_button_3.grid(row=4, column=2)
 
-            reset_settings_label = ttk.Label(set_options_frame, text='Reset Default Settings')
+            reset_settings_label = ttk.Label(set_options_frame, text='Reset Default Settings', background="#1F262A",
+                                             foreground="white")
             reset_settings_label.grid(row=5, column=0, padx=50, pady=30)
-            reset_button = ttk.Button(set_options_frame, text='Reset')
+            reset_button = Button(set_options_frame, text='Reset',  bg="#2a3439", fg="white")
             reset_button.grid(row=5, column=2)
 
-            apply_button = ttk.Button(settings_frame, text='Apply')
+            apply_button = Button(settings_frame, text='Apply', bg="#2a3439", fg="white")
             apply_button.place(relx=0.5, rely=0.95, anchor='center')
 
 
@@ -965,7 +1009,7 @@ class LoginPage:
                 if user_list[i][2] == username and user_list[i][4] == token:
                     exists = True
                     logged_in = True
-                    MakeWindow.nav_buttons(self)
+                    MakeWindow.make_nav_buttons(self)
 
             return exists
 
@@ -1046,7 +1090,7 @@ class RegisterPage:
             role_frame = Label(register_frame, text="Role", background="#1F262A", foreground="white", font=20)
             role_frame.place(relx=.25, rely=.66)
             role_entry = Entry(register_frame, textvariable=role_var, background="#2a3439", foreground="white",
-                                width=25, font=20)
+                               width=25, font=20)
             role_entry.place(relx=.4, rely=.66)
 
             # Create Account Button (sends you to login page)
@@ -1090,49 +1134,49 @@ class ApplicationResultsPage:
     def __init__(self, result_num):
         # Toplevel object which will
         # be treated as a new window
-        newWindow = Toplevel(root)
+        new_window = Toplevel(root)
 
         # Toplevel widget
-        newWindow.title("New Window")
+        new_window.title("New Window")
 
         # Window background color
-        newWindow.configure(background="#2a3439")
+        new_window.configure(background="#2a3439")
 
         # Scaling UI to user's screen
         app_width = 1064
         app_height = 600
-        screen_width = newWindow.winfo_screenwidth()
-        screen_height = newWindow.winfo_screenheight()
+        screen_width = new_window.winfo_screenwidth()
+        screen_height = new_window.winfo_screenheight()
         x = (screen_width / 2) - (app_width / 2)
         y = (screen_height / 2) - (app_height / 2)
-        newWindow.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
+        new_window.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
 
-        newWindow.resizable(True, True)
+        new_window.resizable(True, True)
 
         # Changes the default tkinter to our Sieve logo when minimized
-        newWindow.iconbitmap('logo.ico')
+        new_window.iconbitmap('logo.ico')
 
         # Change the text after minimizing the tool to task bar
-        newWindow.title("Sieve")
+        new_window.title("Sieve")
 
         # Removes title bar
         # newWindow.overrideredirect(True)
         # newWindow.minimized = False  # only to know if root is minimized
         # newWindow.maximized = False  # only to know if root is maximized
 
-        main_frame = Frame(newWindow, bg="#2a3439")
+        main_frame = Frame(new_window, bg="#2a3439")
         main_frame.place(relx=0.5, rely=0.1, anchor="n")
-        main_frame.config(height=newWindow.winfo_height(), width=newWindow.winfo_width())
+        main_frame.config(height=new_window.winfo_height(), width=new_window.winfo_width())
 
-        style = ttk.Style(newWindow)
+        style = ttk.Style(new_window)
         style.theme_use('classic')
         style.configure('Test.TSizegrip', background="#1F262A")
-        root_size_grip = ttk.Sizegrip(newWindow)
+        root_size_grip = ttk.Sizegrip(new_window)
 
         root_size_grip.configure(style="Test.TSizegrip")
         root_size_grip.pack(side="right", anchor=SE)
 
         # Login username and RSA token labels and entries
-        username_label = Label(main_frame, text=files_list[result_num], font=15, background="#2a3439",
-                               foreground="white")
-        username_label.place(relx=0.5, rely=0.3, anchor="center")
+        file_name_label = Label(main_frame, text=files_list[result_num], font=15, background="#2a3439",
+                                foreground="white")
+        file_name_label.grid(row=0, column=0)

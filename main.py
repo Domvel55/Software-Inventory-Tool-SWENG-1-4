@@ -147,5 +147,5 @@ def call_main():
 
 
 if __name__ == '__main__':
-    call_main()
+    threading.Thread(target=call_main(), args=(1,)).start()
     threading.Thread(target=root.mainloop(), args=(2,)).start()

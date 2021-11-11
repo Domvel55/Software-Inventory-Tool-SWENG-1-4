@@ -8,6 +8,7 @@
 
 from tkinter import *
 from tkinter import ttk
+import threading
 
 from tkinter_custom_button import TkinterCustomButton
 from Database import *
@@ -408,7 +409,8 @@ class ScanConfirmPage:
                                               width=200,
                                               height=75,
                                               hover=True,
-                                              command=lambda: [last_time_clicked(), ScanConfirmPage.scan(self)])
+                                              command=lambda: [last_time_clicked(),
+                                                threading.Thread(target=ScanConfirmPage.scan(self), args=(1,)).start()])
         continue_button.place(relx=0.25, rely=0.8, anchor="center")
 
         add_files_button = TkinterCustomButton(master=scan_confirm_frame,

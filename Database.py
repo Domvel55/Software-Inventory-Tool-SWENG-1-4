@@ -69,12 +69,13 @@ class CVEDataFrame:
                             f'{self.df["References"][i]}~/~{self.df["Comments"][i]}\n')
             f.close()
 
-    def select_record_by_name(self, name: str):
+    def select_record_by_name(self, name: str, limit=10):
         query_list = []
         with open('cve.db.metadata', encoding='UTF-8') as f:
-            for record in f:
-                if name.lower() in str(record).lower():
+            for record in reversed(list(f)):
+                if name.lower() in str(record).lower() and limit > 0:
                     query_list.append(record.split('~/~'))
+                    limit -= 1
         f.close()
         return query_list
 
@@ -82,7 +83,7 @@ class CVEDataFrame:
 if __name__ == '__main__':
     cve = CVEDataFrame()
     cve.create_metadata()
-    # print(cve.select_record_by_name('chrome'))
+    # print(cve.select_record_by_name('excel'))
     # Create a CVSSScorer() obj and call .website_query wit the CVE tag as shown below to parse the cvss score
     cvss = CVSSScorer()
-    print(cvss.website_query('CVE-1999-0001'))
+    print(cvss.website_query('CVE-2001-0772'))

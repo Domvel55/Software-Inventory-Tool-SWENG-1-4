@@ -878,12 +878,12 @@ class SettingsPage:
 
             text_size_label = ttk.Label(set_options_frame, text='Text size', background="#1F262A", foreground="white")
             text_size_label.grid(row=0, column=0, padx=50, pady=30)
-            decrease_txt_size_button = Button(set_options_frame, text='-',  bg="#2a3439", fg="white")
+            decrease_txt_size_button = Button(set_options_frame, text='-', bg="#2a3439", fg="white")
             decrease_txt_size_button.grid(row=0, column=1)
             txt_size_entry = ttk.Entry(set_options_frame, width=5)
             txt_size_entry.grid(row=0, column=2)
             txt_size_entry.insert(0, '12')
-            increase_txt_size_button = Button(set_options_frame, text='+',  bg="#2a3439", fg="white")
+            increase_txt_size_button = Button(set_options_frame, text='+', bg="#2a3439", fg="white")
             increase_txt_size_button.grid(row=0, column=3)
 
             ignore_directories_label = ttk.Label(set_options_frame, text='Choose directories to ignore:',
@@ -900,7 +900,8 @@ class SettingsPage:
             frame_style = ttk.Style()
             frame_style.configure("BW.TRadiobutton", background="#1F262A", foreground="white", highlightthickness=0)
 
-            set_3_button_1 = ttk.Radiobutton(set_options_frame, text='Do Nothing', variable=after_scan, value='nothing', style="BW.TRadiobutton")
+            set_3_button_1 = ttk.Radiobutton(set_options_frame, text='Do Nothing', variable=after_scan, value='nothing',
+                                             style="BW.TRadiobutton")
             set_3_button_1.grid(row=2, column=2)
             set_3_button_2 = ttk.Radiobutton(set_options_frame, text='Close the program', variable=after_scan,
                                              style="BW.TRadiobutton", value='close')
@@ -912,7 +913,7 @@ class SettingsPage:
             reset_settings_label = ttk.Label(set_options_frame, text='Reset Default Settings', background="#1F262A",
                                              foreground="white")
             reset_settings_label.grid(row=5, column=0, padx=50, pady=30)
-            reset_button = Button(set_options_frame, text='Reset',  bg="#2a3439", fg="white")
+            reset_button = Button(set_options_frame, text='Reset', bg="#2a3439", fg="white")
             reset_button.grid(row=5, column=2)
 
             apply_button = Button(settings_frame, text='Apply', bg="#2a3439", fg="white")
@@ -1040,6 +1041,7 @@ class RegisterPage:
         first_name_var = tk.StringVar(value="")
         last_name_var = tk.StringVar(value="")
         username_var = tk.StringVar(value="")
+        password_var = tk.StringVar(value="")
         role_var = tk.StringVar(value="")
 
         if last_page != "ResultsPage":
@@ -1070,28 +1072,34 @@ class RegisterPage:
 
             first_name_frame = Label(register_frame, text="First Name", background="#1F262A", foreground="white",
                                      font=20)
-            first_name_frame.place(relx=.16003, rely=.3)
+            first_name_frame.place(relx=.16003, rely=.25)
             first_name_entry = Entry(register_frame, textvariable=first_name_var, background="#2a3439",
                                      foreground="white", width=25, font=20)
-            first_name_entry.place(relx=.4, rely=.3)
+            first_name_entry.place(relx=.4, rely=.25)
 
             last_name_frame = Label(register_frame, text="Last Name", background="#1F262A", foreground="white", font=20)
-            last_name_frame.place(relx=.16001, rely=.42)
+            last_name_frame.place(relx=.16001, rely=.35)
             last_name_entry = Entry(register_frame, textvariable=last_name_var, background="#2a3439",
                                     foreground="white", width=25, font=20)
-            last_name_entry.place(relx=.4, rely=.42)
+            last_name_entry.place(relx=.4, rely=.35)
 
             username_frame = Label(register_frame, text="Username", background="#1F262A", foreground="white", font=20)
-            username_frame.place(relx=.1703, rely=.54)
+            username_frame.place(relx=.1703, rely=.45)
             username_entry = Entry(register_frame, textvariable=username_var, background="#2a3439", foreground="white",
                                    width=25, font=20)
-            username_entry.place(relx=.4, rely=.54)
+            username_entry.place(relx=.4, rely=.45)
+
+            password_frame = Label(register_frame, text="Password", background="#1F262A", foreground="white", font=20)
+            password_frame.place(relx=.1703, rely=.55)
+            password_entry = Entry(register_frame, textvariable=password_var, background="#2a3439", foreground="white",
+                                   width=25, font=20)
+            password_entry.place(relx=.4, rely=.55)
 
             role_frame = Label(register_frame, text="Role", background="#1F262A", foreground="white", font=20)
-            role_frame.place(relx=.25, rely=.66)
+            role_frame.place(relx=.25, rely=.65)
             role_entry = Entry(register_frame, textvariable=role_var, background="#2a3439", foreground="white",
                                width=25, font=20)
-            role_entry.place(relx=.4, rely=.66)
+            role_entry.place(relx=.4, rely=.65)
 
             # Create Account Button (sends you to login page)
             create_button = TkinterCustomButton(master=register_frame,
@@ -1116,10 +1124,11 @@ class RegisterPage:
             first_name = first_name_entry.get()
             last_name = last_name_entry.get()
             username = username_entry.get()
+            password = password_entry.get()
             role = role_entry.get()
 
             # Add new user to user list
-            new_account = [first_name, last_name, username, role, "123456"]
+            new_account = [first_name, last_name, username, password, role]
             user_list.append(new_account)
 
         def enter_register(e):

@@ -31,6 +31,7 @@ root.title("Sieve")
 
 # Removes title bar
 root.overrideredirect(True)
+root.update_idletasks()
 root.minimized = False  # only to know if root is minimized
 root.maximized = False  # only to know if root is maximized
 
@@ -50,6 +51,7 @@ minimize_button = Button(title_bar, text=' — ', bg="#1f262A", padx=2, pady=2, 
 title_bar_title = Label(title_bar, text="Software Inventory Tool", bg="#1f262A", bd=0, fg='white',
                         font=("helvetica", 15),
                         highlightthickness=0)
+
 root_sizegrip = ttk.Sizegrip(master=root)
 minimize_button.bind("<Button-1>", minimizer)
 expand_button.bind("<Button-1>", maximize_me)
@@ -60,7 +62,7 @@ close_button.pack(side=RIGHT, ipadx=7, ipady=1)
 expand_button.pack(side=RIGHT, ipadx=7, ipady=1)
 minimize_button.pack(side=RIGHT, ipadx=7, ipady=1)
 title_bar_title.pack(side=RIGHT, padx=220)
-
+#Maybe scale using title_bar.winfo_width()?
 
 # Functions to change the color of buttons when hovered over
 def changex_on_hovering(event):

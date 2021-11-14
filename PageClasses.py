@@ -21,6 +21,8 @@ from plyer import notification
 root = Tk()
 global files_list
 now = "Last Scanned: ----"
+name = "John Doe"
+role = "None"
 global last_page
 last_page = ""
 user_list = []
@@ -248,10 +250,21 @@ class MainWindow:
             root_size_grip.configure(style="Test.TSizegrip")
             root_size_grip.pack(side="right", anchor=SE)
 
-            # LabelFrame that shows thew Last time some thing was scanned. Initialized as "Last Scanned: ----"
+            # LabelFrame that shows the Last time some thing was scanned. Initialized as "Last Scanned: ----"
             scan_time_frame = LabelFrame(main_frame, bg="#2a3439", fg="white", font=10, text=now, relief=FLAT)
             scan_time_frame.place(relx=0.18, rely=0.1, anchor="n")
             scan_time_frame.config(height=40, width=350)
+
+            # LabelFrame that shows the current user's name. Initialized as "John Doe"
+            current_name = LabelFrame(main_frame, bg="#2a3439", fg="white", font=10, text="NAME:    " + name, relief=FLAT)
+            current_name.place(relx=0.18, rely=0.765, anchor="n")
+            current_name.config(height=40, width=350)
+
+            # LabelFrame that shows the current user's role. Initialized as "None"
+            current_role = LabelFrame(main_frame, bg="#2a3439", fg="white", font=10, text="ROLE:    " + role, relief=FLAT)
+            current_role.place(relx=0.18, rely=0.8, anchor="n")
+            current_role.config(height=40, width=350)
+
 
             # <editor-fold desc="Results Buttons">
             scan_button = TkinterCustomButton(master=main_frame,
@@ -969,7 +982,7 @@ class LoginPage:
             login_page_label = Label(login_inner_frame, text='Login Page', font="Bold, 20", bg='#2a3439', fg="white")
             login_page_label.place(relx=0.5, rely=0.15, anchor='center')
 
-            # Login username and RSA token labels and entries
+            # Login username and Password labels and entries
             username_label = Label(login_inner_frame, text='Username', font=15, background="#2a3439",
                                    foreground="white")
             username_label.place(relx=0.5, rely=0.3, anchor="center")
@@ -1017,15 +1030,17 @@ class LoginPage:
             register_button.place(relx=0.6, rely=0.85, anchor='center')
             ToolTip(register_button, "Register for an account to use the Software Inventory Tool.")
 
-        # Search through user list. Return True if user and token are correct.
+        # Search through user list. Return True if user and password are correct.
         def check_login():
-            global user_list
+            global user_list, name, role
             username = username_entry.get()
             password = password_entry.get()
             exists = False
             for i in range(len(user_list)):
                 if user_list[i][2] == username and user_list[i][3] == password:
                     exists = True
+                    name = user_list[i][0] + " " + user_list[i][1]
+                    role = user_list[i][4].get()
                     MakeWindow.make_nav_buttons(self)
 
             return exists
@@ -1111,11 +1126,20 @@ class RegisterPage:
                                    width=25, font=20)
             password_entry.place(relx=.4, rely=.55)
 
+            # Label for roles
             role_frame = Label(register_frame, text="Role", background="#1F262A", foreground="white", font=20)
             role_frame.place(relx=.25, rely=.65)
-            role_entry = Entry(register_frame, textvariable=role_var, background="#2a3439", foreground="white",
-                               width=25, font=20)
-            role_entry.place(relx=.4, rely=.65)
+            # Style for radio buttons
+            frame_style = ttk.Style()
+            frame_style.configure("BW.TRadiobutton", background="#1F262A", foreground="white", highlightthickness=0)
+            # Admin radio button
+            admin_radio_button = ttk.Radiobutton(register_frame, text='Admin', variable=role_var, value='Admin',
+                                             style="BW.TRadiobutton")
+            admin_radio_button.place(relx=.4, rely=.65)
+            # User radio button
+            user_radio_button = ttk.Radiobutton(register_frame, text='User', variable=role_var, value='User',
+                                             style="BW.TRadiobutton")
+            user_radio_button.place(relx=.60, rely=.65)
 
             # Create Account Button (sends you to login page)
             create_button = TkinterCustomButton(master=register_frame,
@@ -1142,7 +1166,7 @@ class RegisterPage:
             last_name = last_name_entry.get()
             username = username_entry.get()
             password = password_entry.get()
-            role = role_entry.get()
+            role = role_var
 
             # Add new user to user list
             new_account = [first_name, last_name, username, password, role]
@@ -1203,7 +1227,7 @@ class ApplicationResultsPage:
         root_size_grip.configure(style="Test.TSizegrip")
         root_size_grip.pack(side="right", anchor=SE)
 
-        # Login username and RSA token labels and entries
+        # Login username and Password labels and entries
         file_name_label = Label(main_frame, text=files_list[result_num], font=15, background="#2a3439",
                                 foreground="white")
         file_name_label.grid(row=0, column=0)

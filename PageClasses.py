@@ -109,8 +109,8 @@ class ToolTip(object):
     def showtip(self, event=None):
         x = y = 0
         x, y, cx, cy = self.widget.bbox("insert")
-        x += self.widget.winfo_rootx() + 25
-        y += self.widget.winfo_rooty() + 20
+        x += self.widget.winfo_rootx() + self.widget.winfo_width() / 10
+        y += self.widget.winfo_rooty() + self.widget.winfo_height()
         # Makes frame for tip
         self.tw = Toplevel(self.widget)
         # Gets rid of the window for the frame for tip
@@ -267,7 +267,7 @@ class MainWindow:
                                               hover=True,
                                               command=lambda: ScanConfirmPage.make_full_scan_config(self))
             scan_button.place(relx=.01)
-            ToolTip(scan_button, "Scans all the software files from list.")
+            ToolTip(scan_button, "Scans all the software files from a directory.")
 
             express_scan_button = TkinterCustomButton(master=main_frame,
                                                       bg_color="#2a3439",
@@ -282,7 +282,7 @@ class MainWindow:
                                                       hover=True,
                                                       command=lambda: ScanConfirmPage.make_express_config(self))
             express_scan_button.place(relx=.12)
-            ToolTip(express_scan_button, "Scans the most important software files.")
+            ToolTip(express_scan_button, "Scans the selected software files for a quicker scan.")
 
             schedule_scan_button = TkinterCustomButton(master=main_frame,
                                                        bg_color="#2a3439",
@@ -297,6 +297,7 @@ class MainWindow:
                                                        hover=True,
                                                        command=lambda: ResultsPage())
             schedule_scan_button.place(relx=.27)
+            ToolTip(schedule_scan_button, "Schedule a full scan.")
             # </editor-fold>
 
 
@@ -352,6 +353,8 @@ class ScanConfirmPage:
                                                   hover=True,
                                                   command=lambda: [last_time_clicked(), ScanConfirmPage.scan(self)])
             continue_button.place(relx=0.25, rely=0.8, anchor="center")
+            ToolTip(continue_button, "Continue onto the scanning process.")
+
 
             cancel_button = TkinterCustomButton(master=scan_confirm_frame,
                                                 fg_color="#5F4866",
@@ -365,6 +368,8 @@ class ScanConfirmPage:
                                                 hover=True,
                                                 command=lambda: MainWindow())
             cancel_button.place(relx=0.70, rely=0.8, anchor="center")
+            ToolTip(cancel_button, "Go back to the home page.")
+
 
     # This will setup the buttons for the Express Scan Function
     def make_express_config(self):
@@ -442,6 +447,7 @@ class ScanConfirmPage:
                                               command=lambda: [last_time_clicked(),
                                                 threading.Thread(target=ScanConfirmPage.scan(self), args=(1,)).start()])
         continue_button.place(relx=0.25, rely=0.8, anchor="center")
+        ToolTip(continue_button, "Continue onto the scanning process once programs have been selected.")
 
         add_files_button = TkinterCustomButton(master=scan_confirm_frame,
                                                fg_color="#8797AF",
@@ -455,6 +461,8 @@ class ScanConfirmPage:
                                                hover=True,
                                                command=lambda: browse_files())
         add_files_button.place(relx=0.5, rely=0.8, anchor="center")
+        ToolTip(add_files_button, "Opens the File Explorer for selecting specific programs.")
+
 
         cancel_button = TkinterCustomButton(master=scan_confirm_frame,
                                             fg_color="#5F4866",
@@ -468,6 +476,8 @@ class ScanConfirmPage:
                                             hover=True,
                                             command=lambda: MainWindow())
         cancel_button.place(relx=0.70, rely=0.8, anchor="center")
+        ToolTip(cancel_button, "Go back to the home page.")
+
 
     # This will scan the Database
     # This function will be called no matter which config is decided on
@@ -585,6 +595,7 @@ class ResultsPage:
                                                 hover=True,
                                                 command=lambda: None)
         update_all_button.place(relx=0.25, rely=0.8, anchor="center")
+        ToolTip(update_all_button, "Update all the programs flagged for available updates.")
 
         update_selected_button = TkinterCustomButton(master=results_frame,
                                                      fg_color="#8797AF",
@@ -598,6 +609,8 @@ class ResultsPage:
                                                      hover=True,
                                                      command=lambda: None)
         update_selected_button.place(relx=0.5, rely=0.8, anchor="center")
+        ToolTip(update_selected_button, "Update all the selected programs that were flagged for available updates.")
+
 
         cancel_button = TkinterCustomButton(master=results_frame,
                                             fg_color="#5F4866",
@@ -611,6 +624,8 @@ class ResultsPage:
                                             hover=True,
                                             command=lambda: None)
         cancel_button.place(relx=0.70, rely=0.8, anchor="center")
+        ToolTip(cancel_button, "Go back to the home page.")
+
 
         filter_settings_container = tk.Frame(results_frame, bg="#1F262A", borderwidth=2)
         filter_settings_container.place(relx=0.04, rely=0.0, anchor="nw")
@@ -984,6 +999,7 @@ class LoginPage:
                                                hover=True,
                                                command=lambda: [MainWindow() if check_login() else login_error()])
             login_button.place(relx=0.4, rely=0.85, anchor='center')
+            ToolTip(login_button, "Login into the Software Inventory Tool.")
 
             # Registration Button (Sends you to register page)
             register_button = TkinterCustomButton(master=login_inner_frame,
@@ -999,6 +1015,7 @@ class LoginPage:
                                                   hover=True,
                                                   command=lambda: RegisterPage())
             register_button.place(relx=0.6, rely=0.85, anchor='center')
+            ToolTip(register_button, "Register for an account to use the Software Inventory Tool.")
 
         # Search through user list. Return True if user and token are correct.
         def check_login():
@@ -1114,6 +1131,7 @@ class RegisterPage:
                                                 hover=True,
                                                 command=lambda: [new_register(), LoginPage()])
             create_button.place(relx=0.5, rely=0.85, anchor='center')
+            ToolTip(create_button, "Create an account using the provided information.")
 
         # Register new user
         def new_register():

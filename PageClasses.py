@@ -26,7 +26,8 @@ role = "None"
 global last_page
 last_page = ""
 user_list = []
-
+global history_list
+history_list = []
 
 
 title_bar = Frame(root, bg="#1F262A", relief="raised", bd=1)
@@ -74,6 +75,9 @@ def frame_mapped(e):
     root.update_idletasks()
     root.overrideredirect(True)
     root.state('normal')
+
+def update_history():
+    history_list.append([now, list_results])
 
 
 # ToolTip class for making tips that appear after hovering mouse over button for 0.5 seconds
@@ -311,7 +315,66 @@ class MainWindow:
                                                        command=lambda: ResultsPage())
             schedule_scan_button.place(relx=.27)
             ToolTip(schedule_scan_button, "Schedule a full scan.")
+
+            history_button = TkinterCustomButton(master=main_frame,
+                                                       bg_color="#2a3439",
+                                                       fg_color="#1F262A",
+                                                       hover_color="#AAA9AD",
+                                                       text_font="Bold, 14",
+                                                       text="History",
+                                                       text_color="white",
+                                                       corner_radius=10,
+                                                       width=130,
+                                                       height=40,
+                                                       hover=True,
+                                                       command=lambda: HistoryPage())
+            history_button.place(relx=0.6, rely=0.85, anchor='center')
+            ToolTip(schedule_scan_button, "See run history")
             # </editor-fold>
+
+#Contains the history of the program.
+#Creates the page that contains the history.
+class HistoryPage:
+    def __init__(self):
+        global root
+        global last_page
+
+
+
+        if last_page != "MainWindow":
+            last_page = "MainWindow"
+
+            for widget in root.winfo_children()[1:]:
+                widget.destroy()
+
+            root.configure(background="#2a3439")
+            style = ttk.Style(root)
+            style.theme_use('classic')
+            style.configure('Test.TSizegrip', background="#1F262A")
+            root_size_grip = ttk.Sizegrip(root)
+
+            root_size_grip.configure(style="Test.TSizegrip")
+            root_size_grip.pack(side="right", anchor=SE)
+
+            # Register page frame
+            history_frame = Frame(root, bg='#1F262A')
+            history_frame.place(relx=0.5, rely=0.5, anchor='center')
+            history_frame.config(height=400, width=800)
+            history_frame.config(relief=RAISED)
+
+            # Container for results
+            history_container = Frame(history_frame, bg="#1F262A", borderwidth=2)
+            history_container.place(relx=0.5, rely=0.1, anchor="n")
+            history_container.config(relief=RIDGE)
+
+            print(history_list)
+
+
+
+
+
+
+
 
 
 # This class will create the scan page
@@ -534,7 +597,7 @@ class ScanConfirmPage:
                 list_results.append(cve.select_record_by_name(base))
 
         results_progressbar.destroy()
-
+        update_history()
         ResultsPage.print_results(self, list_results)
         title = 'A scan has been completed!'
         message = 'Please return to the Software Inventory Tool to view results.'
@@ -651,7 +714,7 @@ class ResultsPage:
                                                      command=lambda: None)
         ignore_selected_button.place(relx=0.75, rely=0.8, anchor="center")
         ToolTip(ignore_selected_button, "Ignore all the selected programs that were flagged for available updates.")
-    #
+
         ignore_all_button = TkinterCustomButton(master=results_frame,
                                                 fg_color="#848689",
                                                 hover_color="#1F262A",
@@ -735,7 +798,7 @@ class ResultsPage:
         rate = CVSSScorer()
 
         # This loop will run for the amount of items that are found to have vulnerabilities in the Database
-        # It will send a Sting to the results page with the information
+        # It will send a String to the results page with the information
         # It will only run as many times as vulnerabilities found
         for i in range(len(list_results)):
             results_example = Frame(results_container, bg="#2a3439")

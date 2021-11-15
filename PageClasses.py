@@ -537,6 +537,7 @@ class ResultsPage:
 
     # Function to create the update buttons before and after have results
     def create_update_buttons(results_frame):
+
         update_all_button = TkinterCustomButton(master=results_frame,
                                                 fg_color="#848689",
                                                 hover_color="#1F262A",
@@ -548,7 +549,8 @@ class ResultsPage:
                                                 height=75,
                                                 hover=True,
                                                 command=lambda: None)
-        update_all_button.place(relx=0.25, rely=0.8, anchor="center")
+        update_all_button.place(relx=0.15, rely=0.8, anchor="center")
+        ToolTip(update_all_button, "Update all the programs flagged for available updates.")
 
         update_selected_button = TkinterCustomButton(master=results_frame,
                                                      fg_color="#8797AF",
@@ -561,7 +563,8 @@ class ResultsPage:
                                                      height=75,
                                                      hover=True,
                                                      command=lambda: None)
-        update_selected_button.place(relx=0.5, rely=0.8, anchor="center")
+        update_selected_button.place(relx=0.35, rely=0.8, anchor="center")
+        ToolTip(update_selected_button, "Update all the selected programs that were flagged for available updates.")
 
         cancel_button = TkinterCustomButton(master=results_frame,
                                             fg_color="#5F4866",
@@ -574,8 +577,36 @@ class ResultsPage:
                                             height=50,
                                             hover=True,
                                             command=lambda: None)
-        cancel_button.place(relx=0.70, rely=0.8, anchor="center")
+        cancel_button.place(relx=0.9, rely=0.8, anchor="center")
+        ToolTip(cancel_button, "Go back to the home page.")
 
+        ignore_selected_button = TkinterCustomButton(master=results_frame,
+                                                     fg_color="#8797AF",
+                                                     hover_color="#1F262A",
+                                                     text_font="Bold, 14",
+                                                     text="Ignore Selected",
+                                                     text_color="white",
+                                                     corner_radius=10,
+                                                     width=200,
+                                                     height=75,
+                                                     hover=True,
+                                                     command=lambda: None)
+        ignore_selected_button.place(relx=0.75, rely=0.8, anchor="center")
+        ToolTip(ignore_selected_button, "Ignore all the selected programs that were flagged for available updates.")
+
+        ignore_all_button = TkinterCustomButton(master=results_frame,
+                                                fg_color="#848689",
+                                                hover_color="#1F262A",
+                                                text_font="Bold, 14",
+                                                text="Ignore All",
+                                                text_color="white",
+                                                corner_radius=10,
+                                                width=200,
+                                                height=75,
+                                                hover=True,
+                                                command=lambda: None)
+        ignore_all_button.place(relx=0.55, rely=0.8, anchor="center")
+        ToolTip(ignore_all_button, "Ignore all the programs flagged for available updates.")
 
         style = ttk.Style(root)
         style.theme_use('classic')

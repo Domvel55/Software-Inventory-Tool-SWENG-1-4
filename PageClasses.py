@@ -368,10 +368,67 @@ class HistoryPage:
             history_container.config(relief=RIDGE)
 
             print(history_list)
+        HistoryPage.print_history(self, history_list)
 
 
 
+    def print_history(self, history_list):
 
+        history_frame = Frame(root, bg="#2a3439")
+        history_frame.place(relx=0.5, rely=0.1, anchor="n")
+        history_frame.config(height=root.winfo_height(), width=root.winfo_width())
+
+
+        history_canvas = Canvas(history_frame, height=300, width=900, bg="#2a3439")
+        history_canvas.place(relx=0.5, rely=0.15, anchor="n")
+
+        # Container for results
+        history_container = Frame(history_canvas, bg="#1F262A", borderwidth=2)
+        history_container.place(relx=0.5, rely=0.1, anchor="n")
+        history_container.config(relief=RIDGE, height=350, width=900)
+
+        # Bind scrollbar to container
+        history_container.bind(
+            "<Configure>",
+            lambda e: history_canvas.configure(
+                scrollregion=history_canvas.bbox("all")
+            )
+        )
+        history_canvas.create_window((0, 0), window=history_container, anchor="nw")
+
+
+
+        # This loop will run for the amount of items that are found to have vulnerabilities in the Database
+        # It will send a String to the results page with the information
+        # It will only run as many times as vulnerabilities found
+        for i in range(len(history_list)):
+            for a in range(len(history_list[i])):
+                history_example = Frame(history_container, bg="#2a3439")
+                history_example.config(height=50, width=860)
+                history_example1_label = Label(history_example, text=str(history_list[i][a].split('/')[-1]), font=14,
+                                               bg="#2a3439", fg="#FFFFFF")
+                history_example1_label.place(relx=0.01, rely=0.5, anchor="w")
+                history_example.bind("<Button-1>", new_page)
+                history_example.grid(row=i, column=0, padx=10, pady=5)
+
+
+
+            # Label for Rating
+            history_label = Label(history_example, text=rating, font=14, bg=color, fg="black")
+            history_label.config(height=2, width=7)
+            history_label.place(relx=0.904, rely=0.5, anchor="w")
+            history_example1_label.place(relx=0.01, rely=0.5, anchor="w")
+
+            # Design around each result
+            history_frame1 = Frame(history_example, bg=color)
+            history_frame1.config(height=5, width=860)
+            history_frame1.place(relx=0.5, rely=0.99, anchor="s")
+
+            # Scrollbar if more than 5 results are displayed
+            if len(history_list) > 5:
+                history_sb = ttk.Scrollbar(history_canvas, orient="vertical", command=history_canvas.yview)
+                history_sb.place(relx=0.98, height=history_canvas.winfo_height())
+                history_canvas.configure(yscrollcommand=results_sb.set)
 
 
 

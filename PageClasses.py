@@ -405,22 +405,15 @@ class HistoryPage:
             for a in range(len(history_list[i])):
                 history_example = Frame(history_container, bg="#2a3439")
                 history_example.config(height=50, width=860)
-                history_example1_label = Label(history_example, text=str(history_list[i][a].split('/')[-1]), font=14,
+                history_example1_label = Label(history_example, text=str(history_list[i][0]), font=10,
                                                bg="#2a3439", fg="#FFFFFF")
                 history_example1_label.place(relx=0.01, rely=0.5, anchor="w")
                 history_example.bind("<Button-1>", new_page)
                 history_example.grid(row=i, column=0, padx=10, pady=5)
 
 
-
-            # Label for Rating
-            history_label = Label(history_example, text=rating, font=14, bg=color, fg="black")
-            history_label.config(height=2, width=7)
-            history_label.place(relx=0.904, rely=0.5, anchor="w")
-            history_example1_label.place(relx=0.01, rely=0.5, anchor="w")
-
             # Design around each result
-            history_frame1 = Frame(history_example, bg=color)
+            history_frame1 = Frame(history_example, bg="white")
             history_frame1.config(height=5, width=860)
             history_frame1.place(relx=0.5, rely=0.99, anchor="s")
 

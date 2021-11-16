@@ -373,7 +373,6 @@ class HistoryPage:
 
 
 
-
     def print_history(self, history_list):
 
         history_frame = Frame(root, bg="#2a3439")

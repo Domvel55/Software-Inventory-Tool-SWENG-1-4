@@ -28,6 +28,7 @@ last_page = ""
 user_list = []
 global history_list
 history_list = []
+sort_variable = None
 
 
 title_bar = Frame(root, bg="#1F262A", relief="raised", bd=1)
@@ -613,6 +614,7 @@ class ScanConfirmPage:
         global list_results
         list_results = []
         cve = CVEDataFrame()
+        rate = CVSSScorer()
         # Makes a progress bar
         progressbar_style_element = ttk.Style()
         progressbar_style_element.theme_use('alt')
@@ -639,13 +641,15 @@ class ScanConfirmPage:
             results_progressbar['value'] += (100 / len(files_list))
             root.update_idletasks()
 
-            # This will not add an entry to the results list if nothing is found in the CVE Database
-            if not cve.select_record_by_name(base):
-                pass
-                # files_list.remove(record)
+            record = cve.select_record_by_name(base)
+            temp_list = []
             # This will add an entry to the results list with vulnerability from the CVE Database
-            else:
-                list_results.append(cve.select_record_by_name(base))
+            if len(record) != 0:
+                temp_record = None
+                for i in record:
+                    rating = float(rate.website_query(i[0]))
+                    temp_list.append((i, rating))
+                list_results.append(temp_list)
 
         results_progressbar.destroy()
         update_history()
@@ -822,6 +826,7 @@ class ResultsPage:
     # This will take the software found from a scan
     # And print them to the results page
     def print_results(self, list_results):
+        global sort_variable
 
         results_frame = Frame(root, bg="#2a3439")
         results_frame.place(relx=0.5, rely=0.1, anchor="n")
@@ -846,7 +851,11 @@ class ResultsPage:
         )
         results_canvas.create_window((0, 0), window=results_container, anchor="nw")
 
-        rate = CVSSScorer()
+
+
+        temp_list = []
+        for record in list_results:
+            pass
 
         # This loop will run for the amount of items that are found to have vulnerabilities in the Database
         # It will send a String to the results page with the information
@@ -862,8 +871,7 @@ class ResultsPage:
 
             # Getting the score and changing the color to match the
             for i in list_results[i]:
-                rating = rate.website_query(i[0])
-                rating = float(rating)
+                rating = i[1]
             if rating < 4:
                 color = "limegreen"
                 rating = "Low"
@@ -1372,16 +1380,15 @@ class ApplicationResultsPage:
                                 foreground="white")
         file_name_label.grid(row=0, column=0)
 
-        rate = CVSSScorer()
-
         for i in range(len(list_results)):
             count = 1
             for j in list_results[result_num]:
-                cvss_name_label = Label(main_frame, text=j[0], font=15, background="#2a3439",
+                record = j[0]
+                cvss_name_label = Label(main_frame, text=record[0], font=15, background="#2a3439",
                                         foreground="white")
                 cvss_name_label.grid(row=count, column=0)
 
-                rating = rate.website_query(j[0])
+                rating = j[1]
 
                 cvss_score_label = Label(main_frame, text=rating, font=15, background="#2a3439",
                                          foreground="white")

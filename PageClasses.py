@@ -35,6 +35,24 @@ title_bar = Frame(root, bg="#1F262A", relief="raised", bd=1)
 title_bar.pack(fill=X)
 
 
+def read_config():
+    global now, user_list
+    with open('configuration.ini', 'r') as f:
+        file = list(f)
+        now = file[0]
+        for user in file[2:]:
+            temp = user.split('~')
+            user_list.append([temp[0][5:].split()[0], temp[0][5:].split()[1], temp[1][5:].split()[0], temp[2][5:].split()[0], temp[3][5:].split()[0]])
+
+
+def write_config():
+    with open('configuration.ini', 'w') as f:
+        f.write(f'{now}')
+        f.write('Users:\n')
+        for user in user_list:
+            f.write(f'Name: {user[0]} {user[1]}~User: {user[2]}~Pass: {user[3]}~Role: {user[4]}\n')
+
+
 def move_app(e):
     root.geometry(f'+{e.x_root}+{e.y_root}')
 
@@ -869,9 +887,12 @@ class ResultsPage:
             results_example.bind("<Button-1>", new_page)
             results_example.grid(row=i, column=0, padx=10, pady=5)
 
+            rating = 0
             # Getting the score and changing the color to match the
-            for i in list_results[i]:
-                rating = i[1]
+            for j in list_results[i]:
+                rating += j[1]
+            rating = rating/float(len(list_results[i]))
+
             if rating < 4:
                 color = "limegreen"
                 rating = "Low"
@@ -1188,7 +1209,7 @@ class LoginPage:
                 if user_list[i][2] == username and user_list[i][3] == password:
                     exists = True
                     name = user_list[i][0] + " " + user_list[i][1]
-                    role = user_list[i][4].get()
+                    role = user_list[i][4]
                     MakeWindow.make_nav_buttons(self)
 
             return exists
@@ -1211,17 +1232,22 @@ class LoginPage:
 
 
 class RegisterPage:
+    first_name_var: tk.StringVar
+    last_name_var: tk.StringVar
+    username_var: tk.StringVar
+    password_var: tk.StringVar
+    role_var: tk.StringVar
 
     def __init__(self):
         global root
         global last_page
 
         # Initialize input variables
-        first_name_var = tk.StringVar(value="")
-        last_name_var = tk.StringVar(value="")
-        username_var = tk.StringVar(value="")
-        password_var = tk.StringVar(value="")
-        role_var = tk.StringVar(value="")
+        self.first_name_var = tk.StringVar(value="")
+        self.last_name_var = tk.StringVar(value="")
+        self.username_var = tk.StringVar(value="")
+        self.password_var = tk.StringVar(value="")
+        self.role_var = tk.StringVar(value="")
 
         if last_page != "ResultsPage":
             last_page = "ResultsPage"
@@ -1252,25 +1278,25 @@ class RegisterPage:
             first_name_frame = Label(register_frame, text="First Name", background="#1F262A", foreground="white",
                                      font=20)
             first_name_frame.place(relx=.16003, rely=.25)
-            first_name_entry = Entry(register_frame, textvariable=first_name_var, background="#2a3439",
+            first_name_entry = Entry(register_frame, textvariable=self.first_name_var, background="#2a3439",
                                      foreground="white", width=25, font=20)
             first_name_entry.place(relx=.4, rely=.25)
 
             last_name_frame = Label(register_frame, text="Last Name", background="#1F262A", foreground="white", font=20)
             last_name_frame.place(relx=.16001, rely=.35)
-            last_name_entry = Entry(register_frame, textvariable=last_name_var, background="#2a3439",
+            last_name_entry = Entry(register_frame, textvariable=self.last_name_var, background="#2a3439",
                                     foreground="white", width=25, font=20)
             last_name_entry.place(relx=.4, rely=.35)
 
             username_frame = Label(register_frame, text="Username", background="#1F262A", foreground="white", font=20)
             username_frame.place(relx=.1703, rely=.45)
-            username_entry = Entry(register_frame, textvariable=username_var, background="#2a3439", foreground="white",
+            username_entry = Entry(register_frame, textvariable=self.username_var, background="#2a3439", foreground="white",
                                    width=25, font=20)
             username_entry.place(relx=.4, rely=.45)
 
             password_frame = Label(register_frame, text="Password", background="#1F262A", foreground="white", font=20)
             password_frame.place(relx=.1703, rely=.55)
-            password_entry = Entry(register_frame, textvariable=password_var, background="#2a3439", foreground="white",
+            password_entry = Entry(register_frame, textvariable=self.password_var, background="#2a3439", foreground="white",
                                    width=25, font=20)
             password_entry.place(relx=.4, rely=.55)
 
@@ -1281,11 +1307,11 @@ class RegisterPage:
             frame_style = ttk.Style()
             frame_style.configure("BW.TRadiobutton", background="#1F262A", foreground="white", highlightthickness=0)
             # Admin radio button
-            admin_radio_button = ttk.Radiobutton(register_frame, text='Admin', variable=role_var, value='Admin',
+            admin_radio_button = ttk.Radiobutton(register_frame, text='Admin', variable=self.role_var, value='Admin',
                                              style="BW.TRadiobutton")
             admin_radio_button.place(relx=.4, rely=.65)
             # User radio button
-            user_radio_button = ttk.Radiobutton(register_frame, text='User', variable=role_var, value='User',
+            user_radio_button = ttk.Radiobutton(register_frame, text='User', variable=self.role_var, value='User',
                                              style="BW.TRadiobutton")
             user_radio_button.place(relx=.60, rely=.65)
 
@@ -1314,7 +1340,7 @@ class RegisterPage:
             last_name = last_name_entry.get()
             username = username_entry.get()
             password = password_entry.get()
-            role = role_var
+            role = self.role_var.get()
 
             # Add new user to user list
             new_account = [first_name, last_name, username, password, role]

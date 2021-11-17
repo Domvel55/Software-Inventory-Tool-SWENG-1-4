@@ -66,6 +66,8 @@ def maximize_me(e):
 def new_page(e):
     ApplicationResultsPage(e.widget.grid_info()['row'])
 
+def new_user_page(e):
+    ApplicationAdminPage(e.widget.grid_info()['row'])
 
 def last_time_clicked():
     global now
@@ -80,6 +82,11 @@ def frame_mapped(e):
 def update_history():
     history_list.append([now, list_results])
 
+def unlock_account(user_num):
+    user_list[user_num][5] = 0;
+
+def lock_account(user_num):
+    user_list[user_num][5] = 5;
 
 # ToolTip class for making tips that appear after hovering mouse over button for 0.5 seconds
 class ToolTip(object):
@@ -332,6 +339,22 @@ class MainWindow:
             history_button.place(relx=0.6, rely=0.85, anchor='center')
             ToolTip(schedule_scan_button, "See run history")
             # </editor-fold>
+
+            if role == "Admin":
+                admin_button = TkinterCustomButton(master=main_frame,
+                                                           bg_color="#2a3439",
+                                                           fg_color="#1F262A",
+                                                           hover_color="#AAA9AD",
+                                                           text_font="Bold, 14",
+                                                           text="Admin Page",
+                                                           text_color="white",
+                                                           corner_radius=10,
+                                                           width=130,
+                                                           height=40,
+                                                           hover=True,
+                                                           command=lambda: AdminPage())
+                admin_button.place(relx=0.8, rely=0.85, anchor='center')
+                ToolTip(schedule_scan_button, "See users")
 
 #Contains the history of the program.
 #Creates the page that contains the history.
@@ -1099,6 +1122,7 @@ class LoginPage:
     def __init__(self):
         global root
         global last_page
+        error = ""
         username_var = tk.StringVar(value="")
         password_var = tk.StringVar(value="")
 
@@ -1180,25 +1204,40 @@ class LoginPage:
 
         # Search through user list. Return True if user and password are correct.
         def check_login():
-            global user_list, name, role
+            global user_list, name, role, error
             username = username_entry.get()
             password = password_entry.get()
             exists = False
             for i in range(len(user_list)):
-                if user_list[i][2] == username and user_list[i][3] == password:
+
+                # Check to see if account is locked
+                # Sets error code
+                if user_list[i][2] == username and user_list[i][5] >= 5:
+                    error = "Too many attempts. Account has been locked."
+                    return exists
+
+                # Increment the account_status if the username is right but the password is wrong
+                # Sets error code
+                if user_list[i][2] == username and user_list[i][3] != password:
+                    user_list[i][5] += 1
+                    error = "Wrong Username or Password."
+                    return exists
+
+                #Checks for combination of user, password, and account_status to be valid
+                if user_list[i][2] == username and user_list[i][3] == password and user_list[i][5] < 5:
                     exists = True
                     name = user_list[i][0] + " " + user_list[i][1]
-                    role = user_list[i][4].get()
+                    role = user_list[i][4]
                     MakeWindow.make_nav_buttons(self)
-
             return exists
 
         # Make error message for login
         def login_error():
+            global error
             error_message = LabelFrame(login_inner_frame, bg="#2a3439", fg="red", font=10,
-                                       text="Wrong Username or Password.", relief=FLAT)
-            error_message.place(relx=0.5, rely=0.68, anchor="n")
-            error_message.config(height=19, width=240)
+                                       text=error, relief=FLAT, labelanchor = "n")
+            error_message.place(relx=0.5, rely=0.68, anchor= "n")
+            error_message.config(height=19, width=340)
 
         def enter_login(e):
             if check_login():
@@ -1314,10 +1353,11 @@ class RegisterPage:
             last_name = last_name_entry.get()
             username = username_entry.get()
             password = password_entry.get()
-            role = role_var
+            role = role_var.get()
+            account_status = 0
 
             # Add new user to user list
-            new_account = [first_name, last_name, username, password, role]
+            new_account = [first_name, last_name, username, password, role, account_status]
             user_list.append(new_account)
 
         def enter_register(e):
@@ -1394,3 +1434,221 @@ class ApplicationResultsPage:
                                          foreground="white")
                 cvss_score_label.grid(row=count, column=1)
                 count += 1
+
+
+class AdminPage:
+    def __init__(self):
+        global root
+        global last_page
+
+        if last_page != "AdminPage":
+            last_page = "AdminPage"
+
+            for widget in root.winfo_children()[1:]:
+                widget.destroy()
+
+            root.configure(background="#2a3439")
+            style = ttk.Style(root)
+            style.theme_use('classic')
+            style.configure('Test.TSizegrip', background="#1F262A")
+            root_size_grip = ttk.Sizegrip(root)
+
+            root_size_grip.configure(style="Test.TSizegrip")
+            root_size_grip.pack(side="right", anchor=SE)
+
+            # Register page frame
+            admin_frame = Frame(root, bg='#1F262A')
+            admin_frame.place(relx=0.5, rely=0.5, anchor='center')
+            admin_frame.config(height=400, width=800)
+            admin_frame.config(relief=RAISED)
+
+            # Container for users
+            admin_container = Frame(admin_frame, bg="#1F262A", borderwidth=2)
+            admin_container.place(relx=0.5, rely=0.1, anchor="n")
+            admin_container.config(relief=RIDGE)
+
+        AdminPage.print_admin(self, user_list)
+
+
+    def print_admin(self, user_list):
+
+        admin_frame = Frame(root, bg="#2a3439")
+        admin_frame.place(relx=0.5, rely=0.1, anchor="n")
+        admin_frame.config(height=root.winfo_height(), width=root.winfo_width())
+
+        # Label: "Users"
+        users_label = Label(admin_frame, text="Users", font=("Bold", 18), bg="#2a3439", fg="white")
+        users_label.place(relx=0.1, rely=0.1)
+
+        admin_canvas = Canvas(admin_frame, height=300, width=900, bg="#2a3439")
+        admin_canvas.place(relx=0.5, rely=0.15, anchor="n")
+
+        # Container for users
+        admin_container = Frame(admin_canvas, bg="#1F262A", borderwidth=2)
+        admin_container.place(relx=0.5, rely=0.1, anchor="n")
+        admin_container.config(relief=RIDGE, height=350, width=900)
+
+        # Bind scrollbar to container
+        admin_container.bind(
+            "<Configure>",
+            lambda e: admin_canvas.configure(
+                scrollregion=admin_canvas.bbox("all")
+            )
+        )
+        admin_canvas.create_window((0, 0), window=admin_container, anchor="nw")
+
+
+        # This loop will run for the amount of users in user_list
+        # It will send the user information to the admin page with the information
+        # It will only run as many times as vulnerabilities found
+        for i in range(len(user_list)):
+            for a in range(len(user_list[i])):
+                admin_example = Frame(admin_container, bg="#2a3439")
+                admin_example.config(height=50, width=860)
+                admin_example1_label = Label(admin_example, text=str(user_list[i][2]), font=10,
+                                               bg="#2a3439", fg="#FFFFFF")
+                admin_example1_label.place(relx=0.01, rely=0.5, anchor="w")
+                admin_example.bind("<Button-1>", new_user_page)
+                admin_example.grid(row=i, column=0, padx=10, pady=5)
+
+
+            # Design around each result
+            admin_frame1 = Frame(admin_example, bg="white")
+            admin_frame1.config(height=5, width=860)
+            admin_frame1.place(relx=0.5, rely=0.99, anchor="s")
+
+            # Scrollbar if more than 5 results are displayed
+            if len(user_list) > 5:
+                admin_sb = ttk.Scrollbar(admin_canvas, orient="vertical", command=admin_canvas.yview)
+                admin_sb.place(relx=0.98, height=admin_canvas.winfo_height())
+                admin_canvas.configure(yscrollcommand=admin_sb.set)
+
+
+class ApplicationAdminPage:
+    global user_list
+
+    def __init__(self, user_num):
+        global account_status
+        # Toplevel object which will
+        # be treated as a new window
+        new_window = Toplevel(root)
+
+        # Toplevel widget
+        new_window.title("New Window")
+
+        # Window background color
+        new_window.configure(background="#2a3439")
+
+        # Scaling UI to user's screen
+        app_width = 1064
+        app_height = 600
+        screen_width = new_window.winfo_screenwidth()
+        screen_height = new_window.winfo_screenheight()
+        x = (screen_width / 2) - (app_width / 2)
+        y = (screen_height / 2) - (app_height / 2)
+        new_window.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
+
+        new_window.resizable(True, True)
+
+        # Changes the default tkinter to our Sieve logo when minimized
+        new_window.iconbitmap('logo.ico')
+
+        # Change the text after minimizing the tool to task bar
+        new_window.title("Sieve")
+
+        main_frame = Frame(new_window, bg="#2a3439")
+        main_frame.place(relx=0.5, rely=0.1, anchor="n")
+        main_frame.config(height=new_window.winfo_height(), width=new_window.winfo_width())
+
+        style = ttk.Style(new_window)
+        style.theme_use('classic')
+        style.configure('Test.TSizegrip', background="#1F262A")
+        root_size_grip = ttk.Sizegrip(new_window)
+
+        root_size_grip.configure(style="Test.TSizegrip")
+        root_size_grip.pack(side="right", anchor=SE)
+
+        # Setting each users attributes to variables
+        first_name = user_list[user_num][0]
+        last_name = user_list[user_num][1]
+        username = user_list[user_num][2]
+        password = user_list[user_num][3]
+        role = user_list[user_num][4]
+
+        # Checking for status of the account
+        if user_list[user_num][5] >= 5:
+            account_status = "Locked"
+        else:
+            account_status = "Unlocked"
+
+        # Static labels for each attribute
+        first_name_label1 = Label(main_frame, text="First Name: ", font=15, background="#2a3439", foreground="white")
+        last_name_label1 = Label(main_frame, text="Last Name: ", font=15, background="#2a3439", foreground="white")
+        username_label1 = Label(main_frame, text="Username: ", font=15, background="#2a3439", foreground="white")
+        password_label1 = Label(main_frame, text="Password: ", font=15, background="#2a3439", foreground="white")
+        role_label1 = Label(main_frame, text="Role: ", font=15, background="#2a3439", foreground="white")
+        account_status_label1 = Label(main_frame, text="Account Status: ", font=15, background="#2a3439", foreground="white")
+
+        # Showing value of each attribute
+        first_name_label2 = Label(main_frame, text=first_name, font=15, background="#2a3439", foreground="white")
+        last_name_label2 = Label(main_frame, text=last_name, font=15, background="#2a3439", foreground="white")
+        username_label2 = Label(main_frame, text=username, font=15, background="#2a3439", foreground="white")
+        password_label2 = Label(main_frame, text=password, font=15, background="#2a3439", foreground="white")
+        role_label2 = Label(main_frame, text=role, font=15, background="#2a3439", foreground="white")
+        account_status_label2 = Label(main_frame, text=account_status, font=15, background="#2a3439", foreground="white")
+
+        # Arranging static labels
+        first_name_label1.grid(row=2, column=1, padx=10, pady=5)
+        last_name_label1.grid(row=3, column=1, padx=10, pady=5)
+        username_label1.grid(row=4, column=1, padx=10, pady=5)
+        password_label1.grid(row=5, column=1, padx=10, pady=5)
+        role_label1.grid(row=6, column=1, padx=10, pady=5)
+        account_status_label1.grid(row=7, column=1, padx=10, pady=5)
+
+        # Arranging variable labels
+        first_name_label2.grid(row=2, column=2, padx=10, pady=5)
+        last_name_label2.grid(row=3, column=2, padx=10, pady=5)
+        username_label2.grid(row=4, column=2, padx=10, pady=5)
+        password_label2.grid(row=5, column=2, padx=10, pady=5)
+        role_label2.grid(row=6, column=2, padx=10, pady=5)
+        account_status_label2.grid(row=7, column=2, padx=10, pady=5)
+
+        # Unlock Button (unlocks account)
+        unlock_button = TkinterCustomButton(master=main_frame,
+                                            fg_color="aquamarine1",
+                                            hover_color="#1F262A",
+                                            text_font=14,
+                                            text="Unlock",
+                                            text_color="black",
+                                            corner_radius=0,
+                                            width=70,
+                                            height=40,
+                                            hover=True,
+                                            command=lambda: [unlock_account(user_num), account_unlock()])
+        unlock_button.grid(row=8, column=1, padx=10, pady=5)
+
+        # Lock Button (locks account)
+        lock_button = TkinterCustomButton(master=main_frame,
+                                            fg_color="coral1",
+                                            hover_color="#1F262A",
+                                            text_font=14,
+                                            text="Lock",
+                                            text_color="black",
+                                            corner_radius=0,
+                                            width=70,
+                                            height=40,
+                                            hover=True,
+                                            command=lambda: [lock_account(user_num), account_lock()])
+        lock_button.grid(row=8, column=2, padx=10, pady=5)
+
+        # Updates account status to locked
+        def account_lock():
+            global account_status
+            account_status = "Locked"
+            account_status_label2.config(text=account_status)
+
+        #Updates account status to unlocked
+        def account_unlock():
+            global account_status
+            account_status = "Unlocked"
+            account_status_label2.config(text=account_status)

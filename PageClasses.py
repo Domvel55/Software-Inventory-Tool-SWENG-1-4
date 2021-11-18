@@ -863,6 +863,7 @@ class ResultsPage:
         ignore_selected_button.place(relx=0.75, rely=0.8, anchor="center")
         ToolTip(ignore_selected_button, "Ignore all the selected programs that were flagged for available updates.")
 
+
         ignore_all_button = TkinterCustomButton(master=results_frame,
                                                 fg_color="#848689",
                                                 hover_color="#1F262A",

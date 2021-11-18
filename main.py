@@ -31,7 +31,8 @@ root.title("Sieve")
 
 # Removes title bar
 root.overrideredirect(True)
-root.update_idletasks()
+root.after(10, lambda: set_appwindow(root))
+#root.update_idletasks()
 root.minimized = False  # only to know if root is minimized
 root.maximized = False  # only to know if root is maximized
 

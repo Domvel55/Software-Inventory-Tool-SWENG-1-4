@@ -10,27 +10,31 @@ from tkinter import *
 from tkinter import ttk, filedialog
 from tkinter_custom_button import TkinterCustomButton
 from Database import *
-import tkinter as tk
 import os
 import datetime
 from plyer import notification
 from ctypes import windll
+import threading
+
+global stopped
+stopped = False
 
 now = "Last Scanned: ----"
 sort_variable = None
-files_list, user_list, history_list, list_results = [],[],[],[]
-name, role, last_page = "","",""
+files_list, user_list, history_list, list_results = [], [], [], []
+name, role, last_page = "", "", ""
 results_progressbar = None
 
 root = Tk()
 title_bar = Frame(root, bg="#1F262A", relief="raised", bd=1)
 title_bar.pack(fill=X)
 
-GWL_EXSTYLE=-20
-WS_EX_APPWINDOW=0x00040000
-WS_EX_TOOLWINDOW=0x00000080
+GWL_EXSTYLE = -20
+WS_EX_APPWINDOW = 0x00040000
+WS_EX_TOOLWINDOW = 0x00000080
 
 boolTest = FALSE
+
 
 def read_config():
     global now, user_list
@@ -39,7 +43,9 @@ def read_config():
         now = file[0]
         for user in file[2:]:
             temp = user.split('~')
-            user_list.append([temp[0][5:].split()[0], temp[0][5:].split()[1], temp[1][5:].split()[0], temp[2][5:].split()[0], temp[3][5:].split()[0], temp[4][5:].split()[0]])
+            user_list.append(
+                [temp[0][5:].split()[0], temp[0][5:].split()[1], temp[1][5:].split()[0], temp[2][5:].split()[0],
+                 temp[3][5:].split()[0], temp[4][5:].split()[0]])
     f.close()
 
 
@@ -55,6 +61,7 @@ def write_config():
 def move_app(e):
     root.geometry(f'+{e.x_root}+{e.y_root}')
 
+
 def set_appwindow(root):
     hwnd = windll.user32.GetParent(root.winfo_id())
     style = windll.user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
@@ -65,6 +72,7 @@ def set_appwindow(root):
     root.wm_withdraw()
     root.after(10, lambda: root.wm_deiconify())
 
+
 def quitter(e):
     root.quit()
 
@@ -73,7 +81,7 @@ def minimizer(e):
     global boolTest
     root.update_idletasks()
     root.overrideredirect(False)
-    boolTest=TRUE
+    boolTest = TRUE
     root.state('iconic')
 
 
@@ -109,7 +117,7 @@ def frame_mapped(e):
     root.update_idletasks()
     if boolTest:
         root.after(10, lambda: set_appwindow(root))
-        boolTest=FALSE
+        boolTest = FALSE
     root.overrideredirect(True)
     root.state('normal')
 
@@ -120,11 +128,11 @@ def update_history():
 
 
 def unlock_account(user_num):
-    user_list[user_num][5] = 0;
+    user_list[user_num][5] = 0
 
 
 def lock_account(user_num):
-    user_list[user_num][5] = 5;
+    user_list[user_num][5] = 5
 
 
 def update_pb():
@@ -132,8 +140,21 @@ def update_pb():
     # This will actively update the progress bar an appropriate amount of times
     results_progressbar['value'] += (100 / len(files_list))
     root.update_idletasks()
-    results_progressbar['value'] = 0
 
+def destroy_pb():
+    global results_progressbar
+    results_progressbar.destroy()
+
+def stop():
+    global stopped
+    stopped = True
+    destroy_pb()
+
+def start():
+    global stopped
+    stopped = False
+    files_list.clear()
+    list_results.clear()
 
 
 # This will scan the Database
@@ -157,6 +178,7 @@ def scan():
         # This will separate the Application.exe to a list of [Application, .exe]
         os.path.splitext(base)
         base = base[:-4]
+
         update_pb()
         record = cve.select_record_by_name(base)
         temp_list = []
@@ -168,7 +190,7 @@ def scan():
                 temp_list.append((i, rating))
             list_results.append(temp_list)
 
-    results_progressbar.destroy()
+    destroy_pb()
     update_history()
     ResultsPage.print_results()
     title = 'A scan has been completed!'
@@ -360,15 +382,16 @@ class MainWindow:
             scan_time_frame.config(height=40, width=350)
 
             # LabelFrame that shows the current user's name. Initialized as "John Doe"
-            current_name = LabelFrame(main_frame, bg="#2a3439", fg="white", font=10, text="NAME:    " + name, relief=FLAT)
+            current_name = LabelFrame(main_frame, bg="#2a3439", fg="white", font=10, text="NAME:    " + name,
+                                      relief=FLAT)
             current_name.place(relx=0.18, rely=0.765, anchor="n")
             current_name.config(height=40, width=350)
 
             # LabelFrame that shows the current user's role. Initialized as "None"
-            current_role = LabelFrame(main_frame, bg="#2a3439", fg="white", font=10, text="ROLE:    " + role, relief=FLAT)
+            current_role = LabelFrame(main_frame, bg="#2a3439", fg="white", font=10, text="ROLE:    " + role,
+                                      relief=FLAT)
             current_role.place(relx=0.18, rely=0.8, anchor="n")
             current_role.config(height=40, width=350)
-
 
             # <editor-fold desc="Results Buttons">
             scan_button = TkinterCustomButton(master=main_frame,
@@ -417,34 +440,34 @@ class MainWindow:
             ToolTip(schedule_scan_button, "Schedule a full scan.")
 
             history_button = TkinterCustomButton(master=main_frame,
-                                                       bg_color="#2a3439",
-                                                       fg_color="#1F262A",
-                                                       hover_color="#AAA9AD",
-                                                       text_font="Bold, 14",
-                                                       text="History",
-                                                       text_color="white",
-                                                       corner_radius=10,
-                                                       width=130,
-                                                       height=40,
-                                                       hover=True,
-                                                       command=lambda: HistoryPage())
+                                                 bg_color="#2a3439",
+                                                 fg_color="#1F262A",
+                                                 hover_color="#AAA9AD",
+                                                 text_font="Bold, 14",
+                                                 text="History",
+                                                 text_color="white",
+                                                 corner_radius=10,
+                                                 width=130,
+                                                 height=40,
+                                                 hover=True,
+                                                 command=lambda: HistoryPage())
             history_button.place(relx=0.6, rely=0.85, anchor='center')
             ToolTip(schedule_scan_button, "See run history")
             # </editor-fold>
 
             if role == "Admin":
                 admin_button = TkinterCustomButton(master=main_frame,
-                                                           bg_color="#2a3439",
-                                                           fg_color="#1F262A",
-                                                           hover_color="#AAA9AD",
-                                                           text_font="Bold, 14",
-                                                           text="Admin Page",
-                                                           text_color="white",
-                                                           corner_radius=10,
-                                                           width=130,
-                                                           height=40,
-                                                           hover=True,
-                                                           command=lambda: AdminPage())
+                                                   bg_color="#2a3439",
+                                                   fg_color="#1F262A",
+                                                   hover_color="#AAA9AD",
+                                                   text_font="Bold, 14",
+                                                   text="Admin Page",
+                                                   text_color="white",
+                                                   corner_radius=10,
+                                                   width=130,
+                                                   height=40,
+                                                   hover=True,
+                                                   command=lambda: AdminPage())
                 admin_button.place(relx=0.8, rely=0.85, anchor='center')
                 ToolTip(schedule_scan_button, "See users")
 
@@ -455,8 +478,6 @@ class HistoryPage:
     def __init__(self):
         global root
         global last_page
-
-
 
         if last_page != "MainWindow":
             last_page = "MainWindow"
@@ -487,15 +508,11 @@ class HistoryPage:
             print(history_list)
         HistoryPage.print_history(self, history_list)
 
-
-
-
     def print_history(self, history_list):
 
         history_frame = Frame(root, bg="#2a3439")
         history_frame.place(relx=0.5, rely=0.1, anchor="n")
         history_frame.config(height=root.winfo_height(), width=root.winfo_width())
-
 
         history_canvas = Canvas(history_frame, height=300, width=900, bg="#2a3439")
         history_canvas.place(relx=0.5, rely=0.15, anchor="n")
@@ -514,8 +531,6 @@ class HistoryPage:
         )
         history_canvas.create_window((0, 0), window=history_container, anchor="nw")
 
-
-
         # This loop will run for the amount of items that are found to have vulnerabilities in the Database
         # It will send a String to the results page with the information
         # It will only run as many times as vulnerabilities found
@@ -528,7 +543,6 @@ class HistoryPage:
                 history_example1_label.place(relx=0.01, rely=0.5, anchor="w")
                 history_example.bind("<Button-1>", new_page)
                 history_example.grid(row=i, column=0, padx=10, pady=5)
-
 
             # Design around each result
             history_frame1 = Frame(history_example, bg="white")
@@ -546,13 +560,12 @@ class HistoryPage:
 # This will be different whether the full scan or express scan options were selected
 # Picking one of the options will load up the proper buttons for that configuration
 class ScanConfirmPage:
-    global files_list, results_progressbar, list_results
-    files_list.clear()
-    list_results.clear()
-
     def __init__(self):
         global root
         global last_page
+        global files_list, results_progressbar
+        files_list.clear()
+        list_results.clear()
 
     # This will setup the button for the Full Scan configuration
     def make_full_scan_config(self):
@@ -567,22 +580,24 @@ class ScanConfirmPage:
             scan_type = "Full Scan"
 
             # Frame for scan confirmation dialog box
-            scan_confirm_frame = tk.Frame(root, bg="#2a3439")
+            scan_confirm_frame = Frame(root, bg="#2a3439")
             scan_confirm_frame.place(relx=0.5, rely=0.1, anchor="n")
             scan_confirm_frame.config(height=root.winfo_height(), width=root.winfo_width())
 
-            scan_confirm_label = tk.Label(scan_confirm_frame, text='What will be scanned:', font=14, bg="#2a3439",
-                                          fg="white")
+            scan_confirm_label = Label(scan_confirm_frame, text='What will be scanned:', font=14, bg="#2a3439",
+                                       fg="white")
             scan_confirm_label.place(relx=0.05, rely=0.05, anchor="w")
 
             # Container for confirmation dialog
-            scan_confirm_container = tk.Frame(scan_confirm_frame, bg="#1F262A", borderwidth=2)
+            scan_confirm_container = Frame(scan_confirm_frame, bg="#1F262A", borderwidth=2)
             scan_confirm_container.place(relx=0.5, rely=0.1, anchor="n")
             scan_confirm_container.config(relief=RIDGE, height=250, width=700)
 
-            full_scan_dialog = tk.Label(scan_confirm_container, text='Full Scan: All Program Files Will Be Scanned.',
-                                        font=14, bg="#2a3439", fg="white")
+            full_scan_dialog = Label(scan_confirm_container, text='Full Scan: All Program Files Will Be Scanned.',
+                                     font=14, bg="#2a3439", fg="white")
             full_scan_dialog.place(relx=0.5, rely=0.5, anchor="center")
+
+            x = threading.Thread(target=scan)
 
             continue_button = TkinterCustomButton(master=scan_confirm_frame,
                                                   fg_color="#848689",
@@ -594,10 +609,9 @@ class ScanConfirmPage:
                                                   width=200,
                                                   height=75,
                                                   hover=True,
-                                                  command=lambda: [last_time_clicked(), scan()])
+                                                  command=lambda: [last_time_clicked(),start(),  x.start()])
             continue_button.place(relx=0.25, rely=0.8, anchor="center")
             ToolTip(continue_button, "Continue onto the scanning process.")
-
 
             cancel_button = TkinterCustomButton(master=scan_confirm_frame,
                                                 fg_color="#5F4866",
@@ -609,7 +623,7 @@ class ScanConfirmPage:
                                                 width=100,
                                                 height=50,
                                                 hover=True,
-                                                command=lambda: [ResultsPage(), MainWindow()])
+                                                command=lambda: [ResultsPage(), MainWindow(), stop()])
             cancel_button.place(relx=0.70, rely=0.8, anchor="center")
             ToolTip(cancel_button, "Go back to the home page.")
 
@@ -621,11 +635,13 @@ class ScanConfirmPage:
                                                   style="red.Horizontal.TProgressbar")
             results_progressbar.place(relx=0.5, rely=0.8, anchor="center")
 
-
     # This will setup the buttons for the Express Scan Function
+
     def make_express_config(self):
         files_list.clear()
         list_results.clear()
+
+        x = threading.Thread(target=scan)
 
         global scan_type, results_progressbar
         # This lets scan() know whether to scan all program files or just selected files
@@ -633,7 +649,7 @@ class ScanConfirmPage:
 
         def browse_files():
             global files_list
-            filenames = filedialog.askopenfilenames(initialdir="C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
+            filenames = filedialog.askopenfilenames(initialdir="C:\Program Files",
                                                     title="Select Files",
                                                     filetypes=(("all files",
                                                                 "*.*"),
@@ -645,10 +661,10 @@ class ScanConfirmPage:
 
             # Display selected files on confirm page
             for file in files_list:
-                file_block = tk.Frame(scan_confirm_container, bg="#2a3439")
+                file_block = Frame(scan_confirm_container, bg="#2a3439")
                 file_block.config(height=50, width=860)
-                file_label = tk.Label(file_block, text=files_list[ctr], font=14, bg="#2a3439", fg="white",
-                                      wraplength=845, justify='left')
+                file_label = Label(file_block, text=files_list[ctr], font=14, bg="#2a3439", fg="white",
+                                   wraplength=845, justify='left')
                 file_label.place(relx=0.01, rely=0.5, anchor="w")
                 file_block.grid(row=ctr, column=0, padx=10, pady=5)
 
@@ -679,7 +695,6 @@ class ScanConfirmPage:
         scan_confirm_container = Frame(scan_confirm_canvas, bg="#1F262A", borderwidth=2)
         scan_confirm_container.place(relx=0.5, rely=0.1, anchor="n")
         scan_confirm_container.config(relief=RIDGE, height=350, width=900)
-
         # Bind scrollbar to container
         scan_confirm_container.bind(
             "<Configure>",
@@ -699,7 +714,7 @@ class ScanConfirmPage:
                                               width=200,
                                               height=75,
                                               hover=True,
-                                              command=lambda: [last_time_clicked(), scan()])
+                                              command=lambda: [last_time_clicked(), start, x.start()])
         continue_button.place(relx=0.25, rely=0.8, anchor="center")
         ToolTip(continue_button, "Continue onto the scanning process once programs have been selected.")
 
@@ -717,7 +732,6 @@ class ScanConfirmPage:
         add_files_button.place(relx=0.5, rely=0.8, anchor="center")
         ToolTip(add_files_button, "Opens the File Explorer for selecting specific programs.")
 
-
         cancel_button = TkinterCustomButton(master=scan_confirm_frame,
                                             fg_color="#5F4866",
                                             hover_color="#1F262A",
@@ -728,7 +742,7 @@ class ScanConfirmPage:
                                             width=100,
                                             height=50,
                                             hover=True,
-                                            command=lambda: [ResultsPage(), MainWindow()])
+                                            command=lambda:[ResultsPage(), MainWindow(), x.stop(), stop()])
         cancel_button.place(relx=0.70, rely=0.8, anchor="center")
         ToolTip(cancel_button, "Go back to the home page.")
 
@@ -764,7 +778,7 @@ class ResultsPage:
             ResultsPage.create_update_buttons(results_frame)
 
             # Container for filter settings
-            filter_settings_container = tk.Frame(results_frame, bg="#1F262A", borderwidth=2)
+            filter_settings_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
             filter_settings_container.place(relx=0.04, rely=0.0, anchor="nw")
             filter_settings_container.config(relief=RIDGE)
 
@@ -830,7 +844,7 @@ class ResultsPage:
                                             width=100,
                                             height=50,
                                             hover=True,
-                                            command=lambda: [ResultsPage(), MainWindow()])
+                                            command=lambda: None)
         cancel_button.place(relx=0.9, rely=0.8, anchor="center")
         ToolTip(cancel_button, "Go back to the home page.")
 
@@ -862,12 +876,12 @@ class ResultsPage:
         ignore_all_button.place(relx=0.55, rely=0.8, anchor="center")
         ToolTip(ignore_all_button, "Ignore all the programs flagged for available updates.")
 
-        filter_settings_container = tk.Frame(results_frame, bg="#1F262A", borderwidth=2)
+        filter_settings_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
         filter_settings_container.place(relx=0.04, rely=0.0, anchor="nw")
         filter_settings_container.config(relief=RIDGE)
 
-        sort_scan_label = tk.Label(filter_settings_container, text='Sort scan results...', font='2', bg='#2a3439',
-                                   fg="white")
+        sort_scan_label = Label(filter_settings_container, text='Sort scan results...', font='2', bg='#2a3439',
+                                fg="white")
 
         style_element = ttk.Style()  # Creating style element
         style_element.configure('Sort.TRadiobutton',
@@ -884,11 +898,11 @@ class ResultsPage:
             "Alphabetically"
         ]
         global sort_variable
-        sort_variable = tk.StringVar(filter_settings_container)
+        sort_variable = StringVar(filter_settings_container)
         # Default sorting is by severity
         sort_variable.set("By Severity")
 
-        opt = tk.OptionMenu(filter_settings_container, sort_variable, *option_list)
+        opt = OptionMenu(filter_settings_container, sort_variable, *option_list)
         opt.config(background="#1F262A", foreground="white", width=15, font=('Bold', 12))
         opt.grid()
 
@@ -910,7 +924,6 @@ class ResultsPage:
         results_frame = Frame(root, bg="#2a3439")
         results_frame.place(relx=0.5, rely=0.1, anchor="n")
         results_frame.config(height=root.winfo_height(), width=root.winfo_width())
-
         # Calls function to put the update buttons back on the screen with the results
         ResultsPage.create_update_buttons(results_frame)
 
@@ -921,21 +934,6 @@ class ResultsPage:
         results_container = Frame(results_canvas, bg="#1F262A", borderwidth=2)
         results_container.place(relx=0.5, rely=0.1, anchor="n")
         results_container.config(relief=RIDGE, height=350, width=900)
-
-        # Bind scrollbar to container
-        results_container.bind(
-            "<Configure>",
-            lambda e: results_canvas.configure(
-                scrollregion=results_canvas.bbox("all")
-            )
-        )
-        results_canvas.create_window((0, 0), window=results_container, anchor="nw")
-
-        # Scrollbar if more than 5 results are displayed
-        if len(list_results) > 0:
-            results_sb = ttk.Scrollbar(results_canvas, orient="vertical", command=results_canvas.yview)
-            results_sb.place(relx=0.98, height=results_canvas.winfo_height())
-            results_canvas.configure(yscrollcommand=results_sb.set)
 
         temp_list = []
         for record in list_results:
@@ -957,7 +955,7 @@ class ResultsPage:
             # Getting the score and changing the color to match the
             for j in list_results[i]:
                 rating += j[1]
-            rating = rating/float(len(list_results[i]))
+            rating = rating / float(len(list_results[i]))
 
             if rating < 4:
                 color = "limegreen"
@@ -982,8 +980,6 @@ class ResultsPage:
             rate_frame1 = Frame(results_example, bg=color)
             rate_frame1.config(height=5, width=860)
             rate_frame1.place(relx=0.5, rely=0.99, anchor="s")
-
-
 
 
 class HelpPage:
@@ -1115,7 +1111,7 @@ class SettingsPage:
             root_size_grip.configure(style="Test.TSizegrip")
             root_size_grip.pack(side="right", anchor=SE)
 
-            settings_frame = tk.Frame(root)
+            settings_frame = Frame(root)
             settings_frame.place(relx=0.5, rely=0.5, anchor='center')
             settings_frame.config(height=500, width=700)
             settings_frame.config(relief=RIDGE, background="#1F262A")
@@ -1183,8 +1179,8 @@ class LoginPage:
         global root
         global last_page
         error = ""
-        username_var = tk.StringVar(value="")
-        password_var = tk.StringVar(value="")
+        username_var = StringVar(value="")
+        password_var = StringVar(value="")
 
         if last_page != "LoginPage":
             last_page = "LoginPage"
@@ -1225,7 +1221,8 @@ class LoginPage:
             password_label = Label(login_inner_frame, text='Password', font=15, background="#2a3439",
                                    foreground="white")
             password_label.place(relx=0.5, rely=0.53, anchor='center')
-            password_entry = Entry(login_inner_frame, textvariable=password_var, show=' ', background="#1F262A", insertbackground="#1F262A",
+            password_entry = Entry(login_inner_frame, textvariable=password_var, show=' ', background="#1F262A",
+                                   insertbackground="#1F262A",
                                    foreground="white",
                                    font=15)
             password_entry.place(relx=0.5, rely=0.63, anchor='center')
@@ -1268,6 +1265,7 @@ class LoginPage:
             username = username_entry.get()
             password = password_entry.get()
             exists = False
+            error = "Login Error"
             for i in range(len(user_list)):
 
                 # Check to see if account is locked
@@ -1279,25 +1277,24 @@ class LoginPage:
                 # Increment the account_status if the username is right but the password is wrong
                 # Sets error code
                 if user_list[i][2] == username and user_list[i][3] != password:
-                    user_list[i][5]=str(int(user_list[i][5])+1)
+                    user_list[i][5] = str(int(user_list[i][5]) + 1)
                     error = "Wrong Username or Password."
                     return exists
 
-                #Checks for combination of user, password, and account_status to be valid
+                # Checks for combination of user, password, and account_status to be valid
                 if user_list[i][2] == username and user_list[i][3] == password and int(user_list[i][5]) < 5:
                     exists = True
                     name = user_list[i][0] + " " + user_list[i][1]
                     role = user_list[i][4]
                     MakeWindow.make_nav_buttons(self)
-                    user_list[i][5]=0
             return exists
 
         # Make error message for login
         def login_error():
             global error
             error_message = LabelFrame(login_inner_frame, bg="#2a3439", fg="red", font=10,
-                                       text=error, relief=FLAT, labelanchor = "n")
-            error_message.place(relx=0.5, rely=0.68, anchor= "n")
+                                       text=error, relief=FLAT, labelanchor="n")
+            error_message.place(relx=0.5, rely=0.68, anchor="n")
             error_message.config(height=19, width=340)
 
         def enter_login(e):
@@ -1311,22 +1308,22 @@ class LoginPage:
 
 
 class RegisterPage:
-    first_name_var: tk.StringVar
-    last_name_var: tk.StringVar
-    username_var: tk.StringVar
-    password_var: tk.StringVar
-    role_var: tk.StringVar
+    first_name_var: StringVar
+    last_name_var: StringVar
+    username_var: StringVar
+    password_var: StringVar
+    role_var: StringVar
 
     def __init__(self):
         global root
         global last_page
 
         # Initialize input variables
-        self.first_name_var = tk.StringVar(value="")
-        self.last_name_var = tk.StringVar(value="")
-        self.username_var = tk.StringVar(value="")
-        self.password_var = tk.StringVar(value="")
-        self.role_var = tk.StringVar(value="")
+        self.first_name_var = StringVar(value="")
+        self.last_name_var = StringVar(value="")
+        self.username_var = StringVar(value="")
+        self.password_var = StringVar(value="")
+        self.role_var = StringVar(value="")
 
         if last_page != "ResultsPage":
             last_page = "ResultsPage"
@@ -1369,13 +1366,15 @@ class RegisterPage:
 
             username_frame = Label(register_frame, text="Username", background="#1F262A", foreground="white", font=20)
             username_frame.place(relx=.1703, rely=.45)
-            username_entry = Entry(register_frame, textvariable=self.username_var, background="#2a3439", foreground="white",
+            username_entry = Entry(register_frame, textvariable=self.username_var, background="#2a3439",
+                                   foreground="white",
                                    width=25, font=20)
             username_entry.place(relx=.4, rely=.45)
 
             password_frame = Label(register_frame, text="Password", background="#1F262A", foreground="white", font=20)
             password_frame.place(relx=.1703, rely=.55)
-            password_entry = Entry(register_frame, textvariable=self.password_var, background="#2a3439", foreground="white",
+            password_entry = Entry(register_frame, textvariable=self.password_var, background="#2a3439",
+                                   foreground="white",
                                    width=25, font=20)
             password_entry.place(relx=.4, rely=.55)
 
@@ -1387,11 +1386,11 @@ class RegisterPage:
             frame_style.configure("BW.TRadiobutton", background="#1F262A", foreground="white", highlightthickness=0)
             # Admin radio button
             admin_radio_button = ttk.Radiobutton(register_frame, text='Admin', variable=self.role_var, value='Admin',
-                                             style="BW.TRadiobutton")
+                                                 style="BW.TRadiobutton")
             admin_radio_button.place(relx=.4, rely=.65)
             # User radio button
             user_radio_button = ttk.Radiobutton(register_frame, text='User', variable=self.role_var, value='User',
-                                             style="BW.TRadiobutton")
+                                                style="BW.TRadiobutton")
             user_radio_button.place(relx=.60, rely=.65)
 
             # Create Account Button (sends you to login page)
@@ -1408,25 +1407,10 @@ class RegisterPage:
                                                 hover=True,
                                                 command=lambda: [
                                                     enter_register() if valid_register() else registration_error()])
-            create_button.place(relx=0.35, rely=0.85, anchor='center')
+            create_button.place(relx=0.5, rely=0.85, anchor='center')
             ToolTip(create_button, "Create an account using the provided information.")
 
-            # Back Button (sends you back to login page)
-            back_button = TkinterCustomButton(master=register_frame,
-                                                bg_color="#1F262A",
-                                                fg_color="#56667A",
-                                                hover_color="#AAA9AD",
-                                                text_font=20,
-                                                text="Back",
-                                                text_color="white",
-                                                corner_radius=10,
-                                                width=100,
-                                                height=30,
-                                                hover=True,
-                                                command=lambda: [LoginPage()])
-            back_button.place(relx=0.65, rely=0.85, anchor='center')
-            ToolTip(back_button, "Go back to the Login Page.")
-
+            # Register new user
 
         def valid_register():
             global user_list
@@ -1580,7 +1564,6 @@ class AdminPage:
 
         AdminPage.print_admin(self, user_list)
 
-
     def print_admin(self, user_list):
 
         admin_frame = Frame(root, bg="#2a3439")
@@ -1608,7 +1591,6 @@ class AdminPage:
         )
         admin_canvas.create_window((0, 0), window=admin_container, anchor="nw")
 
-
         # This loop will run for the amount of users in user_list
         # It will send the user information to the admin page with the information
         # It will only run as many times as vulnerabilities found
@@ -1617,11 +1599,10 @@ class AdminPage:
                 admin_example = Frame(admin_container, bg="#2a3439")
                 admin_example.config(height=50, width=860)
                 admin_example1_label = Label(admin_example, text=str(user_list[i][2]), font=10,
-                                               bg="#2a3439", fg="#FFFFFF")
+                                             bg="#2a3439", fg="#FFFFFF")
                 admin_example1_label.place(relx=0.01, rely=0.5, anchor="w")
                 admin_example.bind("<Button-1>", new_user_page)
                 admin_example.grid(row=i, column=0, padx=10, pady=5)
-
 
             # Design around each result
             admin_frame1 = Frame(admin_example, bg="white")
@@ -1698,7 +1679,8 @@ class ApplicationAdminPage:
         username_label1 = Label(main_frame, text="Username: ", font=15, background="#2a3439", foreground="white")
         password_label1 = Label(main_frame, text="Password: ", font=15, background="#2a3439", foreground="white")
         role_label1 = Label(main_frame, text="Role: ", font=15, background="#2a3439", foreground="white")
-        account_status_label1 = Label(main_frame, text="Account Status: ", font=15, background="#2a3439", foreground="white")
+        account_status_label1 = Label(main_frame, text="Account Status: ", font=15, background="#2a3439",
+                                      foreground="white")
 
         # Showing value of each attribute
         first_name_label2 = Label(main_frame, text=first_name, font=15, background="#2a3439", foreground="white")
@@ -1706,7 +1688,8 @@ class ApplicationAdminPage:
         username_label2 = Label(main_frame, text=username, font=15, background="#2a3439", foreground="white")
         password_label2 = Label(main_frame, text=password, font=15, background="#2a3439", foreground="white")
         role_label2 = Label(main_frame, text=role, font=15, background="#2a3439", foreground="white")
-        account_status_label2 = Label(main_frame, text=account_status, font=15, background="#2a3439", foreground="white")
+        account_status_label2 = Label(main_frame, text=account_status, font=15, background="#2a3439",
+                                      foreground="white")
 
         # Arranging static labels
         first_name_label1.grid(row=2, column=1, padx=10, pady=5)

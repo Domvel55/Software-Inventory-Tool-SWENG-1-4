@@ -19,6 +19,7 @@ import threading
 global stopped
 stopped = False
 
+
 now = "Last Scanned: ----"
 sort_variable = None
 files_list, user_list, history_list, list_results = [], [], [], []

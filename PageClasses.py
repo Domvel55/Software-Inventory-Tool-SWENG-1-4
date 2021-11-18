@@ -16,6 +16,7 @@ import tkinter as tk
 import os
 import datetime
 from plyer import notification
+from ctypes import windll
 
 now = "Last Scanned: ----"
 sort_variable = None
@@ -26,6 +27,11 @@ root = Tk()
 title_bar = Frame(root, bg="#1F262A", relief="raised", bd=1)
 title_bar.pack(fill=X)
 
+GWL_EXSTYLE=-20
+WS_EX_APPWINDOW=0x00040000
+WS_EX_TOOLWINDOW=0x00000080
+
+boolTest = FALSE
 
 def read_config():
     global now, user_list
@@ -48,14 +54,25 @@ def write_config():
 def move_app(e):
     root.geometry(f'+{e.x_root}+{e.y_root}')
 
+def set_appwindow(root):
+    hwnd = windll.user32.GetParent(root.winfo_id())
+    style = windll.user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
+    style = style & ~WS_EX_TOOLWINDOW
+    style = style | WS_EX_APPWINDOW
+    res = windll.user32.SetWindowLongW(hwnd, GWL_EXSTYLE, style)
+    # re-assert the new window style
+    root.wm_withdraw()
+    root.after(10, lambda: root.wm_deiconify())
 
 def quitter(e):
     root.quit()
 
 
 def minimizer(e):
+    global boolTest
     root.update_idletasks()
     root.overrideredirect(False)
+    boolTest=TRUE
     root.state('iconic')
 
 
@@ -87,7 +104,11 @@ def last_time_clicked():
 
 
 def frame_mapped(e):
+    global boolTest
     root.update_idletasks()
+    if boolTest:
+        root.after(10, lambda: set_appwindow(root))
+        boolTest=FALSE
     root.overrideredirect(True)
     root.state('normal')
 
@@ -936,11 +957,11 @@ class ResultsPage:
             rate_frame1.config(height=5, width=860)
             rate_frame1.place(relx=0.5, rely=0.99, anchor="s")
 
-            # Scrollbar if more than 5 results are displayed
-            if len(list_results) > 5:
-                results_sb = ttk.Scrollbar(results_canvas, orient="vertical", command=results_canvas.yview)
-                results_sb.place(relx=0.98, height=results_canvas.winfo_height())
-                results_canvas.configure(yscrollcommand=results_sb.set)
+        # Scrollbar if more than 5 results are displayed
+        if len(list_results) > 5:
+            results_sb = ttk.Scrollbar(results_canvas, orient="vertical", command=results_canvas.yview)
+            results_sb.place(relx=0.98, height=results_canvas.winfo_height())
+            results_canvas.configure(yscrollcommand=results_sb.set)
 
 
 class HelpPage:

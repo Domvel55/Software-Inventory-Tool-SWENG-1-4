@@ -5,7 +5,7 @@
     This file was entirely made by the Puffins Team
     Version:11.5.2021
 """
-#
+
 from tkinter import *
 from tkinter import ttk
 import threading

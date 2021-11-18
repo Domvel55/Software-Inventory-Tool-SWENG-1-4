@@ -132,6 +132,8 @@ def update_pb():
     # This will actively update the progress bar an appropriate amount of times
     results_progressbar['value'] += (100 / len(files_list))
     root.update_idletasks()
+    results_progressbar['value'] = 0
+
 
 
 # This will scan the Database
@@ -544,8 +546,9 @@ class HistoryPage:
 # This will be different whether the full scan or express scan options were selected
 # Picking one of the options will load up the proper buttons for that configuration
 class ScanConfirmPage:
-    global files_list, results_progressbar
-    files_list = []
+    global files_list, results_progressbar, list_results
+    files_list.clear()
+    list_results.clear()
 
     def __init__(self):
         global root
@@ -553,6 +556,7 @@ class ScanConfirmPage:
 
     # This will setup the button for the Full Scan configuration
     def make_full_scan_config(self):
+        list_results.clear()
         for widget in root.winfo_children()[1:]:
             widget.destroy()
 
@@ -605,7 +609,7 @@ class ScanConfirmPage:
                                                 width=100,
                                                 height=50,
                                                 hover=True,
-                                                command=lambda: MainWindow())
+                                                command=lambda: [ResultsPage(), MainWindow()])
             cancel_button.place(relx=0.70, rely=0.8, anchor="center")
             ToolTip(cancel_button, "Go back to the home page.")
 
@@ -620,13 +624,16 @@ class ScanConfirmPage:
 
     # This will setup the buttons for the Express Scan Function
     def make_express_config(self):
+        files_list.clear()
+        list_results.clear()
+
         global scan_type, results_progressbar
         # This lets scan() know whether to scan all program files or just selected files
         scan_type = "Express Scan"
 
         def browse_files():
             global files_list
-            filenames = filedialog.askopenfilenames(initialdir="C:\Program Files",
+            filenames = filedialog.askopenfilenames(initialdir="C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
                                                     title="Select Files",
                                                     filetypes=(("all files",
                                                                 "*.*"),
@@ -672,6 +679,7 @@ class ScanConfirmPage:
         scan_confirm_container = Frame(scan_confirm_canvas, bg="#1F262A", borderwidth=2)
         scan_confirm_container.place(relx=0.5, rely=0.1, anchor="n")
         scan_confirm_container.config(relief=RIDGE, height=350, width=900)
+
         # Bind scrollbar to container
         scan_confirm_container.bind(
             "<Configure>",
@@ -720,7 +728,7 @@ class ScanConfirmPage:
                                             width=100,
                                             height=50,
                                             hover=True,
-                                            command=lambda: MainWindow())
+                                            command=lambda: [ResultsPage(), MainWindow()])
         cancel_button.place(relx=0.70, rely=0.8, anchor="center")
         ToolTip(cancel_button, "Go back to the home page.")
 
@@ -822,7 +830,7 @@ class ResultsPage:
                                             width=100,
                                             height=50,
                                             hover=True,
-                                            command=lambda: None)
+                                            command=lambda: [ResultsPage(), MainWindow()])
         cancel_button.place(relx=0.9, rely=0.8, anchor="center")
         ToolTip(cancel_button, "Go back to the home page.")
 
@@ -902,6 +910,7 @@ class ResultsPage:
         results_frame = Frame(root, bg="#2a3439")
         results_frame.place(relx=0.5, rely=0.1, anchor="n")
         results_frame.config(height=root.winfo_height(), width=root.winfo_width())
+
         # Calls function to put the update buttons back on the screen with the results
         ResultsPage.create_update_buttons(results_frame)
 
@@ -922,7 +931,11 @@ class ResultsPage:
         )
         results_canvas.create_window((0, 0), window=results_container, anchor="nw")
 
-
+        # Scrollbar if more than 5 results are displayed
+        if len(list_results) > 0:
+            results_sb = ttk.Scrollbar(results_canvas, orient="vertical", command=results_canvas.yview)
+            results_sb.place(relx=0.98, height=results_canvas.winfo_height())
+            results_canvas.configure(yscrollcommand=results_sb.set)
 
         temp_list = []
         for record in list_results:
@@ -970,11 +983,7 @@ class ResultsPage:
             rate_frame1.config(height=5, width=860)
             rate_frame1.place(relx=0.5, rely=0.99, anchor="s")
 
-        # Scrollbar if more than 5 results are displayed
-        if len(list_results) > 5:
-            results_sb = ttk.Scrollbar(results_canvas, orient="vertical", command=results_canvas.yview)
-            results_sb.place(relx=0.98, height=results_canvas.winfo_height())
-            results_canvas.configure(yscrollcommand=results_sb.set)
+
 
 
 class HelpPage:
@@ -1259,7 +1268,6 @@ class LoginPage:
             username = username_entry.get()
             password = password_entry.get()
             exists = False
-            error = "Login Error"
             for i in range(len(user_list)):
 
                 # Check to see if account is locked
@@ -1271,7 +1279,7 @@ class LoginPage:
                 # Increment the account_status if the username is right but the password is wrong
                 # Sets error code
                 if user_list[i][2] == username and user_list[i][3] != password:
-                    user_list[i][5] = str(int(user_list[i][5]) + 1)
+                    user_list[i][5]=str(int(user_list[i][5])+1)
                     error = "Wrong Username or Password."
                     return exists
 
@@ -1281,6 +1289,7 @@ class LoginPage:
                     name = user_list[i][0] + " " + user_list[i][1]
                     role = user_list[i][4]
                     MakeWindow.make_nav_buttons(self)
+                    user_list[i][5]=0
             return exists
 
         # Make error message for login
@@ -1399,10 +1408,25 @@ class RegisterPage:
                                                 hover=True,
                                                 command=lambda: [
                                                     enter_register() if valid_register() else registration_error()])
-            create_button.place(relx=0.5, rely=0.85, anchor='center')
+            create_button.place(relx=0.35, rely=0.85, anchor='center')
             ToolTip(create_button, "Create an account using the provided information.")
 
-            # Register new user
+            # Back Button (sends you back to login page)
+            back_button = TkinterCustomButton(master=register_frame,
+                                                bg_color="#1F262A",
+                                                fg_color="#56667A",
+                                                hover_color="#AAA9AD",
+                                                text_font=20,
+                                                text="Back",
+                                                text_color="white",
+                                                corner_radius=10,
+                                                width=100,
+                                                height=30,
+                                                hover=True,
+                                                command=lambda: [LoginPage()])
+            back_button.place(relx=0.65, rely=0.85, anchor='center')
+            ToolTip(back_button, "Go back to the Login Page.")
+
 
         def valid_register():
             global user_list
@@ -1716,16 +1740,16 @@ class ApplicationAdminPage:
 
         # Lock Button (locks account)
         lock_button = TkinterCustomButton(master=main_frame,
-                                            fg_color="coral1",
-                                            hover_color="#1F262A",
-                                            text_font=14,
-                                            text="Lock",
-                                            text_color="black",
-                                            corner_radius=0,
-                                            width=70,
-                                            height=40,
-                                            hover=True,
-                                            command=lambda: [lock_account(user_num), account_lock()])
+                                          fg_color="coral1",
+                                          hover_color="#1F262A",
+                                          text_font=14,
+                                          text="Lock",
+                                          text_color="black",
+                                          corner_radius=0,
+                                          width=70,
+                                          height=40,
+                                          hover=True,
+                                          command=lambda: [lock_account(user_num), account_lock()])
         lock_button.grid(row=8, column=2, padx=10, pady=5)
 
         # Updates account status to locked
@@ -1734,7 +1758,7 @@ class ApplicationAdminPage:
             account_status = "Locked"
             account_status_label2.config(text=account_status)
 
-        #Updates account status to unlocked
+        # Updates account status to unlocked
         def account_unlock():
             global account_status
             account_status = "Unlocked"

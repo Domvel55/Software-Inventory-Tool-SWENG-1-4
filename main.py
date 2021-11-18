@@ -8,7 +8,7 @@
 import PageClasses
 from PageClasses import *
 from PageClasses import root as root
-#
+
 # Window background color
 root.configure(background="#2a3439")
 

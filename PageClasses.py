@@ -8,8 +8,6 @@
 
 from tkinter import *
 from tkinter import ttk, filedialog
-import threading
-
 from tkinter_custom_button import TkinterCustomButton
 from Database import *
 import tkinter as tk
@@ -19,8 +17,9 @@ from plyer import notification
 
 now = "Last Scanned: ----"
 sort_variable = None
-files_list, user_list, history_list = [],[],[]
+files_list, user_list, history_list, list_results = [],[],[],[]
 name, role, last_page = "","",""
+results_progressbar = None
 
 root = Tk()
 title_bar = Frame(root, bg="#1F262A", relief="raised", bd=1)
@@ -29,20 +28,22 @@ title_bar.pack(fill=X)
 
 def read_config():
     global now, user_list
-    with open('configuration.ini', 'r') as f:
+    with open('configuration.ini', encoding='UTF-8') as f:
         file = list(f)
         now = file[0]
         for user in file[2:]:
             temp = user.split('~')
             user_list.append([temp[0][5:].split()[0], temp[0][5:].split()[1], temp[1][5:].split()[0], temp[2][5:].split()[0], temp[3][5:].split()[0], temp[4][5:].split()[0]])
+    f.close()
 
 
 def write_config():
-    with open('configuration.ini', 'w') as f:
-        f.write(f'{now}')
-        f.write('Users:\n')
+    with open('configuration.ini', 'w', encoding='UTF-8') as f:
+        f.write(f'{now}'
+                f'Users:\n')
         for user in user_list:
             f.write(f'Name: {user[0]} {user[1]}~User: {user[2]}~Pass: {user[3]}~Role: {user[4]}~Stat: {user[5]}\n')
+    f.close()
 
 
 def move_app(e):
@@ -83,7 +84,7 @@ def new_user_page(e):
 
 def last_time_clicked():
     global now
-    now = datetime.datetime.now().strftime("Last Scan: %b %d %Y, %I:%M:%S %p")
+    now = f'{datetime.datetime.now().strftime("Last Scan: %b %d %Y, %I:%M:%S %p")}\n'
 
 
 def frame_mapped(e):
@@ -93,6 +94,7 @@ def frame_mapped(e):
 
 
 def update_history():
+    global list_results
     history_list.append([now, list_results])
 
 
@@ -102,6 +104,57 @@ def unlock_account(user_num):
 
 def lock_account(user_num):
     user_list[user_num][5] = 5;
+
+
+def update_pb():
+    global results_progressbar, root
+    # This will actively update the progress bar an appropriate amount of times
+    results_progressbar['value'] += (100 / len(files_list))
+    root.update_idletasks()
+
+
+# This will scan the Database
+# This function will be called no matter which config is decided on
+def scan():
+    global files_list, results_progressbar, list_results
+    cve = CVEDataFrame()
+    rate = CVSSScorer()
+
+    if scan_type == "Full Scan":
+        # Get all files from Start Menu folder
+        for dirpath, dirnames, files in os.walk("C:\ProgramData\Microsoft\Windows\Start Menu"):
+            for file in files:
+                files_list.append(os.path.join(dirpath, file))
+
+    # This will remove the path extension for all of the selected applications
+    # This will loop through all the Files, selected from the sub menu in Express Scan
+    for record in files_list:
+        # This will reduce the name to a Application.exe
+        base = os.path.basename(record)
+        # This will separate the Application.exe to a list of [Application, .exe]
+        os.path.splitext(base)
+        base = base[:-4]
+        update_pb()
+        record = cve.select_record_by_name(base)
+        temp_list = []
+        # This will add an entry to the results list with vulnerability from the CVE Database
+        if len(record) != 0:
+            temp_record = None
+            for i in record:
+                rating = float(rate.website_query(i[0]))
+                temp_list.append((i, rating))
+            list_results.append(temp_list)
+
+    results_progressbar.destroy()
+    update_history()
+    ResultsPage.print_results()
+    title = 'A scan has been completed!'
+    message = 'Please return to the Software Inventory Tool to view results.'
+    notification.notify(title=title,
+                        message=message,
+                        app_icon='logo.ico',
+                        timeout=10,
+                        toast=False)
 
 
 # ToolTip class for making tips that appear after hovering mouse over button for 0.5 seconds
@@ -470,7 +523,7 @@ class HistoryPage:
 # This will be different whether the full scan or express scan options were selected
 # Picking one of the options will load up the proper buttons for that configuration
 class ScanConfirmPage:
-    global files_list
+    global files_list, results_progressbar
     files_list = []
 
     def __init__(self):
@@ -485,7 +538,7 @@ class ScanConfirmPage:
             root.configure(background="#2a3439")
 
             # This lets scan() know whether to scan all program files or just selected files
-            global scan_type
+            global scan_type, results_progressbar
             scan_type = "Full Scan"
 
             # Frame for scan confirmation dialog box
@@ -516,7 +569,7 @@ class ScanConfirmPage:
                                                   width=200,
                                                   height=75,
                                                   hover=True,
-                                                  command=lambda: [last_time_clicked(), ScanConfirmPage.scan(self)])
+                                                  command=lambda: [last_time_clicked(), scan()])
             continue_button.place(relx=0.25, rely=0.8, anchor="center")
             ToolTip(continue_button, "Continue onto the scanning process.")
 
@@ -535,10 +588,18 @@ class ScanConfirmPage:
             cancel_button.place(relx=0.70, rely=0.8, anchor="center")
             ToolTip(cancel_button, "Go back to the home page.")
 
+            # Makes a progress bar
+            progressbar_style_element = ttk.Style()
+            progressbar_style_element.theme_use('alt')
+            progressbar_style_element.configure("red.Horizontal.TProgressbar", foreground='red', bg='red')
+            results_progressbar = ttk.Progressbar(root, orient=HORIZONTAL, length=500, mode='determinate',
+                                                  style="red.Horizontal.TProgressbar")
+            results_progressbar.place(relx=0.5, rely=0.8, anchor="center")
+
 
     # This will setup the buttons for the Express Scan Function
     def make_express_config(self):
-        global scan_type
+        global scan_type, results_progressbar
         # This lets scan() know whether to scan all program files or just selected files
         scan_type = "Express Scan"
 
@@ -609,8 +670,7 @@ class ScanConfirmPage:
                                               width=200,
                                               height=75,
                                               hover=True,
-                                              command=lambda: [last_time_clicked(),
-                                                threading.Thread(target=ScanConfirmPage.scan(self), args=(1,)).start()])
+                                              command=lambda: [last_time_clicked(), scan()])
         continue_button.place(relx=0.25, rely=0.8, anchor="center")
         ToolTip(continue_button, "Continue onto the scanning process once programs have been selected.")
 
@@ -643,15 +703,6 @@ class ScanConfirmPage:
         cancel_button.place(relx=0.70, rely=0.8, anchor="center")
         ToolTip(cancel_button, "Go back to the home page.")
 
-
-    # This will scan the Database
-    # This function will be called no matter which config is decided on
-    def scan(self):
-        global files_list
-        global list_results
-        list_results = []
-        cve = CVEDataFrame()
-        rate = CVSSScorer()
         # Makes a progress bar
         progressbar_style_element = ttk.Style()
         progressbar_style_element.theme_use('alt')
@@ -659,45 +710,6 @@ class ScanConfirmPage:
         results_progressbar = ttk.Progressbar(root, orient=HORIZONTAL, length=500, mode='determinate',
                                               style="red.Horizontal.TProgressbar")
         results_progressbar.place(relx=0.5, rely=0.8, anchor="center")
-
-        if scan_type == "Full Scan":
-            # Get all files from Start Menu folder
-            for dirpath, dirnames, files in os.walk("C:\ProgramData\Microsoft\Windows\Start Menu"):
-                for file in files:
-                    files_list.append(os.path.join(dirpath, file))
-
-        # This will remove the path extension for all of the selected applications
-        # This will loop through all the Files, selected from the sub menu in Express Scan
-        for record in files_list:
-            # This will reduce the name to a Application.exe
-            base = os.path.basename(record)
-            # This will separate the Application.exe to a list of [Application, .exe]
-            os.path.splitext(base)
-            base = base[:-4]
-            # This will actively update the progress bar an appropriate amount of times
-            results_progressbar['value'] += (100 / len(files_list))
-            root.update_idletasks()
-
-            record = cve.select_record_by_name(base)
-            temp_list = []
-            # This will add an entry to the results list with vulnerability from the CVE Database
-            if len(record) != 0:
-                temp_record = None
-                for i in record:
-                    rating = float(rate.website_query(i[0]))
-                    temp_list.append((i, rating))
-                list_results.append(temp_list)
-
-        results_progressbar.destroy()
-        update_history()
-        ResultsPage.print_results(self, list_results)
-        title = 'A scan has been completed!'
-        message = 'Please return to the Software Inventory Tool to view results.'
-        notification.notify(title=title,
-                            message=message,
-                            app_icon='logo.ico',
-                            timeout=10,
-                            toast=False)
 
 
 # This will create the results page
@@ -862,8 +874,9 @@ class ResultsPage:
 
     # This will take the software found from a scan
     # And print them to the results page
-    def print_results(self, list_results):
-        global sort_variable
+    @staticmethod
+    def print_results():
+        global sort_variable, list_results
 
         results_frame = Frame(root, bg="#2a3439")
         results_frame.place(relx=0.5, rely=0.1, anchor="n")

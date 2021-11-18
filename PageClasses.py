@@ -873,7 +873,7 @@ class ResultsPage:
                                                 width=200,
                                                 height=75,
                                                 hover=True,
-                                                command=lambda: None)
+                                                command=lambda: [ResultsPage(), MainWindow()])
         ignore_all_button.place(relx=0.55, rely=0.8, anchor="center")
         ToolTip(ignore_all_button, "Ignore all the programs flagged for available updates.")
 

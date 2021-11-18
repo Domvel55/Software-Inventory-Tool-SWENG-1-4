@@ -1259,6 +1259,7 @@ class LoginPage:
             username = username_entry.get()
             password = password_entry.get()
             exists = False
+            error = "Login Error"
             for i in range(len(user_list)):
 
                 # Check to see if account is locked
@@ -1270,7 +1271,7 @@ class LoginPage:
                 # Increment the account_status if the username is right but the password is wrong
                 # Sets error code
                 if user_list[i][2] == username and user_list[i][3] != password:
-                    user_list[i][5] += 1
+                    user_list[i][5] = str(int(user_list[i][5]) + 1)
                     error = "Wrong Username or Password."
                     return exists
 
@@ -1396,30 +1397,59 @@ class RegisterPage:
                                                 width=100,
                                                 height=30,
                                                 hover=True,
-                                                command=lambda: [new_register(), LoginPage()])
+                                                command=lambda: [
+                                                    enter_register() if valid_register() else registration_error()])
             create_button.place(relx=0.5, rely=0.85, anchor='center')
             ToolTip(create_button, "Create an account using the provided information.")
 
-        # Register new user
-        def new_register():
-            global user_list
+            # Register new user
 
+        def valid_register():
+            global user_list
+            valid = True
+
+            username = self.username_var.get()
+            for i in range(len(user_list)):
+                if username == user_list[i][2]:
+                    valid = False
+                    return valid
+
+            if len(self.first_name_var.get()) == 0:
+                valid = False
+                return valid
+            if len(self.last_name_var.get()) == 0:
+                valid = False
+                return valid
+            if len(self.username_var.get()) == 0:
+                valid = False
+                return valid
+            if len(self.password_var.get()) == 0:
+                valid = False
+                return valid
+            if len(self.role_var.get()) == 0:
+                valid = False
+                return valid
+
+            return valid
+
+        def enter_register():
             # Get new users info
             first_name = first_name_entry.get()
             last_name = last_name_entry.get()
             username = username_entry.get()
             password = password_entry.get()
-
             role = self.role_var.get()
             account_status = 0
-
             # Add new user to user list
             new_account = [first_name, last_name, username, password, role, account_status]
             user_list.append(new_account)
-
-        def enter_register(e):
-            new_register()
             LoginPage()
+
+        def registration_error():
+            error_message = LabelFrame(register_frame, bg="#1F262A", fg="red", font=10,
+                                       text="Registration Error", relief=FLAT, labelanchor="n")
+            error_message.place(relx=0.5, rely=0.73, anchor="n")
+            error_message.config(height=19, width=340)
 
         root.bind('<Return>', enter_register)
 

@@ -16,6 +16,9 @@ from plyer import notification
 from ctypes import windll
 import threading
 
+global stopped
+stopped = False
+
 now = "Last Scanned: ----"
 sort_variable = None
 files_list, user_list, history_list, list_results = [], [], [], []
@@ -138,11 +141,25 @@ def update_pb():
     results_progressbar['value'] += (100 / len(files_list))
     root.update_idletasks()
 
+def destroy_pb():
+    global results_progressbar
+    results_progressbar.destroy()
+
+def stop():
+    global stopped
+    stopped = True
+    destroy_pb()
+
+def start():
+    global stopped
+    stopped = False
+    files_list.clear()
+    list_results.clear()
+
 
 # This will scan the Database
 # This function will be called no matter which config is decided on
 def scan():
-    print(threading.active_count)
     global files_list, results_progressbar, list_results
     cve = CVEDataFrame()
     rate = CVSSScorer()
@@ -161,6 +178,7 @@ def scan():
         # This will separate the Application.exe to a list of [Application, .exe]
         os.path.splitext(base)
         base = base[:-4]
+
         update_pb()
         record = cve.select_record_by_name(base)
         temp_list = []
@@ -172,7 +190,7 @@ def scan():
                 temp_list.append((i, rating))
             list_results.append(temp_list)
 
-    results_progressbar.destroy()
+    destroy_pb()
     update_history()
     ResultsPage.print_results()
     title = 'A scan has been completed!'
@@ -547,9 +565,11 @@ class ScanConfirmPage:
         global last_page
         global files_list, results_progressbar
         files_list.clear()
+        list_results.clear()
 
     # This will setup the button for the Full Scan configuration
     def make_full_scan_config(self):
+        list_results.clear()
         for widget in root.winfo_children()[1:]:
             widget.destroy()
 
@@ -589,7 +609,7 @@ class ScanConfirmPage:
                                                   width=200,
                                                   height=75,
                                                   hover=True,
-                                                  command=lambda: [last_time_clicked(), x.start()])
+                                                  command=lambda: [last_time_clicked(),start(),  x.start()])
             continue_button.place(relx=0.25, rely=0.8, anchor="center")
             ToolTip(continue_button, "Continue onto the scanning process.")
 
@@ -603,7 +623,7 @@ class ScanConfirmPage:
                                                 width=100,
                                                 height=50,
                                                 hover=True,
-                                                command=lambda: [MainWindow(), x.join()])
+                                                command=lambda: [ResultsPage(), MainWindow(), stop()])
             cancel_button.place(relx=0.70, rely=0.8, anchor="center")
             ToolTip(cancel_button, "Go back to the home page.")
 
@@ -618,6 +638,11 @@ class ScanConfirmPage:
     # This will setup the buttons for the Express Scan Function
 
     def make_express_config(self):
+        files_list.clear()
+        list_results.clear()
+
+        x = threading.Thread(target=scan)
+
         global scan_type, results_progressbar
         # This lets scan() know whether to scan all program files or just selected files
         scan_type = "Express Scan"
@@ -689,7 +714,7 @@ class ScanConfirmPage:
                                               width=200,
                                               height=75,
                                               hover=True,
-                                              command=lambda: [last_time_clicked(), threading.Thread(target=scan).start()])
+                                              command=lambda: [last_time_clicked(), start, x.start()])
         continue_button.place(relx=0.25, rely=0.8, anchor="center")
         ToolTip(continue_button, "Continue onto the scanning process once programs have been selected.")
 
@@ -717,7 +742,7 @@ class ScanConfirmPage:
                                             width=100,
                                             height=50,
                                             hover=True,
-                                            command=lambda: MainWindow())
+                                            command=lambda:[ResultsPage(), MainWindow(), x.stop(), stop()])
         cancel_button.place(relx=0.70, rely=0.8, anchor="center")
         ToolTip(cancel_button, "Go back to the home page.")
 

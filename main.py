@@ -8,6 +8,7 @@
 import PageClasses
 from PageClasses import *
 from PageClasses import root as root
+import threading
 
 # Window background color
 root.configure(background="#2a3439")
@@ -25,6 +26,7 @@ root.resizable(True, True)
 
 # Changes the default tkinter to our Sieve logo when minimized
 root.iconbitmap('logo.ico')
+
 
 # Change the text after minimizing the tool to task bar
 root.title("Sieve")
@@ -152,5 +154,6 @@ def call_main():
 if __name__ == '__main__':
     call_main()
     read_config()
-    root.mainloop()
+    x = threading.Thread(target=root.mainloop(), args=(1,))
+    x.start()
     write_config()

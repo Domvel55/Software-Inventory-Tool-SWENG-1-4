@@ -7,30 +7,22 @@
 """
 
 from tkinter import *
-from tkinter import ttk
+from tkinter import ttk, filedialog
 import threading
 
 from tkinter_custom_button import TkinterCustomButton
 from Database import *
-from tkinter import filedialog
 import tkinter as tk
 import os
 import datetime
 from plyer import notification
 
-root = Tk()
-global files_list
 now = "Last Scanned: ----"
-name = "John Doe"
-role = "None"
-global last_page
-last_page = ""
-user_list = []
-global history_list
-history_list = []
 sort_variable = None
+files_list, user_list, history_list = [],[],[]
+name, role, last_page = "","",""
 
-
+root = Tk()
 title_bar = Frame(root, bg="#1F262A", relief="raised", bd=1)
 title_bar.pack(fill=X)
 
@@ -42,7 +34,7 @@ def read_config():
         now = file[0]
         for user in file[2:]:
             temp = user.split('~')
-            user_list.append([temp[0][5:].split()[0], temp[0][5:].split()[1], temp[1][5:].split()[0], temp[2][5:].split()[0], temp[3][5:].split()[0]])
+            user_list.append([temp[0][5:].split()[0], temp[0][5:].split()[1], temp[1][5:].split()[0], temp[2][5:].split()[0], temp[3][5:].split()[0], temp[4][5:].split()[0]])
 
 
 def write_config():
@@ -50,7 +42,7 @@ def write_config():
         f.write(f'{now}')
         f.write('Users:\n')
         for user in user_list:
-            f.write(f'Name: {user[0]} {user[1]}~User: {user[2]}~Pass: {user[3]}~Role: {user[4]}\n')
+            f.write(f'Name: {user[0]} {user[1]}~User: {user[2]}~Pass: {user[3]}~Role: {user[4]}~Stat: {user[5]}\n')
 
 
 def move_app(e):
@@ -84,8 +76,10 @@ def maximize_me(e):
 def new_page(e):
     ApplicationResultsPage(e.widget.grid_info()['row'])
 
+
 def new_user_page(e):
     ApplicationAdminPage(e.widget.grid_info()['row'])
+
 
 def last_time_clicked():
     global now
@@ -97,14 +91,18 @@ def frame_mapped(e):
     root.overrideredirect(True)
     root.state('normal')
 
+
 def update_history():
     history_list.append([now, list_results])
+
 
 def unlock_account(user_num):
     user_list[user_num][5] = 0;
 
+
 def lock_account(user_num):
     user_list[user_num][5] = 5;
+
 
 # ToolTip class for making tips that appear after hovering mouse over button for 0.5 seconds
 class ToolTip(object):
@@ -374,8 +372,9 @@ class MainWindow:
                 admin_button.place(relx=0.8, rely=0.85, anchor='center')
                 ToolTip(schedule_scan_button, "See users")
 
-#Contains the history of the program.
-#Creates the page that contains the history.
+
+# Contains the history of the program.
+# Creates the page that contains the history.
 class HistoryPage:
     def __init__(self):
         global root
@@ -464,10 +463,7 @@ class HistoryPage:
             if len(history_list) > 5:
                 history_sb = ttk.Scrollbar(history_canvas, orient="vertical", command=history_canvas.yview)
                 history_sb.place(relx=0.98, height=history_canvas.winfo_height())
-                history_canvas.configure(yscrollcommand=results_sb.set)
-
-
-
+                history_canvas.configure(yscrollcommand=history_sb.set)
 
 
 # This class will create the scan page
@@ -1186,7 +1182,7 @@ class LoginPage:
             password_label = Label(login_inner_frame, text='Password', font=15, background="#2a3439",
                                    foreground="white")
             password_label.place(relx=0.5, rely=0.53, anchor='center')
-            password_entry = Entry(login_inner_frame, textvariable=password_var, background="#1F262A",
+            password_entry = Entry(login_inner_frame, textvariable=password_var, show=' ', background="#1F262A", insertbackground="#1F262A",
                                    foreground="white",
                                    font=15)
             password_entry.place(relx=0.5, rely=0.63, anchor='center')
@@ -1233,7 +1229,7 @@ class LoginPage:
 
                 # Check to see if account is locked
                 # Sets error code
-                if user_list[i][2] == username and user_list[i][5] >= 5:
+                if user_list[i][2] == username and int(user_list[i][5]) >= 5:
                     error = "Too many attempts. Account has been locked."
                     return exists
 
@@ -1245,12 +1241,11 @@ class LoginPage:
                     return exists
 
                 #Checks for combination of user, password, and account_status to be valid
-                if user_list[i][2] == username and user_list[i][3] == password and user_list[i][5] < 5:
+                if user_list[i][2] == username and user_list[i][3] == password and int(user_list[i][5]) < 5:
                     exists = True
                     name = user_list[i][0] + " " + user_list[i][1]
                     role = user_list[i][4]
                     MakeWindow.make_nav_buttons(self)
-
             return exists
 
         # Make error message for login
@@ -1380,6 +1375,7 @@ class RegisterPage:
             last_name = last_name_entry.get()
             username = username_entry.get()
             password = password_entry.get()
+
             role = self.role_var.get()
             account_status = 0
 
@@ -1567,8 +1563,8 @@ class ApplicationAdminPage:
         new_window.configure(background="#2a3439")
 
         # Scaling UI to user's screen
-        app_width = 1064
-        app_height = 600
+        app_width = 700
+        app_height = 400
         screen_width = new_window.winfo_screenwidth()
         screen_height = new_window.winfo_screenheight()
         x = (screen_width / 2) - (app_width / 2)
@@ -1603,7 +1599,7 @@ class ApplicationAdminPage:
         role = user_list[user_num][4]
 
         # Checking for status of the account
-        if user_list[user_num][5] >= 5:
+        if int(user_list[user_num][5]) >= 5:
             account_status = "Locked"
         else:
             account_status = "Unlocked"

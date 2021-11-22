@@ -1409,8 +1409,24 @@ class RegisterPage:
                                                 hover=True,
                                                 command=lambda: [
                                                     enter_register() if valid_register() else registration_error()])
-            create_button.place(relx=0.5, rely=0.85, anchor='center')
+            create_button.place(relx=0.35, rely=0.85, anchor='center')
             ToolTip(create_button, "Create an account using the provided information.")
+
+            # Back Button (sends you back to login page)
+            back_button = TkinterCustomButton(master=register_frame,
+                                              bg_color="#1F262A",
+                                              fg_color="#56667A",
+                                              hover_color="#AAA9AD",
+                                              text_font=20,
+                                              text="Back",
+                                              text_color="white",
+                                              corner_radius=10,
+                                              width=100,
+                                              height=30,
+                                              hover=True,
+                                              command=lambda: [LoginPage()])
+            back_button.place(relx=0.65, rely=0.85, anchor='center')
+            ToolTip(back_button, "Go back to the Login Page.")
 
             # Register new user
 

@@ -949,6 +949,7 @@ class ResultsPage:
             results_example.config(height=50, width=860)
             results_example1_label = Label(results_example, text=str(files_list[i].split('/')[-1]), font=14,
                                            bg="#2a3439", fg="#FFFFFF")
+
             results_example1_label.place(relx=0.05, rely=0.5, anchor="w")
             # Selection Boxes
             var = IntVar()
@@ -956,7 +957,6 @@ class ResultsPage:
             selection_box.place(relx=0.00, rely=0.5, anchor="w")
             results_example.bind("<Button-1>", new_page)
             results_example.grid(row=i, column=0, padx=10, pady=5)
-
 
             rating = 0
             # Getting the score and changing the color to match the

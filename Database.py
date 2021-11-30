@@ -7,6 +7,26 @@
 
 import os.path
 import pandas as pd
+import bs4
+import requests
+
+
+class CVSSScorer:
+
+    def __init__(self):
+        pass
+
+    # Retrieves NVD CVE html text string from link with certain id
+    def website_query(self, id):
+        # Requests is used to retrieve the link to a webpage
+        result = requests.get(f'https://services.nvd.nist.gov/rest/json/cve/1.0/{id}')
+        # BS4 is beautiful soup which is used to parse html from the above request
+        # lxml is the type of html parser used. Must pip install lxml to work
+        soup = str(bs4.BeautifulSoup(result.text, 'html.parser'))
+        # Retrieves the body text and finds the base cvss score
+        find = soup.find('baseScore')
+        return soup[find+11:find+14]
+
 
 """
 Columns:
@@ -45,12 +65,13 @@ class CVEDataFrame:
                             f'{self.df["References"][i]}~/~{self.df["Comments"][i]}\n')
             f.close()
 
-    def select_record_by_name(self, name: str):
+    def select_record_by_name(self, name: str, limit=10):
         query_list = []
         with open('cve.db.metadata', encoding='UTF-8') as f:
-            for record in f:
-                if name.lower() in str(record).lower():
+            for record in reversed(list(f)):
+                if name.lower() in str(record).lower() and limit > 0:
                     query_list.append(record.split('~/~'))
+                    limit -= 1
         f.close()
         return query_list
 
@@ -58,4 +79,7 @@ class CVEDataFrame:
 if __name__ == '__main__':
     cve = CVEDataFrame()
     cve.create_metadata()
-    cve.select_record_by_name('excel')
+    # print(cve.select_record_by_name('excel'))
+    # Create a CVSSScorer() obj and call .website_query wit the CVE tag as shown below to parse the cvss score
+    cvss = CVSSScorer()
+    print(cvss.website_query('CVE-2021-40494'))

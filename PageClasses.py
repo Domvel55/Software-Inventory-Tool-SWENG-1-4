@@ -654,7 +654,7 @@ class ScanConfirmPage:
                                                     title="Select Files",
                                                     filetypes=(("all files",
                                                                 "*.*"),
-                                                               ("Executable files",
+                                                               ("applications",
                                                                 "*.exe*")))
             # Additional files selected after first selection will be appended to list
             files_list = files_list + list(filenames)
@@ -949,7 +949,12 @@ class ResultsPage:
             results_example.config(height=50, width=860)
             results_example1_label = Label(results_example, text=str(files_list[i].split('/')[-1]), font=14,
                                            bg="#2a3439", fg="#FFFFFF")
-            results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
+
+            results_example1_label.place(relx=0.05, rely=0.5, anchor="w")
+            # Selection Boxes
+            var = IntVar()
+            selection_box = Checkbutton(results_example, variable=var, onvalue=1, offvalue=0, bg="#2a3439")
+            selection_box.place(relx=0.00, rely=0.5, anchor="w")
             results_example.bind("<Button-1>", new_page)
             results_example.grid(row=i, column=0, padx=10, pady=5)
 
@@ -976,7 +981,6 @@ class ResultsPage:
             rating_label = Label(results_example, text=rating, font=14, bg=color, fg="black")
             rating_label.config(height=2, width=7)
             rating_label.place(relx=0.904, rely=0.5, anchor="w")
-            results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
 
             # Design around each result
             rate_frame1 = Frame(results_example, bg=color)

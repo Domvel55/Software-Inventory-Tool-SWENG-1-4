@@ -142,14 +142,17 @@ def update_pb():
     results_progressbar['value'] += (100 / len(files_list))
     root.update_idletasks()
 
+
 def destroy_pb():
     global results_progressbar
     results_progressbar.destroy()
+
 
 def stop():
     global stopped
     stopped = True
     destroy_pb()
+
 
 def start():
     global stopped
@@ -187,8 +190,10 @@ def scan():
         if len(record) != 0:
             temp_record = None
             for i in record:
-                rating = float(rate.website_query(i[0]))
-                temp_list.append((i, rating))
+                nvd_query = rate.website_query(i[0])
+                temp = i.copy()
+                temp.append(nvd_query[1])
+                temp_list.append((temp, float(nvd_query[0])))
             list_results.append(temp_list)
 
     destroy_pb()
@@ -1547,8 +1552,8 @@ class ApplicationResultsPage:
 
                 rating = j[1]
 
-                cvss_score_label = Label(main_frame, text=rating, font=15, background="#2a3439",
-                                         foreground="white")
+                cvss_score_label = Label(main_frame, text=str(f'Rating: {rating}    Date: {record[-1]}'), font=15,
+                                         background="#2a3439", foreground="white")
                 cvss_score_label.grid(row=count, column=1)
                 count += 1
 

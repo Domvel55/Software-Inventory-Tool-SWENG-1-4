@@ -24,8 +24,10 @@ class CVSSScorer:
         # lxml is the type of html parser used. Must pip install lxml to work
         soup = str(bs4.BeautifulSoup(result.text, 'html.parser'))
         # Retrieves the body text and finds the base cvss score
-        find = soup.find('baseScore')
-        return soup[find+11:find+14]
+        find_score = soup.find('baseScore')
+        find_date = soup.find('publishedDate')
+        temp_tup = (soup[find_score+11:find_score+14],soup[find_date+16:find_date+26])
+        return temp_tup
 
 
 """
@@ -82,4 +84,4 @@ if __name__ == '__main__':
     # print(cve.select_record_by_name('excel'))
     # Create a CVSSScorer() obj and call .website_query wit the CVE tag as shown below to parse the cvss score
     cvss = CVSSScorer()
-    print(cvss.website_query('CVE-2021-40494'))
+    print(cvss.website_query('CVE-1999-0001'))

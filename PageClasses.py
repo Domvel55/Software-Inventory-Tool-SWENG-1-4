@@ -481,6 +481,7 @@ class MainWindow:
 # Contains the history of the program.
 # Creates the page that contains the history.
 class HistoryPage:
+
     def __init__(self):
         global root
         global last_page
@@ -763,10 +764,8 @@ class ScanConfirmPage:
 
 # This will create the results page
 class ResultsPage:
-
     def __init__(self):
-        global root
-        global last_page
+        global root, last_page
 
         # Does a check to see if the page we are currently on to not reload page
         if last_page != "ResultsPage":
@@ -850,7 +849,7 @@ class ResultsPage:
                                             width=100,
                                             height=50,
                                             hover=True,
-                                            command=lambda: None)
+                                            command=lambda: [ResultsPage(), MainWindow()])
         cancel_button.place(relx=0.9, rely=0.8, anchor="center")
         ToolTip(cancel_button, "Go back to the home page.")
 
@@ -931,6 +930,8 @@ class ResultsPage:
         results_frame = Frame(root, bg="#2a3439")
         results_frame.place(relx=0.5, rely=0.1, anchor="n")
         results_frame.config(height=root.winfo_height(), width=root.winfo_width())
+
+
         # Calls function to put the update buttons back on the screen with the results
         ResultsPage.create_update_buttons(results_frame)
 
@@ -941,6 +942,15 @@ class ResultsPage:
         results_container = Frame(results_canvas, bg="#1F262A", borderwidth=2)
         results_container.place(relx=0.5, rely=0.1, anchor="n")
         results_container.config(relief=RIDGE, height=350, width=900)
+
+        # Bind scrollbar to container
+        results_container.bind(
+            "<Configure>",
+            lambda e: results_canvas.configure(
+                scrollregion=results_canvas.bbox("all")
+            )
+        )
+        results_canvas.create_window((0, 0), window=results_container, anchor="nw")
 
         temp_list = []
         for record in list_results:
@@ -991,6 +1001,15 @@ class ResultsPage:
             rate_frame1 = Frame(results_example, bg=color)
             rate_frame1.config(height=5, width=860)
             rate_frame1.place(relx=0.5, rely=0.99, anchor="s")
+
+        # Scrollbar if more than 5 files are selected
+        if len(list_results) > 5:
+            results_sb = ttk.Scrollbar(results_canvas, orient="vertical",
+                                       command=results_canvas.yview)
+            results_sb.place(relx=0.98, height=results_canvas.winfo_height())
+            results_canvas.configure(yscrollcommand=results_sb.set)
+
+
 
 
 class HelpPage:
@@ -1560,8 +1579,7 @@ class ApplicationResultsPage:
 
 class AdminPage:
     def __init__(self):
-        global root
-        global last_page
+        global root, last_page
 
         if last_page != "AdminPage":
             last_page = "AdminPage"
@@ -1578,6 +1596,8 @@ class AdminPage:
             root_size_grip.configure(style="Test.TSizegrip")
             root_size_grip.pack(side="right", anchor=SE)
 
+            # Dupe code?
+            """
             # Register page frame
             admin_frame = Frame(root, bg='#1F262A')
             admin_frame.place(relx=0.5, rely=0.5, anchor='center')
@@ -1588,10 +1608,12 @@ class AdminPage:
             admin_container = Frame(admin_frame, bg="#1F262A", borderwidth=2)
             admin_container.place(relx=0.5, rely=0.1, anchor="n")
             admin_container.config(relief=RIDGE)
+            """
+            AdminPage.print_admin()
 
-        AdminPage.print_admin(self, user_list)
-
-    def print_admin(self, user_list):
+    @staticmethod
+    def print_admin():
+        global user_list
 
         admin_frame = Frame(root, bg="#2a3439")
         admin_frame.place(relx=0.5, rely=0.1, anchor="n")
@@ -1631,16 +1653,18 @@ class AdminPage:
                 admin_example.bind("<Button-1>", new_user_page)
                 admin_example.grid(row=i, column=0, padx=10, pady=5)
 
+
             # Design around each result
             admin_frame1 = Frame(admin_example, bg="white")
             admin_frame1.config(height=5, width=860)
             admin_frame1.place(relx=0.5, rely=0.99, anchor="s")
 
-            # Scrollbar if more than 5 results are displayed
-            if len(user_list) > 5:
-                admin_sb = ttk.Scrollbar(admin_canvas, orient="vertical", command=admin_canvas.yview)
-                admin_sb.place(relx=0.98, height=admin_canvas.winfo_height())
-                admin_canvas.configure(yscrollcommand=admin_sb.set)
+        # Scrollbar if more than 5 users are displayed
+        if len(user_list) > 5:
+            admin_sb = ttk.Scrollbar(admin_canvas, orient="vertical", command=admin_canvas.yview)
+            admin_sb.place(relx=0.98, height=300)
+            admin_canvas.configure(yscrollcommand=admin_sb.set)
+
 
 
 class ApplicationAdminPage:

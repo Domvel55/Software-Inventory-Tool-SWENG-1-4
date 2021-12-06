@@ -882,11 +882,13 @@ class ResultsPage:
         ignore_all_button.place(relx=0.55, rely=0.8, anchor="center")
         ToolTip(ignore_all_button, "Ignore all the programs flagged for available updates.")
 
-        filter_settings_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
-        filter_settings_container.place(relx=0.04, rely=0.0, anchor="nw")
-        filter_settings_container.config(relief=RIDGE)
 
-        sort_scan_label = Label(filter_settings_container, text='Sort scan results...', font='2', bg='#2a3439',
+        ## Sort Settings
+        sort_settings_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
+        sort_settings_container.place(relx=0.04, rely=0.0, anchor="nw")
+        sort_settings_container.config(relief=RIDGE)
+
+        sort_scan_label = Label(sort_settings_container, text='Sort scan results...', font='2', bg='#2a3439',
                                 fg="white")
 
         style_element = ttk.Style()  # Creating style element
@@ -904,13 +906,41 @@ class ResultsPage:
             "Alphabetically"
         ]
         global sort_variable
-        sort_variable = StringVar(filter_settings_container)
+        sort_variable = StringVar(sort_settings_container)
         # Default sorting is by severity
         sort_variable.set("By Severity")
 
-        opt = OptionMenu(filter_settings_container, sort_variable, *option_list)
+        opt = OptionMenu(sort_settings_container, sort_variable, *option_list)
         opt.config(background="#1F262A", foreground="white", width=15, font=('Bold', 12))
         opt.grid()
+
+
+        ## Filter settings
+        filter_settings_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
+        filter_settings_container.place(relx=0.4, rely=0.0, anchor="nw")
+        filter_settings_container.config(relief=RIDGE)
+
+        filter_label = ttk.Label(filter_settings_container, text='Filter Settings', font='2', background="#1F262A",
+                                foreground="white")
+        filter_label.grid(row=1, column=3, padx=50)
+
+        filter_settings_1 = IntVar()
+        filter_settings_2 = IntVar()
+        filter_settings_3 = IntVar()
+
+        frame_style = ttk.Style()
+        frame_style.configure("BW.TCheckbutton", background="#1F262A", foreground="white", highlightthickness=0)
+
+
+        filter_button_1 = ttk.Checkbutton(filter_settings_container, text='Hide low', onvalue=1, offvalue=0,
+                                          variable=filter_settings_1, style="BW.TCheckbutton")
+        filter_button_1.grid(row=2, column=2)
+        filter_button_2 = ttk.Checkbutton(filter_settings_container, text='Hide medium', onvalue=1, offvalue=0,
+                                          variable=filter_settings_2, style="BW.TCheckbutton")
+        filter_button_2.grid(row=2, column=3)
+        filter_button_3 = ttk.Checkbutton(filter_settings_container, text='Hide high', onvalue=1, offvalue=0,
+                                          variable=filter_settings_3, style="BW.TCheckbutton")
+        filter_button_3.grid(row=2, column=4)
 
         style = ttk.Style(root)
         style.theme_use('classic')

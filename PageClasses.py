@@ -996,6 +996,7 @@ class ResultsPage:
                                            bg="#2a3439", fg="#FFFFFF")
 
             results_example1_label.place(relx=0.05, rely=0.5, anchor="w")
+
             # Selection Boxes
             var = IntVar()
             selection_box = Checkbutton(results_example, variable=var, onvalue=1, offvalue=0, bg="#2a3439")
@@ -1004,6 +1005,7 @@ class ResultsPage:
             results_example.grid(row=i, column=0, padx=10, pady=5)
 
             rating = 0
+
             # Getting the score and changing the color to match the
             for j in list_results[i]:
                 rating += j[1]
@@ -1031,6 +1033,11 @@ class ResultsPage:
             rate_frame1 = Frame(results_example, bg=color)
             rate_frame1.config(height=5, width=860)
             rate_frame1.place(relx=0.5, rely=0.99, anchor="s")
+
+            # Label for Flags
+            flags_label = Label(results_example, text="Days:", font=14, bg=color, fg="black")
+            flags_label.config(height=2, width=8)
+            flags_label.place(relx=0.8, rely=0.5, anchor="w")
 
         # Scrollbar if more than 5 files are selected
         if len(list_results) > 5:

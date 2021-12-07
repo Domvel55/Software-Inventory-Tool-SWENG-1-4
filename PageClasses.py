@@ -321,6 +321,7 @@ class MakeWindow:
                                           command=lambda: [HelpPage(), change_help_button()])
         help_button.pack(side=LEFT, padx=5)
 
+
         # This will change the color of the home button when clicked on
         # This will also change the color of all the other buttons back to default
         def change_home_button():
@@ -476,6 +477,20 @@ class MainWindow:
                                                    command=lambda: AdminPage())
                 admin_button.place(relx=0.8, rely=0.85, anchor='center')
                 ToolTip(schedule_scan_button, "See users")
+
+            # Create Logout Button
+            logout_button = TkinterCustomButton(master=main_frame, bg_color="#2a3439",
+                                                fg_color="#1F262A",
+                                                hover_color="#AAA9AD",
+                                                text_font="Bold, 14",
+                                                text="Logout",
+                                                text_color="white",
+                                                corner_radius=10,
+                                                width=80,
+                                                height=40,
+                                                hover=True,
+                                                command=lambda: [LoginPage()])
+            logout_button.place(relx=0.05, rely=0.69, anchor="n")
 
 
 # Contains the history of the program.
@@ -1254,6 +1269,9 @@ class LoginPage:
 
             for widget in root.winfo_children()[1:]:
                 widget.destroy()
+            for widget in title_bar.winfo_children()[4:]:
+                widget.destroy()
+
 
             style = ttk.Style(root)
             style.theme_use('classic')
@@ -1288,11 +1306,32 @@ class LoginPage:
             password_label = Label(login_inner_frame, text='Password', font=15, background="#2a3439",
                                    foreground="white")
             password_label.place(relx=0.5, rely=0.53, anchor='center')
-            password_entry = Entry(login_inner_frame, textvariable=password_var, show=' ', background="#1F262A",
+            password_entry = Entry(login_inner_frame, textvariable=password_var, show='*', background="#1F262A",
                                    insertbackground="#1F262A",
                                    foreground="white",
                                    font=15)
             password_entry.place(relx=0.5, rely=0.63, anchor='center')
+            global show_pass
+            show_pass = False
+
+            toggle_label = Label(login_inner_frame, text='Show Password', font='Bold, 10', background="#2a3439",
+                                   foreground="grey")
+            toggle_label.place(relx=0.52, rely=0.73, anchor='center')
+
+            # Create Show Password Button
+            show_password_button = TkinterCustomButton(master=login_inner_frame,
+                                              bg_color="#2a3439",
+                                              fg_color="#56667A",
+                                              hover_color="#AAA9AD",
+                                              text_font="Bold, 12",
+                                              text=" ",
+                                              text_color="white",
+                                              corner_radius=5,
+                                              width=20,
+                                              height=20,
+                                              hover=True,
+                                              command=lambda: toggle_password1())
+            show_password_button.place(relx=0.4, rely=0.73, anchor='center')
 
             # Login Button (sends you to home page)
             login_button = TkinterCustomButton(master=login_inner_frame,
@@ -1373,6 +1412,15 @@ class LoginPage:
 
         root.bind('<Return>', enter_login)
 
+        # Changes password to be visible or not
+        def toggle_password1():
+            if password_entry.cget('show') == '':
+                password_entry.config(show='*')
+                toggle_label.config(text='Show Password')
+            else:
+                password_entry.config(show='')
+                toggle_label.config(text='Hide Password')
+
 
 class RegisterPage:
     first_name_var: StringVar
@@ -1391,6 +1439,7 @@ class RegisterPage:
         self.username_var = StringVar(value="")
         self.password_var = StringVar(value="")
         self.role_var = StringVar(value="")
+        self.conf_password_var = StringVar(value="")
 
         if last_page != "ResultsPage":
             last_page = "ResultsPage"
@@ -1420,45 +1469,52 @@ class RegisterPage:
 
             first_name_frame = Label(register_frame, text="First Name", background="#1F262A", foreground="white",
                                      font=20)
-            first_name_frame.place(relx=.16003, rely=.25)
+            first_name_frame.place(relx=.16003, rely=.2)
             first_name_entry = Entry(register_frame, textvariable=self.first_name_var, background="#2a3439",
                                      foreground="white", width=25, font=20)
-            first_name_entry.place(relx=.4, rely=.25)
+            first_name_entry.place(relx=.4, rely=.2)
 
             last_name_frame = Label(register_frame, text="Last Name", background="#1F262A", foreground="white", font=20)
-            last_name_frame.place(relx=.16001, rely=.35)
+            last_name_frame.place(relx=.16001, rely=.3)
             last_name_entry = Entry(register_frame, textvariable=self.last_name_var, background="#2a3439",
                                     foreground="white", width=25, font=20)
-            last_name_entry.place(relx=.4, rely=.35)
+            last_name_entry.place(relx=.4, rely=.3)
 
             username_frame = Label(register_frame, text="Username", background="#1F262A", foreground="white", font=20)
-            username_frame.place(relx=.1703, rely=.45)
+            username_frame.place(relx=.1703, rely=.4)
             username_entry = Entry(register_frame, textvariable=self.username_var, background="#2a3439",
                                    foreground="white",
                                    width=25, font=20)
-            username_entry.place(relx=.4, rely=.45)
+            username_entry.place(relx=.4, rely=.4)
 
             password_frame = Label(register_frame, text="Password", background="#1F262A", foreground="white", font=20)
-            password_frame.place(relx=.1703, rely=.55)
+            password_frame.place(relx=.1703, rely=.5)
             password_entry = Entry(register_frame, textvariable=self.password_var, background="#2a3439",
                                    foreground="white",
                                    width=25, font=20)
-            password_entry.place(relx=.4, rely=.55)
+            password_entry.place(relx=.4, rely=.5)
+
+            conf_password_frame = Label(register_frame, text="Confirm Password", background="#1F262A", foreground="white", font=20)
+            conf_password_frame.place(relx=.05, rely=.6)
+            conf_password_entry = Entry(register_frame, textvariable=self.conf_password_var, background="#2a3439",
+                                   foreground="white",
+                                   width=25, font=20)
+            conf_password_entry.place(relx=.4, rely=.6)
 
             # Label for roles
             role_frame = Label(register_frame, text="Role", background="#1F262A", foreground="white", font=20)
-            role_frame.place(relx=.25, rely=.65)
+            role_frame.place(relx=.25, rely=.7)
             # Style for radio buttons
             frame_style = ttk.Style()
             frame_style.configure("BW.TRadiobutton", background="#1F262A", foreground="white", highlightthickness=0)
             # Admin radio button
             admin_radio_button = ttk.Radiobutton(register_frame, text='Admin', variable=self.role_var, value='Admin',
                                                  style="BW.TRadiobutton")
-            admin_radio_button.place(relx=.4, rely=.65)
+            admin_radio_button.place(relx=.4, rely=.71)
             # User radio button
             user_radio_button = ttk.Radiobutton(register_frame, text='User', variable=self.role_var, value='User',
                                                 style="BW.TRadiobutton")
-            user_radio_button.place(relx=.60, rely=.65)
+            user_radio_button.place(relx=.60, rely=.71)
 
             # Create Account Button (sends you to login page)
             create_button = TkinterCustomButton(master=register_frame,
@@ -1474,7 +1530,7 @@ class RegisterPage:
                                                 hover=True,
                                                 command=lambda: [
                                                     enter_register() if valid_register() else registration_error()])
-            create_button.place(relx=0.35, rely=0.85, anchor='center')
+            create_button.place(relx=0.35, rely=0.9, anchor='center')
             ToolTip(create_button, "Create an account using the provided information.")
 
             # Back Button (sends you back to login page)
@@ -1490,7 +1546,7 @@ class RegisterPage:
                                               height=30,
                                               hover=True,
                                               command=lambda: [LoginPage()])
-            back_button.place(relx=0.65, rely=0.85, anchor='center')
+            back_button.place(relx=0.65, rely=0.9, anchor='center')
             ToolTip(back_button, "Go back to the Login Page.")
 
             # Register new user
@@ -1498,6 +1554,10 @@ class RegisterPage:
         def valid_register():
             global user_list
             valid = True
+
+            if self.password_var.get() != self.conf_password_var.get():
+                valid = False
+                return valid
 
             username = self.username_var.get()
             for i in range(len(user_list)):
@@ -1539,8 +1599,8 @@ class RegisterPage:
         def registration_error():
             error_message = LabelFrame(register_frame, bg="#1F262A", fg="red", font=10,
                                        text="Registration Error", relief=FLAT, labelanchor="n")
-            error_message.place(relx=0.5, rely=0.73, anchor="n")
-            error_message.config(height=19, width=340)
+            error_message.place(relx=0.5, rely=0.78, anchor="n")
+            error_message.config(height=20, width=170)
 
         root.bind('<Return>', enter_register)
 
@@ -1616,37 +1676,21 @@ class ApplicationResultsPage:
 
 class AdminPage:
     def __init__(self):
-        global root, last_page
+        global root
 
-        if last_page != "AdminPage":
-            last_page = "AdminPage"
-
-            for widget in root.winfo_children()[1:]:
+        for widget in root.winfo_children()[1:]:
                 widget.destroy()
 
-            root.configure(background="#2a3439")
-            style = ttk.Style(root)
-            style.theme_use('classic')
-            style.configure('Test.TSizegrip', background="#1F262A")
-            root_size_grip = ttk.Sizegrip(root)
+        root.configure(background="#2a3439")
+        style = ttk.Style(root)
+        style.theme_use('classic')
+        style.configure('Test.TSizegrip', background="#1F262A")
+        root_size_grip = ttk.Sizegrip(root)
 
-            root_size_grip.configure(style="Test.TSizegrip")
-            root_size_grip.pack(side="right", anchor=SE)
+        root_size_grip.configure(style="Test.TSizegrip")
+        root_size_grip.pack(side="right", anchor=SE)
 
-            # Dupe code?
-            """
-            # Register page frame
-            admin_frame = Frame(root, bg='#1F262A')
-            admin_frame.place(relx=0.5, rely=0.5, anchor='center')
-            admin_frame.config(height=400, width=800)
-            admin_frame.config(relief=RAISED)
-
-            # Container for users
-            admin_container = Frame(admin_frame, bg="#1F262A", borderwidth=2)
-            admin_container.place(relx=0.5, rely=0.1, anchor="n")
-            admin_container.config(relief=RIDGE)
-            """
-            AdminPage.print_admin()
+        AdminPage.print_admin()
 
     @staticmethod
     def print_admin():
@@ -1659,6 +1703,21 @@ class AdminPage:
         # Label: "Users"
         users_label = Label(admin_frame, text="Users", font=("Bold", 18), bg="#2a3439", fg="white")
         users_label.place(relx=0.1, rely=0.1)
+
+        # Refresh Button (unlocks account)
+        refresh_button = TkinterCustomButton(master=admin_frame,
+                                          bg_color="#2a3439",
+                                          fg_color="#56667A",
+                                          hover_color="#AAA9AD",
+                                          text_font=10,
+                                          text="Refresh",
+                                          text_color="white",
+                                          corner_radius=10,
+                                          width=100,
+                                          height=30,
+                                          hover=True,
+                                          command=lambda: [AdminPage()])
+        refresh_button.place(relx=0.1, rely=0.7)
 
         admin_canvas = Canvas(admin_frame, height=300, width=900, bg="#2a3439")
         admin_canvas.place(relx=0.5, rely=0.15, anchor="n")
@@ -1692,7 +1751,11 @@ class AdminPage:
 
 
             # Design around each result
-            admin_frame1 = Frame(admin_example, bg="white")
+            if int(user_list[i][5]) >= 5:
+                color = "coral1"
+            else:
+                color = "aquamarine1"
+            admin_frame1 = Frame(admin_example, bg=color)
             admin_frame1.config(height=5, width=860)
             admin_frame1.place(relx=0.5, rely=0.99, anchor="s")
 
@@ -1701,6 +1764,7 @@ class AdminPage:
             admin_sb = ttk.Scrollbar(admin_canvas, orient="vertical", command=admin_canvas.yview)
             admin_sb.place(relx=0.98, height=300)
             admin_canvas.configure(yscrollcommand=admin_sb.set)
+
 
 
 

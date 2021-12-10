@@ -184,21 +184,20 @@ def scan():
         base = base[:-4]
 
         update_pb()
-        record = cve.select_record_by_name(base)
+        record_query = cve.select_record_by_name(base)
         temp_list = []
         # This will add an entry to the results list with vulnerability from the CVE Database
-        if len(record) != 0:
-            temp_record = None
-            for i in record:
+        if len(record_query) != 0:
+            for i in record_query:
                 nvd_query = rate.website_query(i[0])
                 temp = i.copy()
                 temp.append(nvd_query[1])
-                temp_list.append((temp, float(nvd_query[0])))
+                temp_list.append((temp, float(nvd_query[0]), record))
             list_results.append(temp_list)
 
     destroy_pb()
     update_history()
-    ResultsPage.print_results()
+    ResultsPage.print_results('By Severity')
     title = 'A scan has been completed!'
     message = 'Please return to the Software Inventory Tool to view results.'
     notification.notify(title=title,
@@ -867,7 +866,6 @@ class ResultsPage:
         ignore_selected_button.place(relx=0.75, rely=0.8, anchor="center")
         ToolTip(ignore_selected_button, "Ignore all the selected programs that were flagged for available updates.")
 
-
         ignore_all_button = TkinterCustomButton(master=results_frame,
                                                 fg_color="#848689",
                                                 hover_color="#1F262A",
@@ -881,7 +879,6 @@ class ResultsPage:
                                                 command=lambda: [ResultsPage(), MainWindow()])
         ignore_all_button.place(relx=0.55, rely=0.8, anchor="center")
         ToolTip(ignore_all_button, "Ignore all the programs flagged for available updates.")
-
 
         ## Sort Settings
         sort_settings_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
@@ -914,6 +911,23 @@ class ResultsPage:
         opt.config(background="#1F262A", foreground="white", width=15, font=('Bold', 12))
         opt.grid()
 
+        ## Refresh the page
+        refresh_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
+        refresh_container.place(relx=0.1, rely=0.1)
+        refresh_container.config(relief=RIDGE)
+
+        refresh_button = TkinterCustomButton(master=results_frame,
+                                             fg_color="#848689",
+                                             hover_color="#1F262A",
+                                             text_font="Bold, 14",
+                                             text="Refresh",
+                                             text_color="white",
+                                             corner_radius=10,
+                                             width=120,
+                                             height=50,
+                                             hover=True,
+                                             command=lambda: ResultsPage.print_results(sort_variable.get()))
+        refresh_button.place(relx=0.275, rely=0)
 
         ## Filter settings
         filter_settings_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
@@ -921,7 +935,7 @@ class ResultsPage:
         filter_settings_container.config(relief=RIDGE)
 
         filter_label = ttk.Label(filter_settings_container, text='Filter Settings', font='2', background="#1F262A",
-                                foreground="white")
+                                 foreground="white")
         filter_label.grid(row=1, column=3, padx=50)
 
         filter_settings_1 = IntVar()
@@ -930,7 +944,6 @@ class ResultsPage:
 
         frame_style = ttk.Style()
         frame_style.configure("BW.TCheckbutton", background="#1F262A", foreground="white", highlightthickness=0)
-
 
         filter_button_1 = ttk.Checkbutton(filter_settings_container, text='Hide low', onvalue=1, offvalue=0,
                                           variable=filter_settings_1, style="BW.TCheckbutton")
@@ -954,13 +967,12 @@ class ResultsPage:
     # This will take the software found from a scan
     # And print them to the results page
     @staticmethod
-    def print_results():
+    def print_results(sorting):
         global sort_variable, list_results
 
         results_frame = Frame(root, bg="#2a3439")
         results_frame.place(relx=0.5, rely=0.1, anchor="n")
         results_frame.config(height=root.winfo_height(), width=root.winfo_width())
-
 
         # Calls function to put the update buttons back on the screen with the results
         ResultsPage.create_update_buttons(results_frame)
@@ -982,9 +994,27 @@ class ResultsPage:
         )
         results_canvas.create_window((0, 0), window=results_container, anchor="nw")
 
-        temp_list = []
-        for record in list_results:
-            pass
+        temp_list_results = []
+        results_list = []
+        print(list_results)
+        if sorting == 'By Time':
+            for record_list in list_results:
+                temp_list_results = []
+                for record in record_list:
+                    temp_list_results.append((record[0][-1], record))
+                temp_list_results.sort()
+                results_list.append(temp_list_results)
+            results_list.sort()
+            print(results_list)
+            list_results = []
+            for record in results_list:
+                list_results.append([record[0][-1]])
+        elif sorting == 'Alphabetically':
+            for record in list_results:
+                print(record)
+
+        for widget in results_container.winfo_children():
+            widget.destroy()
 
         # This loop will run for the amount of items that are found to have vulnerabilities in the Database
         # It will send a String to the results page with the information
@@ -992,7 +1022,7 @@ class ResultsPage:
         for i in range(len(list_results)):
             results_example = Frame(results_container, bg="#2a3439")
             results_example.config(height=50, width=860)
-            results_example1_label = Label(results_example, text=str(files_list[i].split('/')[-1]), font=14,
+            results_example1_label = Label(results_example, text=str(list_results[i][0][-1].split('/')[-1]), font=14,
                                            bg="#2a3439", fg="#FFFFFF")
 
             results_example1_label.place(relx=0.05, rely=0.5, anchor="w")
@@ -1045,8 +1075,6 @@ class ResultsPage:
                                        command=results_canvas.yview)
             results_sb.place(relx=0.98, height=results_canvas.winfo_height())
             results_canvas.configure(yscrollcommand=results_sb.set)
-
-
 
 
 class HelpPage:
@@ -1594,7 +1622,7 @@ class ApplicationResultsPage:
         root_size_grip.pack(side="right", anchor=SE)
 
         # Login username and Password labels and entries
-        file_name_label = Label(main_frame, text=files_list[result_num], font=15, background="#2a3439",
+        file_name_label = Label(main_frame, text=list_results[result_num][0][-1], font=15, background="#2a3439",
                                 foreground="white")
         file_name_label.grid(row=0, column=0)
 
@@ -1701,7 +1729,6 @@ class AdminPage:
             admin_sb = ttk.Scrollbar(admin_canvas, orient="vertical", command=admin_canvas.yview)
             admin_sb.place(relx=0.98, height=300)
             admin_canvas.configure(yscrollcommand=admin_sb.set)
-
 
 
 class ApplicationAdminPage:

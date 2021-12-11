@@ -1040,7 +1040,7 @@ class ResultsPage:
                 temp_list_results.append([rating, record_list])
             temp_list_results.sort()
             list_results = []
-            for record_list in temp_list_results:
+            for record_list in reversed(temp_list_results):
                 list_results.append(record_list[-1])
 
         elif sorting == 'By Time':
@@ -1063,7 +1063,7 @@ class ResultsPage:
             for record_list in list_results:
                 individual_record_list = []
                 for record in record_list:
-                    individual_record_list.append((record[-1].split('/')[-1], record))
+                    individual_record_list.append((record[-1].split('/')[-1].upper(), record))
                 individual_record_list.sort()
                 temp_list_results.append(individual_record_list)
             temp_list_results.sort()

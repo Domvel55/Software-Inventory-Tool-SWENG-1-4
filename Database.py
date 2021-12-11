@@ -26,7 +26,7 @@ class CVSSScorer:
         # Retrieves the body text and finds the base cvss score
         find_score = soup.find('baseScore')
         find_date = soup.find('publishedDate')
-        temp_tup = (soup[find_score+11:find_score+14],soup[find_date+16:find_date+26])
+        temp_tup = (soup[find_score+11:find_score+14], soup[find_date+16:find_date+26])
         return temp_tup
 
 

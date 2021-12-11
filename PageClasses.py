@@ -142,14 +142,17 @@ def update_pb():
     results_progressbar['value'] += (100 / len(files_list))
     root.update_idletasks()
 
+
 def destroy_pb():
     global results_progressbar
     results_progressbar.destroy()
+
 
 def stop():
     global stopped
     stopped = True
     destroy_pb()
+
 
 def start():
     global stopped
@@ -181,19 +184,20 @@ def scan():
         base = base[:-4]
 
         update_pb()
-        record = cve.select_record_by_name(base)
+        record_query = cve.select_record_by_name(base)
         temp_list = []
         # This will add an entry to the results list with vulnerability from the CVE Database
-        if len(record) != 0:
-            temp_record = None
-            for i in record:
-                rating = float(rate.website_query(i[0]))
-                temp_list.append((i, rating))
+        if len(record_query) != 0:
+            for i in record_query:
+                nvd_query = rate.website_query(i[0])
+                temp = i.copy()
+                temp.append(nvd_query[1])
+                temp_list.append((temp, float(nvd_query[0]), record))
             list_results.append(temp_list)
 
     destroy_pb()
     update_history()
-    ResultsPage.print_results()
+    ResultsPage.print_results('By Severity')
     title = 'A scan has been completed!'
     message = 'Please return to the Software Inventory Tool to view results.'
     notification.notify(title=title,
@@ -315,6 +319,7 @@ class MakeWindow:
                                           hover=True,
                                           command=lambda: [HelpPage(), change_help_button()])
         help_button.pack(side=LEFT, padx=5)
+
 
         # This will change the color of the home button when clicked on
         # This will also change the color of all the other buttons back to default
@@ -472,10 +477,25 @@ class MainWindow:
                 admin_button.place(relx=0.8, rely=0.85, anchor='center')
                 ToolTip(schedule_scan_button, "See users")
 
+            # Create Logout Button
+            logout_button = TkinterCustomButton(master=main_frame, bg_color="#2a3439",
+                                                fg_color="#1F262A",
+                                                hover_color="#AAA9AD",
+                                                text_font="Bold, 14",
+                                                text="Logout",
+                                                text_color="white",
+                                                corner_radius=10,
+                                                width=80,
+                                                height=40,
+                                                hover=True,
+                                                command=lambda: [LoginPage()])
+            logout_button.place(relx=0.05, rely=0.69, anchor="n")
+
 
 # Contains the history of the program.
 # Creates the page that contains the history.
 class HistoryPage:
+
     def __init__(self):
         global root
         global last_page
@@ -758,10 +778,8 @@ class ScanConfirmPage:
 
 # This will create the results page
 class ResultsPage:
-
     def __init__(self):
-        global root
-        global last_page
+        global root, last_page
 
         # Does a check to see if the page we are currently on to not reload page
         if last_page != "ResultsPage":
@@ -807,6 +825,17 @@ class ResultsPage:
     # Function to create the update buttons before and after have results
     @staticmethod
     def create_update_buttons(results_frame):
+        search_bar = Frame(results_frame)
+        search_bar.config(height=50, width=50, relief=RIDGE)
+        global search_entry
+        search_entry = Entry(search_bar, bg="#5B676D", fg="white", width=50)
+        search_entry.insert(0, 'Search...')
+        search_entry.pack(side=LEFT, fill=BOTH, expand=1)
+        search_button = Button(search_bar, text='Search', bg="#1F262A", fg="white", activebackground="#5F4B66",
+                               activeforeground="white", command=lambda: ResultsPage.search(search_entry.get()))
+        search_button.pack(side=RIGHT)
+        search_bar.place(relx=0.40, rely=0.1)
+
         update_all_button = TkinterCustomButton(master=results_frame,
                                                 fg_color="#848689",
                                                 hover_color="#1F262A",
@@ -845,7 +874,7 @@ class ResultsPage:
                                             width=100,
                                             height=50,
                                             hover=True,
-                                            command=lambda: None)
+                                            command=lambda: [ResultsPage(), MainWindow()])
         cancel_button.place(relx=0.9, rely=0.8, anchor="center")
         ToolTip(cancel_button, "Go back to the home page.")
 
@@ -863,7 +892,6 @@ class ResultsPage:
         ignore_selected_button.place(relx=0.75, rely=0.8, anchor="center")
         ToolTip(ignore_selected_button, "Ignore all the selected programs that were flagged for available updates.")
 
-
         ignore_all_button = TkinterCustomButton(master=results_frame,
                                                 fg_color="#848689",
                                                 hover_color="#1F262A",
@@ -878,11 +906,12 @@ class ResultsPage:
         ignore_all_button.place(relx=0.55, rely=0.8, anchor="center")
         ToolTip(ignore_all_button, "Ignore all the programs flagged for available updates.")
 
-        filter_settings_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
-        filter_settings_container.place(relx=0.04, rely=0.0, anchor="nw")
-        filter_settings_container.config(relief=RIDGE)
+        ## Sort Settings
+        sort_settings_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
+        sort_settings_container.place(relx=0.04, rely=0.0, anchor="nw")
+        sort_settings_container.config(relief=RIDGE)
 
-        sort_scan_label = Label(filter_settings_container, text='Sort scan results...', font='2', bg='#2a3439',
+        sort_scan_label = Label(sort_settings_container, text='Sort scan results...', font='2', bg='#2a3439',
                                 fg="white")
 
         style_element = ttk.Style()  # Creating style element
@@ -900,13 +929,57 @@ class ResultsPage:
             "Alphabetically"
         ]
         global sort_variable
-        sort_variable = StringVar(filter_settings_container)
+        sort_variable = StringVar(sort_settings_container)
         # Default sorting is by severity
         sort_variable.set("By Severity")
 
-        opt = OptionMenu(filter_settings_container, sort_variable, *option_list)
+        opt = OptionMenu(sort_settings_container, sort_variable, *option_list)
         opt.config(background="#1F262A", foreground="white", width=15, font=('Bold', 12))
         opt.grid()
+
+        ## Refresh the page
+        refresh_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
+        refresh_container.place(relx=0.1, rely=0.1)
+        refresh_container.config(relief=RIDGE)
+
+        refresh_button = TkinterCustomButton(master=results_frame,
+                                             fg_color="#848689",
+                                             hover_color="#1F262A",
+                                             text_font="Bold, 14",
+                                             text="Refresh",
+                                             text_color="white",
+                                             corner_radius=10,
+                                             width=120,
+                                             height=50,
+                                             hover=True,
+                                             command=lambda: ResultsPage.print_results(sort_variable.get()))
+        refresh_button.place(relx=0.275, rely=0)
+
+        ## Filter settings
+        filter_settings_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
+        filter_settings_container.place(relx=0.4, rely=0.0, anchor="nw")
+        filter_settings_container.config(relief=RIDGE)
+
+        filter_label = ttk.Label(filter_settings_container, text='Filter Settings', font='2', background="#1F262A",
+                                 foreground="white")
+        filter_label.grid(row=1, column=3, padx=50)
+
+        filter_settings_1 = IntVar()
+        filter_settings_2 = IntVar()
+        filter_settings_3 = IntVar()
+
+        frame_style = ttk.Style()
+        frame_style.configure("BW.TCheckbutton", background="#1F262A", foreground="white", highlightthickness=0)
+
+        filter_button_1 = ttk.Checkbutton(filter_settings_container, text='Hide low', onvalue=1, offvalue=0,
+                                          variable=filter_settings_1, style="BW.TCheckbutton")
+        filter_button_1.grid(row=2, column=2)
+        filter_button_2 = ttk.Checkbutton(filter_settings_container, text='Hide medium', onvalue=1, offvalue=0,
+                                          variable=filter_settings_2, style="BW.TCheckbutton")
+        filter_button_2.grid(row=2, column=3)
+        filter_button_3 = ttk.Checkbutton(filter_settings_container, text='Hide high', onvalue=1, offvalue=0,
+                                          variable=filter_settings_3, style="BW.TCheckbutton")
+        filter_button_3.grid(row=2, column=4)
 
         style = ttk.Style(root)
         style.theme_use('classic')
@@ -920,12 +993,16 @@ class ResultsPage:
     # This will take the software found from a scan
     # And print them to the results page
     @staticmethod
-    def print_results():
-        global sort_variable, list_results
+    def print_results(sorting):
+        global sort_variable, list_results, results_names, results_container
+        # This list stores program names as displayed in results.
+        # Used by Search Bar.
+        results_names = []
 
         results_frame = Frame(root, bg="#2a3439")
         results_frame.place(relx=0.5, rely=0.1, anchor="n")
         results_frame.config(height=root.winfo_height(), width=root.winfo_width())
+
         # Calls function to put the update buttons back on the screen with the results
         ResultsPage.create_update_buttons(results_frame)
 
@@ -937,9 +1014,36 @@ class ResultsPage:
         results_container.place(relx=0.5, rely=0.1, anchor="n")
         results_container.config(relief=RIDGE, height=350, width=900)
 
-        temp_list = []
-        for record in list_results:
-            pass
+        # Bind scrollbar to container
+        results_container.bind(
+            "<Configure>",
+            lambda e: results_canvas.configure(
+                scrollregion=results_canvas.bbox("all")
+            )
+        )
+        results_canvas.create_window((0, 0), window=results_container, anchor="nw")
+
+        temp_list_results = []
+        results_list = []
+        print(list_results)
+        if sorting == 'By Time':
+            for record_list in list_results:
+                temp_list_results = []
+                for record in record_list:
+                    temp_list_results.append((record[0][-1], record))
+                temp_list_results.sort()
+                results_list.append(temp_list_results)
+            results_list.sort()
+            print(results_list)
+            list_results = []
+            for record in results_list:
+                list_results.append([record[0][-1]])
+        elif sorting == 'Alphabetically':
+            for record in list_results:
+                print(record)
+
+        for widget in results_container.winfo_children():
+            widget.destroy()
 
         # This loop will run for the amount of items that are found to have vulnerabilities in the Database
         # It will send a String to the results page with the information
@@ -947,10 +1051,11 @@ class ResultsPage:
         for i in range(len(list_results)):
             results_example = Frame(results_container, bg="#2a3439")
             results_example.config(height=50, width=860)
-            results_example1_label = Label(results_example, text=str(files_list[i].split('/')[-1]), font=14,
+            results_example1_label = Label(results_example, text=str(list_results[i][0][-1].split('/')[-1]), font=14,
                                            bg="#2a3439", fg="#FFFFFF")
-
+            results_names.append(results_example1_label.cget("text"))
             results_example1_label.place(relx=0.05, rely=0.5, anchor="w")
+
             # Selection Boxes
             var = IntVar()
             selection_box = Checkbutton(results_example, variable=var, onvalue=1, offvalue=0, bg="#2a3439")
@@ -959,6 +1064,7 @@ class ResultsPage:
             results_example.grid(row=i, column=0, padx=10, pady=5)
 
             rating = 0
+
             # Getting the score and changing the color to match the
             for j in list_results[i]:
                 rating += j[1]
@@ -986,6 +1092,36 @@ class ResultsPage:
             rate_frame1 = Frame(results_example, bg=color)
             rate_frame1.config(height=5, width=860)
             rate_frame1.place(relx=0.5, rely=0.99, anchor="s")
+
+            # Label for Flags
+            flags_label = Label(results_example, text="Days:", font=14, bg=color, fg="black")
+            flags_label.config(height=2, width=8)
+            flags_label.place(relx=0.8, rely=0.5, anchor="w")
+
+        # Scrollbar if more than 5 files are selected
+        if len(list_results) > 5:
+            results_sb = ttk.Scrollbar(results_canvas, orient="vertical",
+                                       command=results_canvas.yview)
+            results_sb.place(relx=0.98, height=results_canvas.winfo_height())
+            results_canvas.configure(yscrollcommand=results_sb.set)
+
+    # If search bar is empty, re-print original results.
+    # Otherwise, hide results that don't contain the keyword;
+    # Leave those that do.
+    def search(keyword):
+        if keyword == '':
+            ResultsPage.print_results(sort_variable.get())
+        elif not any(keyword in result for result in results_names):
+            search_entry.insert(0, "No results match keyword ")
+        else:
+            for widget in results_container.winfo_children():
+                if widget.winfo_class() == 'Frame':
+                    for child in widget.winfo_children():
+                        if child.winfo_class() == 'Label' and '.' in child.cget("text"):
+                            if keyword in child.cget("text"):
+                                pass
+                            else:
+                                widget.grid_forget()
 
 
 class HelpPage:
@@ -1193,6 +1329,9 @@ class LoginPage:
 
             for widget in root.winfo_children()[1:]:
                 widget.destroy()
+            for widget in title_bar.winfo_children()[4:]:
+                widget.destroy()
+
 
             style = ttk.Style(root)
             style.theme_use('classic')
@@ -1227,11 +1366,32 @@ class LoginPage:
             password_label = Label(login_inner_frame, text='Password', font=15, background="#2a3439",
                                    foreground="white")
             password_label.place(relx=0.5, rely=0.53, anchor='center')
-            password_entry = Entry(login_inner_frame, textvariable=password_var, show=' ', background="#1F262A",
+            password_entry = Entry(login_inner_frame, textvariable=password_var, show='*', background="#1F262A",
                                    insertbackground="#1F262A",
                                    foreground="white",
                                    font=15)
             password_entry.place(relx=0.5, rely=0.63, anchor='center')
+            global show_pass
+            show_pass = False
+
+            toggle_label = Label(login_inner_frame, text='Show Password', font='Bold, 10', background="#2a3439",
+                                   foreground="grey")
+            toggle_label.place(relx=0.52, rely=0.73, anchor='center')
+
+            # Create Show Password Button
+            show_password_button = TkinterCustomButton(master=login_inner_frame,
+                                              bg_color="#2a3439",
+                                              fg_color="#56667A",
+                                              hover_color="#AAA9AD",
+                                              text_font="Bold, 12",
+                                              text=" ",
+                                              text_color="white",
+                                              corner_radius=5,
+                                              width=20,
+                                              height=20,
+                                              hover=True,
+                                              command=lambda: toggle_password1())
+            show_password_button.place(relx=0.4, rely=0.73, anchor='center')
 
             # Login Button (sends you to home page)
             login_button = TkinterCustomButton(master=login_inner_frame,
@@ -1312,6 +1472,15 @@ class LoginPage:
 
         root.bind('<Return>', enter_login)
 
+        # Changes password to be visible or not
+        def toggle_password1():
+            if password_entry.cget('show') == '':
+                password_entry.config(show='*')
+                toggle_label.config(text='Show Password')
+            else:
+                password_entry.config(show='')
+                toggle_label.config(text='Hide Password')
+
 
 class RegisterPage:
     first_name_var: StringVar
@@ -1330,6 +1499,7 @@ class RegisterPage:
         self.username_var = StringVar(value="")
         self.password_var = StringVar(value="")
         self.role_var = StringVar(value="")
+        self.conf_password_var = StringVar(value="")
 
         if last_page != "ResultsPage":
             last_page = "ResultsPage"
@@ -1359,45 +1529,52 @@ class RegisterPage:
 
             first_name_frame = Label(register_frame, text="First Name", background="#1F262A", foreground="white",
                                      font=20)
-            first_name_frame.place(relx=.16003, rely=.25)
+            first_name_frame.place(relx=.16003, rely=.2)
             first_name_entry = Entry(register_frame, textvariable=self.first_name_var, background="#2a3439",
                                      foreground="white", width=25, font=20)
-            first_name_entry.place(relx=.4, rely=.25)
+            first_name_entry.place(relx=.4, rely=.2)
 
             last_name_frame = Label(register_frame, text="Last Name", background="#1F262A", foreground="white", font=20)
-            last_name_frame.place(relx=.16001, rely=.35)
+            last_name_frame.place(relx=.16001, rely=.3)
             last_name_entry = Entry(register_frame, textvariable=self.last_name_var, background="#2a3439",
                                     foreground="white", width=25, font=20)
-            last_name_entry.place(relx=.4, rely=.35)
+            last_name_entry.place(relx=.4, rely=.3)
 
             username_frame = Label(register_frame, text="Username", background="#1F262A", foreground="white", font=20)
-            username_frame.place(relx=.1703, rely=.45)
+            username_frame.place(relx=.1703, rely=.4)
             username_entry = Entry(register_frame, textvariable=self.username_var, background="#2a3439",
                                    foreground="white",
                                    width=25, font=20)
-            username_entry.place(relx=.4, rely=.45)
+            username_entry.place(relx=.4, rely=.4)
 
             password_frame = Label(register_frame, text="Password", background="#1F262A", foreground="white", font=20)
-            password_frame.place(relx=.1703, rely=.55)
+            password_frame.place(relx=.1703, rely=.5)
             password_entry = Entry(register_frame, textvariable=self.password_var, background="#2a3439",
                                    foreground="white",
                                    width=25, font=20)
-            password_entry.place(relx=.4, rely=.55)
+            password_entry.place(relx=.4, rely=.5)
+
+            conf_password_frame = Label(register_frame, text="Confirm Password", background="#1F262A", foreground="white", font=20)
+            conf_password_frame.place(relx=.05, rely=.6)
+            conf_password_entry = Entry(register_frame, textvariable=self.conf_password_var, background="#2a3439",
+                                   foreground="white",
+                                   width=25, font=20)
+            conf_password_entry.place(relx=.4, rely=.6)
 
             # Label for roles
             role_frame = Label(register_frame, text="Role", background="#1F262A", foreground="white", font=20)
-            role_frame.place(relx=.25, rely=.65)
+            role_frame.place(relx=.25, rely=.7)
             # Style for radio buttons
             frame_style = ttk.Style()
             frame_style.configure("BW.TRadiobutton", background="#1F262A", foreground="white", highlightthickness=0)
             # Admin radio button
             admin_radio_button = ttk.Radiobutton(register_frame, text='Admin', variable=self.role_var, value='Admin',
                                                  style="BW.TRadiobutton")
-            admin_radio_button.place(relx=.4, rely=.65)
+            admin_radio_button.place(relx=.4, rely=.71)
             # User radio button
             user_radio_button = ttk.Radiobutton(register_frame, text='User', variable=self.role_var, value='User',
                                                 style="BW.TRadiobutton")
-            user_radio_button.place(relx=.60, rely=.65)
+            user_radio_button.place(relx=.60, rely=.71)
 
             # Create Account Button (sends you to login page)
             create_button = TkinterCustomButton(master=register_frame,
@@ -1413,7 +1590,7 @@ class RegisterPage:
                                                 hover=True,
                                                 command=lambda: [
                                                     enter_register() if valid_register() else registration_error()])
-            create_button.place(relx=0.35, rely=0.85, anchor='center')
+            create_button.place(relx=0.35, rely=0.9, anchor='center')
             ToolTip(create_button, "Create an account using the provided information.")
 
             # Back Button (sends you back to login page)
@@ -1429,7 +1606,7 @@ class RegisterPage:
                                               height=30,
                                               hover=True,
                                               command=lambda: [LoginPage()])
-            back_button.place(relx=0.65, rely=0.85, anchor='center')
+            back_button.place(relx=0.65, rely=0.9, anchor='center')
             ToolTip(back_button, "Go back to the Login Page.")
 
             # Register new user
@@ -1437,6 +1614,10 @@ class RegisterPage:
         def valid_register():
             global user_list
             valid = True
+
+            if self.password_var.get() != self.conf_password_var.get():
+                valid = False
+                return valid
 
             username = self.username_var.get()
             for i in range(len(user_list)):
@@ -1478,8 +1659,8 @@ class RegisterPage:
         def registration_error():
             error_message = LabelFrame(register_frame, bg="#1F262A", fg="red", font=10,
                                        text="Registration Error", relief=FLAT, labelanchor="n")
-            error_message.place(relx=0.5, rely=0.73, anchor="n")
-            error_message.config(height=19, width=340)
+            error_message.place(relx=0.5, rely=0.78, anchor="n")
+            error_message.config(height=20, width=170)
 
         root.bind('<Return>', enter_register)
 
@@ -1533,7 +1714,7 @@ class ApplicationResultsPage:
         root_size_grip.pack(side="right", anchor=SE)
 
         # Login username and Password labels and entries
-        file_name_label = Label(main_frame, text=files_list[result_num], font=15, background="#2a3439",
+        file_name_label = Label(main_frame, text=list_results[result_num][0][-1], font=15, background="#2a3439",
                                 foreground="white")
         file_name_label.grid(row=0, column=0)
 
@@ -1547,8 +1728,8 @@ class ApplicationResultsPage:
 
                 rating = j[1]
 
-                cvss_score_label = Label(main_frame, text=rating, font=15, background="#2a3439",
-                                         foreground="white")
+                cvss_score_label = Label(main_frame, text=str(f'Rating: {rating}    Date: {record[-1]}'), font=15,
+                                         background="#2a3439", foreground="white")
                 cvss_score_label.grid(row=count, column=1)
                 count += 1
 
@@ -1556,37 +1737,24 @@ class ApplicationResultsPage:
 class AdminPage:
     def __init__(self):
         global root
-        global last_page
 
-        if last_page != "AdminPage":
-            last_page = "AdminPage"
-
-            for widget in root.winfo_children()[1:]:
+        for widget in root.winfo_children()[1:]:
                 widget.destroy()
 
-            root.configure(background="#2a3439")
-            style = ttk.Style(root)
-            style.theme_use('classic')
-            style.configure('Test.TSizegrip', background="#1F262A")
-            root_size_grip = ttk.Sizegrip(root)
+        root.configure(background="#2a3439")
+        style = ttk.Style(root)
+        style.theme_use('classic')
+        style.configure('Test.TSizegrip', background="#1F262A")
+        root_size_grip = ttk.Sizegrip(root)
 
-            root_size_grip.configure(style="Test.TSizegrip")
-            root_size_grip.pack(side="right", anchor=SE)
+        root_size_grip.configure(style="Test.TSizegrip")
+        root_size_grip.pack(side="right", anchor=SE)
 
-            # Register page frame
-            admin_frame = Frame(root, bg='#1F262A')
-            admin_frame.place(relx=0.5, rely=0.5, anchor='center')
-            admin_frame.config(height=400, width=800)
-            admin_frame.config(relief=RAISED)
+        AdminPage.print_admin()
 
-            # Container for users
-            admin_container = Frame(admin_frame, bg="#1F262A", borderwidth=2)
-            admin_container.place(relx=0.5, rely=0.1, anchor="n")
-            admin_container.config(relief=RIDGE)
-
-        AdminPage.print_admin(self, user_list)
-
-    def print_admin(self, user_list):
+    @staticmethod
+    def print_admin():
+        global user_list
 
         admin_frame = Frame(root, bg="#2a3439")
         admin_frame.place(relx=0.5, rely=0.1, anchor="n")
@@ -1595,6 +1763,21 @@ class AdminPage:
         # Label: "Users"
         users_label = Label(admin_frame, text="Users", font=("Bold", 18), bg="#2a3439", fg="white")
         users_label.place(relx=0.1, rely=0.1)
+
+        # Refresh Button (unlocks account)
+        refresh_button = TkinterCustomButton(master=admin_frame,
+                                          bg_color="#2a3439",
+                                          fg_color="#56667A",
+                                          hover_color="#AAA9AD",
+                                          text_font=10,
+                                          text="Refresh",
+                                          text_color="white",
+                                          corner_radius=10,
+                                          width=100,
+                                          height=30,
+                                          hover=True,
+                                          command=lambda: [AdminPage()])
+        refresh_button.place(relx=0.1, rely=0.7)
 
         admin_canvas = Canvas(admin_frame, height=300, width=900, bg="#2a3439")
         admin_canvas.place(relx=0.5, rely=0.15, anchor="n")
@@ -1626,16 +1809,21 @@ class AdminPage:
                 admin_example.bind("<Button-1>", new_user_page)
                 admin_example.grid(row=i, column=0, padx=10, pady=5)
 
+
             # Design around each result
-            admin_frame1 = Frame(admin_example, bg="white")
+            if int(user_list[i][5]) >= 5:
+                color = "coral1"
+            else:
+                color = "aquamarine1"
+            admin_frame1 = Frame(admin_example, bg=color)
             admin_frame1.config(height=5, width=860)
             admin_frame1.place(relx=0.5, rely=0.99, anchor="s")
 
-            # Scrollbar if more than 5 results are displayed
-            if len(user_list) > 5:
-                admin_sb = ttk.Scrollbar(admin_canvas, orient="vertical", command=admin_canvas.yview)
-                admin_sb.place(relx=0.98, height=admin_canvas.winfo_height())
-                admin_canvas.configure(yscrollcommand=admin_sb.set)
+        # Scrollbar if more than 5 users are displayed
+        if len(user_list) > 5:
+            admin_sb = ttk.Scrollbar(admin_canvas, orient="vertical", command=admin_canvas.yview)
+            admin_sb.place(relx=0.98, height=300)
+            admin_canvas.configure(yscrollcommand=admin_sb.set)
 
 
 class ApplicationAdminPage:

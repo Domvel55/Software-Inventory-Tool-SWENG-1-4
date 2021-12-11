@@ -1973,6 +1973,7 @@ class ApplicationAdminPage:
             account_status = "Locked"
             account_status_label2.config(text=account_status)
 
+
         # Updates account status to unlocked
         def account_unlock():
             global account_status

@@ -3,7 +3,7 @@
     This is the file that contains all the different functions to create/destroy the different
     windows that generate from clicking buttons on the GUI
     This file was entirely made by the Puffins Team
-    Version:11.5.2021
+    Version:12.11.2021
 """
 
 from tkinter import *
@@ -1143,10 +1143,15 @@ class ResultsPage:
     # Leave those that do.
     def search(keyword):
         if keyword == '':
-            ResultsPage.print_results(sort_variable.get(), filter_settings)
+            for result in results_container.winfo_children():
+                if result.winfo_class() == 'Frame':
+                    result.grid()
         elif not any(keyword in result for result in results_names):
             search_entry.insert(0, "No results match keyword ")
         else:
+            for result in results_container.winfo_children():
+                if result.winfo_class() == 'Frame':
+                    result.grid()
             for widget in results_container.winfo_children():
                 if widget.winfo_class() == 'Frame':
                     for child in widget.winfo_children():
@@ -1155,6 +1160,7 @@ class ResultsPage:
                                 pass
                             else:
                                 widget.grid_forget()
+
 
 class HelpPage:
 

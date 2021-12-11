@@ -827,6 +827,17 @@ class ResultsPage:
     # Function to create the update buttons before and after have results
     @staticmethod
     def create_update_buttons(results_frame):
+        search_bar = Frame(results_frame)
+        search_bar.config(height=50, width=50, relief=RIDGE)
+        global search_entry
+        search_entry = Entry(search_bar, bg="#5B676D", fg="white", width=50)
+        search_entry.insert(0, 'Search...')
+        search_entry.pack(side=LEFT, fill=BOTH, expand=1)
+        search_button = Button(search_bar, text='Search', bg="#1F262A", fg="white", activebackground="#5F4B66",
+                               activeforeground="white", command=lambda: ResultsPage.search(search_entry.get()))
+        search_button.pack(side=RIGHT)
+        search_bar.place(relx=0.40, rely=0.1)
+
         update_all_button = TkinterCustomButton(master=results_frame,
                                                 fg_color="#848689",
                                                 hover_color="#1F262A",
@@ -988,7 +999,11 @@ class ResultsPage:
     # And print them to the results page
     @staticmethod
     def print_results(sorting, filter_settings):
-        global sort_variable, list_results
+        global sort_variable, list_results, results_names, results_container
+
+        # This list stores program names as displayed in results.
+        # Used by Search Bar.
+        results_names = []
 
         results_frame = Frame(root, bg="#2a3439")
         results_frame.place(relx=0.5, rely=0.1, anchor="n")
@@ -1071,7 +1086,7 @@ class ResultsPage:
             results_example.config(height=50, width=860)
             results_example1_label = Label(results_example, text=str(list_results[i][0][-1].split('/')[-1]), font=14,
                                            bg="#2a3439", fg="#FFFFFF")
-
+            results_names.append(results_example1_label.cget("text"))
             results_example1_label.place(relx=0.05, rely=0.5, anchor="w")
 
             # Selection Boxes
@@ -1123,6 +1138,23 @@ class ResultsPage:
                 results_sb.place(relx=0.98, height=results_canvas.winfo_height())
                 results_canvas.configure(yscrollcommand=results_sb.set)
 
+    # If search bar is empty, re-print original results.
+    # Otherwise, hide results that don't contain the keyword;
+    # Leave those that do.
+    def search(keyword):
+        if keyword == '':
+            ResultsPage.print_results(sort_variable.get(), filter_settings)
+        elif not any(keyword in result for result in results_names):
+            search_entry.insert(0, "No results match keyword ")
+        else:
+            for widget in results_container.winfo_children():
+                if widget.winfo_class() == 'Frame':
+                    for child in widget.winfo_children():
+                        if child.winfo_class() == 'Label' and '.' in child.cget("text"):
+                            if keyword in child.cget("text"):
+                                pass
+                            else:
+                                widget.grid_forget()
 
 class HelpPage:
 
@@ -1940,6 +1972,7 @@ class ApplicationAdminPage:
             global account_status
             account_status = "Locked"
             account_status_label2.config(text=account_status)
+
 
         # Updates account status to unlocked
         def account_unlock():

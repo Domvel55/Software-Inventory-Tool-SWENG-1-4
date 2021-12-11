@@ -192,7 +192,9 @@ def scan():
                 nvd_query = rate.website_query(i[0])
                 temp = i.copy()
                 temp.append(nvd_query[1])
-                temp_list.append((temp, float(nvd_query[0]), record))
+                temp.append(nvd_query[0])
+                temp.append(record)
+                temp_list.append(temp)
             list_results.append(temp_list)
 
     destroy_pb()
@@ -1010,23 +1012,50 @@ class ResultsPage:
         results_canvas.create_window((0, 0), window=results_container, anchor="nw")
 
         temp_list_results = []
-        results_list = []
-        print(list_results)
-        if sorting == 'By Time':
+        individual_record_list = []
+        if sorting == 'By Severity':
             for record_list in list_results:
-                temp_list_results = []
+                rating = 0.0
                 for record in record_list:
-                    temp_list_results.append((record[0][-1], record))
-                temp_list_results.sort()
-                results_list.append(temp_list_results)
-            results_list.sort()
-            print(results_list)
+                    rating += float(record[-2])
+                rating = rating / float(len(record_list))
+                temp_list_results.append([rating, record_list])
+            temp_list_results.sort()
             list_results = []
-            for record in results_list:
-                list_results.append([record[0][-1]])
+            for record_list in temp_list_results:
+                list_results.append(record_list[-1])
+
+        elif sorting == 'By Time':
+            for record_list in list_results:
+                individual_record_list = []
+                for record in record_list:
+                    individual_record_list.append((record[-3], record))
+                individual_record_list.sort()
+                temp_list_results.append(individual_record_list)
+            temp_list_results.sort()
+            list_results = []
+            temp_list = []
+            for record_list in temp_list_results:
+                temp_list = []
+                for record in record_list:
+                    temp_list.append(record[-1])
+                list_results.append(temp_list)
+
         elif sorting == 'Alphabetically':
-            for record in list_results:
-                print(record)
+            for record_list in list_results:
+                individual_record_list = []
+                for record in record_list:
+                    individual_record_list.append((record[-1].split('/')[-1], record))
+                individual_record_list.sort()
+                temp_list_results.append(individual_record_list)
+            temp_list_results.sort()
+            list_results = []
+            temp_list = []
+            for record_list in temp_list_results:
+                temp_list = []
+                for record in record_list:
+                    temp_list.append(record[-1])
+                list_results.append(temp_list)
 
         for widget in results_container.winfo_children():
             widget.destroy()
@@ -1053,7 +1082,7 @@ class ResultsPage:
 
             # Getting the score and changing the color to match the
             for j in list_results[i]:
-                rating += j[1]
+                rating += float(j[-2])
             rating = rating / float(len(list_results[i]))
 
             if rating < 4:
@@ -1689,14 +1718,11 @@ class ApplicationResultsPage:
         for i in range(len(list_results)):
             count = 1
             for j in list_results[result_num]:
-                record = j[0]
-                cvss_name_label = Label(main_frame, text=record[0], font=15, background="#2a3439",
+                cvss_name_label = Label(main_frame, text=j[0], font=15, background="#2a3439",
                                         foreground="white")
                 cvss_name_label.grid(row=count, column=0)
 
-                rating = j[1]
-
-                cvss_score_label = Label(main_frame, text=str(f'Rating: {rating}    Date: {record[-1]}'), font=15,
+                cvss_score_label = Label(main_frame, text=str(f'Rating: {j[-2]}    Date: {j[-3]}'), font=15,
                                          background="#2a3439", foreground="white")
                 cvss_score_label.grid(row=count, column=1)
                 count += 1

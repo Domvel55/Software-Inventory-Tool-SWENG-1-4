@@ -22,7 +22,7 @@ stopped = False
 
 now = "Last Scanned: ----"
 sort_variable = None
-files_list, user_list, history_list, list_results = [], [], [], []
+files_list, user_list, history_list, list_results, filter_settings = [], [], [], [], []
 name, role, last_page = "", "", ""
 results_progressbar = None
 
@@ -199,7 +199,7 @@ def scan():
 
     destroy_pb()
     update_history()
-    ResultsPage.print_results('By Severity')
+    ResultsPage.print_results('By Severity', filter_settings)
     title = 'A scan has been completed!'
     message = 'Please return to the Software Inventory Tool to view results.'
     notification.notify(title=title,
@@ -943,7 +943,7 @@ class ResultsPage:
                                              width=120,
                                              height=50,
                                              hover=True,
-                                             command=lambda: ResultsPage.print_results(sort_variable.get()))
+                                             command=lambda: ResultsPage.print_results(sort_variable.get(), filter_settings))
         refresh_button.place(relx=0.275, rely=0)
 
         ## Filter settings
@@ -953,24 +953,27 @@ class ResultsPage:
 
         filter_label = ttk.Label(filter_settings_container, text='Filter Settings', font='2', background="#1F262A",
                                  foreground="white")
-        filter_label.grid(row=1, column=3, padx=50)
+        filter_label.grid(row=1, column=2, columnspan=2)
 
-        filter_settings_1 = IntVar()
-        filter_settings_2 = IntVar()
-        filter_settings_3 = IntVar()
+        for i in range(4):
+            filter_settings.append(IntVar())
+
 
         frame_style = ttk.Style()
         frame_style.configure("BW.TCheckbutton", background="#1F262A", foreground="white", highlightthickness=0)
 
         filter_button_1 = ttk.Checkbutton(filter_settings_container, text='Hide low', onvalue=1, offvalue=0,
-                                          variable=filter_settings_1, style="BW.TCheckbutton")
-        filter_button_1.grid(row=2, column=2)
+                                          variable=filter_settings[0], style="BW.TCheckbutton")
+        filter_button_1.grid(row=2, column=1, padx=20)
         filter_button_2 = ttk.Checkbutton(filter_settings_container, text='Hide medium', onvalue=1, offvalue=0,
-                                          variable=filter_settings_2, style="BW.TCheckbutton")
-        filter_button_2.grid(row=2, column=3)
+                                          variable=filter_settings[1], style="BW.TCheckbutton")
+        filter_button_2.grid(row=2, column=2, padx=20)
         filter_button_3 = ttk.Checkbutton(filter_settings_container, text='Hide high', onvalue=1, offvalue=0,
-                                          variable=filter_settings_3, style="BW.TCheckbutton")
-        filter_button_3.grid(row=2, column=4)
+                                          variable=filter_settings[2], style="BW.TCheckbutton")
+        filter_button_3.grid(row=2, column=3, padx=20)
+        filter_button_4 = ttk.Checkbutton(filter_settings_container, text='Hide critical', onvalue=1, offvalue=0,
+                                          variable=filter_settings[3], style="BW.TCheckbutton")
+        filter_button_4.grid(row=2, column=4, padx=20)
 
         style = ttk.Style(root)
         style.theme_use('classic')
@@ -984,7 +987,7 @@ class ResultsPage:
     # This will take the software found from a scan
     # And print them to the results page
     @staticmethod
-    def print_results(sorting):
+    def print_results(sorting, filter_settings):
         global sort_variable, list_results
 
         results_frame = Frame(root, bg="#2a3439")
@@ -1113,12 +1116,12 @@ class ResultsPage:
             flags_label.config(height=2, width=8)
             flags_label.place(relx=0.8, rely=0.5, anchor="w")
 
-        # Scrollbar if more than 5 files are selected
-        if len(list_results) > 5:
-            results_sb = ttk.Scrollbar(results_canvas, orient="vertical",
-                                       command=results_canvas.yview)
-            results_sb.place(relx=0.98, height=results_canvas.winfo_height())
-            results_canvas.configure(yscrollcommand=results_sb.set)
+            # Scrollbar if more than 5 files are selected
+            if len(list_results) > 5:
+                results_sb = ttk.Scrollbar(results_canvas, orient="vertical",
+                                           command=results_canvas.yview)
+                results_sb.place(relx=0.98, height=results_canvas.winfo_height())
+                results_canvas.configure(yscrollcommand=results_sb.set)
 
 
 class HelpPage:
@@ -1147,13 +1150,6 @@ class HelpPage:
             help_canvas = Canvas(helper_frame, bg="#2a3439", highlightthickness=0)
             help_canvas.pack(side=LEFT, fill=BOTH, expand=1)
 
-            help_sb = ttk.Scrollbar(helper_frame, orient=VERTICAL, command=help_canvas.yview)
-            help_sb.pack(side=RIGHT, fill=Y)
-
-            help_canvas.configure(yscrollcommand=help_sb.set)
-            help_canvas.bind('<Configure>',
-                             lambda e: help_canvas.configure(scrollregion=help_canvas.bbox("all")))
-
             # <editor-fold desc="Results GUI">
             # Frame for whole results page
             help_frame = Frame(help_canvas)
@@ -1168,7 +1164,7 @@ class HelpPage:
             # Help tip examples
             help_example1 = Frame(help_frame, bg="#2a3439")
             help_example1.place(relx=0.5, rely=0.02, anchor="n")
-            help_example1.config(height=285, width=900)
+            help_example1.config(height=200, width=900)
             help_example1_header_label = Label(help_example1, text='How to use the program:', font=24, bg="#2a3439",
                                                fg="#FFFFFF")
             help_example1_header_label.place(relx=0.01, rely=0.1, anchor="nw")
@@ -1190,7 +1186,7 @@ class HelpPage:
 
             help_example2 = Frame(help_frame, bg="#2a3439")
             help_example2.place(relx=0.5, rely=0.02, anchor="n")
-            help_example2.config(height=200, width=900)
+            help_example2.config(height=150, width=900)
             help_example2_header_label = Label(help_example2, text='How the Vulnerabilities are scored:', font=24,
                                                bg="#2a3439", fg="#FFFFFF")
             help_example2_header_label.place(relx=0.01, rely=0.1, anchor="nw")
@@ -1198,7 +1194,7 @@ class HelpPage:
             text2 = """ To score the vulnerabilities we will be interfacing with the a CVSS 2.0 scorer.
                     CVSS or better known as the Common Vulnerability Scoring System will take in a number of parameters
                     in order to delivery an accurate threat score. Some of the items taken into account when calculating
-                    a score are the Access Vector, Access Complexity, Authentication, Confidentiality Impact, Integrity Impact, 
+                    a score are the Access Vector, Access Complexity, Authentication, Confidentiality Impact, Integrity Impact,
                     and lastly the Availability Impact.
             """ \
                 .replace('\n', ' ').replace('                    ', '')
@@ -1208,7 +1204,7 @@ class HelpPage:
 
             help_example3 = Frame(help_frame, bg="#2a3439")
             help_example3.place(relx=0.5, rely=0.02, anchor="n")
-            help_example3.config(height=200, width=900)
+            help_example3.config(height=150, width=900)
             help_example3_header_label = Label(help_example3, text="What databases we're checking against:", font=24,
                                                bg="#2a3439", fg="#FFFFFF")
             help_example3_header_label.place(relx=0.01, rely=0.1, anchor="nw")

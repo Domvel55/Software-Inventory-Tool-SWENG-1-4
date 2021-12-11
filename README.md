@@ -1,11 +1,11 @@
 #Software Inventory Tool
 ![img.png](img.png)
 
-The Software inventory tool or SIEVE is a tool used to detect vunerabilities in the 
+The Software inventory tool or SIEVE is a tool used to detect vulnerabilities in the 
 applications in a computers file system. The SIEVE uses the NVD Database to search for 
 any programs you have decided to scan for. If a program is found in the database, it wll
-be shown on the results page as a button. If you click the text, you will be able to recieve more
-information about the vunerability that was detected. 
+be shown on the results page as a button. If you click the text, you will be able to receive more
+information about the vulnerability that was detected. 
 
 **Creators**           
 This tool was created by the Puffins Team including
@@ -32,6 +32,6 @@ This tool was created by the Puffins Team including
 * Lastly, if a user is an admin while registering, they will have access to a special menu
   * They will have access to the admin menu, from here they will be able to lock/unlock user accounts
 
-**Instalation**
+**Installation**
 
 To install the tool copy this repository and run main

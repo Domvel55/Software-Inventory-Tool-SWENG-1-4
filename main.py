@@ -1,10 +1,12 @@
-'''
+"""
     This is the main.py class for the Software Inventory Tool Project
     This is the main file that will generate the whole of the GUI
     This file imports from the PageClasses.py and tkinter_custom_button files
     This file was entirely made by the Puffins Team
     Version:10.20.2021
-'''
+
+
+"""
 import PageClasses
 from PageClasses import *
 from PageClasses import root as root

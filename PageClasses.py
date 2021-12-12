@@ -880,6 +880,12 @@ class ResultsPage:
         cancel_button.place(relx=0.9, rely=0.8, anchor="center")
         ToolTip(cancel_button, "Go back to the home page.")
 
+
+        def ignore_selected():
+            for i in range(len(list_results)):
+                #if var.get():
+                    print(list_results[i] + "checked")
+
         ignore_selected_button = TkinterCustomButton(master=results_frame,
                                                      fg_color="#8797AF",
                                                      hover_color="#1F262A",
@@ -890,7 +896,7 @@ class ResultsPage:
                                                      width=200,
                                                      height=75,
                                                      hover=True,
-                                                     command=lambda: None)
+                                                     command= lambda: [ignore_selected()])
         ignore_selected_button.place(relx=0.75, rely=0.8, anchor="center")
         ToolTip(ignore_selected_button, "Ignore all the selected programs that were flagged for available updates.")
 
@@ -1127,9 +1133,10 @@ class ResultsPage:
             rate_frame1.place(relx=0.5, rely=0.99, anchor="s")
 
             # Label for Flags
-            flags_label = Label(results_example, text="Days:", font=14, bg=color, fg="black")
-            flags_label.config(height=2, width=8)
-            flags_label.place(relx=0.8, rely=0.5, anchor="w")
+            flags_label = Label(results_example, text="Date of Discovery: "+list_results[i-1][-1][-3], font=8, bg=color, fg="black")
+            flags_label.config(height=2, width=30)
+            flags_label.place(relx=0.5, rely=0.5, anchor="w")
+
 
             # Scrollbar if more than 5 files are selected
             if len(list_results) > 5:

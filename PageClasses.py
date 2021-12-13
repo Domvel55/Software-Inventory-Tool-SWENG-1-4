@@ -170,6 +170,9 @@ def start():
 def update_comments(result_num, text):
     history_comments[history_counter] = {result_num: text}
 
+def reset_results_list():
+    global list_results
+    list_results.clear()
 
 # This will scan the Database
 # This function will be called no matter which config is decided on
@@ -688,7 +691,7 @@ class ScanConfirmPage:
 
         def browse_files():
             global files_list
-            filenames = filedialog.askopenfilenames(initialdir="C:\Program Files",
+            filenames = filedialog.askopenfilenames(initialdir="C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
                                                     title="Select Files",
                                                     filetypes=(("all files",
                                                                 "*.*"),
@@ -918,7 +921,7 @@ class ResultsPage:
                                                 width=200,
                                                 height=75,
                                                 hover=True,
-                                                command=lambda: [ResultsPage(), MainWindow()])
+                                                command=lambda: [ResultsPage(), MainWindow(), reset_results_list()])
         ignore_all_button.place(relx=0.55, rely=0.8, anchor="center")
         ToolTip(ignore_all_button, "Ignore all the programs flagged for available updates.")
 
@@ -1174,23 +1177,55 @@ class ResultsPage:
                 results_sb.place(relx=0.98, height=300)
                 results_canvas.configure(yscrollcommand=results_sb.set)
 
-    # If search bar is empty, re-print original results.
-    # Otherwise, hide results that don't contain the keyword;
-    # Leave those that do.
-    def search(keyword):
-        if keyword == '':
-            ResultsPage.print_results(sort_variable.get(), filter_settings)
-        elif not any(keyword in result for result in results_names):
-            search_entry.insert(0, "No results match keyword ")
-        else:
-            for widget in results_container.winfo_children():
-                if widget.winfo_class() == 'Frame':
-                    for child in widget.winfo_children():
-                        if child.winfo_class() == 'Label' and '.' in child.cget("text"):
-                            if keyword in child.cget("text"):
-                                pass
-                            else:
-                                widget.grid_forget()
+
+            # This list stores names of programs in results whose checkboxes are selected.
+            selected_list = []
+
+            selection_box.config(command=lambda: ResultsPage.append_selected_list(result_name))
+
+            # Each check button gets this function as a command
+            # with the name of the program as displayed in the result
+            # as a parameter.
+            def append_selected_list(program_name):
+                if program_name in selected_list:
+                    selected_list.remove(program_name)
+                else:
+                    selected_list.append(program_name)
+                print("selected_list: ")
+                print(selected_list)
+
+            @staticmethod
+            def update_selected():
+                for program in selected_list:
+                    for widget in results_container.winfo_children():
+                        if widget.winfo_class() == 'Frame':
+                            for child in widget.winfo_children():
+                                if child.winfo_class() == 'Label' and program == child.cget("text"):
+                                    print("Update " + program)
+                                    widget.grid_forget()
+
+        # If search bar is empty, re-print original results.
+        # Otherwise, hide results that don't contain the keyword;
+        # Leave those that do.
+        def search(keyword):
+            if keyword == '':
+                for result in results_container.winfo_children():
+                    if result.winfo_class() == 'Frame':
+                        result.grid()
+            elif not any(keyword in result for result in results_names):
+                search_entry.insert(0, "No results match keyword ")
+            else:
+                for result in results_container.winfo_children():
+                    if result.winfo_class() == 'Frame':
+                        result.grid()
+                for widget in results_container.winfo_children():
+                    if widget.winfo_class() == 'Frame':
+                        for child in widget.winfo_children():
+                            if child.winfo_class() == 'Label' and '.' in child.cget("text"):
+                                if keyword in child.cget("text"):
+                                    pass
+                                else:
+                                    widget.grid_forget()
 
 
 class HelpPage:

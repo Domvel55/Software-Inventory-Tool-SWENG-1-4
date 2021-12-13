@@ -21,7 +21,9 @@ stopped = False
 
 now = "Last Scanned: ----"
 sort_variable = None
+history_counter = 0
 files_list, user_list, history_list, list_results, filter_settings = [], [], [], [], []
+history_comments = {}
 name, role, last_page = "", "", ""
 results_progressbar = None
 
@@ -127,8 +129,9 @@ def frame_mapped(e):
 
 
 def update_history():
-    global list_results
+    global list_results, history_counter
     history_list.append([now, list_results])
+    history_counter += 1
 
 
 def unlock_account(user_num):
@@ -162,6 +165,10 @@ def start():
     stopped = False
     files_list.clear()
     list_results.clear()
+
+
+def update_comments(result_num, text):
+    history_comments[history_counter] = {result_num: text}
 
 
 # This will scan the Database
@@ -1719,7 +1726,7 @@ class RegisterPage:
 
 
 class ApplicationResultsPage:
-    global list_results
+    global list_results, history_comments
 
     def __init__(self, result_num):
         # Toplevel object which will
@@ -1766,26 +1773,39 @@ class ApplicationResultsPage:
         root_size_grip.configure(style="Test.TSizegrip")
         root_size_grip.pack(side="right", anchor=SE)
 
+        submit_comment_button = TkinterCustomButton(master=main_frame,
+                                                fg_color="#848689",
+                                                hover_color="#1F262A",
+                                                text_font="Bold, 14",
+                                                text="Submit Comment",
+                                                text_color="white",
+                                                corner_radius=10,
+                                                width=170,
+                                                height=35,
+                                                hover=True,
+                                                command=lambda: update_comments(result_num, comment_text.get("1.0", 'end-1c')))
+        submit_comment_button.grid(row=0, column=0)
+
         # Login username and Password labels and entries
         file_name_label = Label(main_frame, text=list_results[result_num][0][-1], font=15, background="#2a3439",
                                 foreground="white")
-        file_name_label.grid(row=0, column=0)
+        file_name_label.grid(row=1, column=0)
 
         for i in range(len(list_results)):
-            count = 1
+            count = 2
             for j in list_results[result_num]:
-                cvss_name_label = Label(main_frame, text=j[0], font=15, background="#2a3439",
-                                        foreground="white")
-                cvss_name_label.grid(row=count, column=0)
-
-                cvss_score_label = Label(main_frame, text=str(f'Rating: {j[-2]}    Date: {j[-3]}'), font=15,
-                                         background="#2a3439", foreground="white")
-                cvss_score_label.grid(row=count, column=1)
+                cvss_score_label = Label(main_frame, text=str(f'CVE: {j[0]}     Rating: {j[-2]}    Date: {j[-3]}'),
+                                         font=15, background="#2a3439", foreground="white")
+                cvss_score_label.grid(row=count, column=0)
                 count += 1
+
+        comment_text = Text(main_frame, font=15, background="#2a3439", foreground="white",
+                            height=10, width=30)
+        comment_text.grid(row=count+1, column=0)
 
 
 class HistoryLogPage:
-    global history_list
+    global history_list, history_comments
 
     def __init__(self, result_num):
         # Toplevel object which will
@@ -1833,6 +1853,7 @@ class HistoryLogPage:
         root_size_grip.pack(side="right", anchor=SE)
 
         count = 0
+        record_counter = 0
         for record_list in history_list[result_num][1]:
 
             # Login username and Password labels and entries
@@ -1842,16 +1863,20 @@ class HistoryLogPage:
             count += 1
 
             for record in record_list:
-
-                cve_name_label = Label(main_frame, text=record[0], font=15, background="#2a3439",
-                                                foreground="white")
-                cve_name_label.grid(row=count, column=0)
-
-                cve_score_label = Label(main_frame, text=str(f'Rating: {record[-2]}    Date: {record[-3]}'), font=15,
-                                                 background="#2a3439", foreground="white")
-                cve_score_label.grid(row=count, column=1)
+                cvss_score_label = Label(main_frame, text=str(f'CVE: {record[0]}     Rating: {record[-2]}    Date: {record[-3]}'),
+                                         font=15, background="#2a3439", foreground="white")
+                cvss_score_label.grid(row=count, column=0)
                 count += 1
-            count += 1
+            try:
+                comment_label = Label(main_frame, text=f'Comments: \n{history_comments[history_counter][record_counter]}',
+                                  font=15, background="#2a3439", foreground="white")
+                comment_label.grid(row=count+1, column=0)
+            except:
+                comment_label = Label(main_frame, text='No Comments',
+                                      font=15, background="#2a3439", foreground="white")
+                comment_label.grid(row=count + 1, column=0)
+            count += 2
+            record_counter += 1
 
 
 class AdminPage:

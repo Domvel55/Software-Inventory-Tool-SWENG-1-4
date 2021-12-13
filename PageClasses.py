@@ -189,16 +189,13 @@ def scan():
         # This will add an entry to the results list with vulnerability from the CVE Database
         if len(record_query) != 0:
             for i in record_query:
-                try:
-                    nvd_query = rate.website_query(i[0])
-                    temp = i.copy()
-                    temp.append(nvd_query[1])
-                    temp.append(float(nvd_query[0]))
-                    temp.append(record)
-                    temp_list.append(temp)
-                except ValueError:
-                    print("You just tried to convert text into a float, sorry, that isn't allowed.")
-                    continue
+                nvd_query = rate.website_query(i[0])
+                sleep(0.75)
+                temp = i.copy()
+                temp.append(nvd_query[1])
+                temp.append(nvd_query[0])
+                temp.append(record)
+                temp_list.append(temp)
             list_results.append(temp_list)
 
     destroy_pb()

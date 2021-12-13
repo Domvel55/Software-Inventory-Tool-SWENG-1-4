@@ -16,10 +16,8 @@ from plyer import notification
 from ctypes import windll
 import threading
 
-
 global stopped
 stopped = False
-
 
 now = "Last Scanned: ----"
 sort_variable = None
@@ -64,7 +62,6 @@ def move_app(e):
     root.geometry(f'+{e.x_root}+{e.y_root}')
 
 
-
 def set_appwindow(root):
     hwnd = windll.user32.GetParent(root.winfo_id())
     style = windll.user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
@@ -88,8 +85,6 @@ def minimizer(e):
     root.state('iconic')
 
 
-
-
 def maximize_me(e):
     if not root.maximized:  # if the window was not maximized
         root.normal_size = root.geometry()
@@ -106,6 +101,10 @@ def maximize_me(e):
 
 def new_page(e):
     ApplicationResultsPage(e.widget.grid_info()['row'])
+
+
+def history_page(e):
+    HistoryLogPage(e.widget.grid_info()['row'])
 
 
 def new_user_page(e):
@@ -298,7 +297,9 @@ class MakeWindow:
                                              width=65,
                                              height=40,
                                              hover=True,
-                                             command=lambda: [ResultsPage(), change_results_button(), ResultsPage.print_results(sort_variable.get(), filter_settings)])
+                                             command=lambda: [ResultsPage(), change_results_button(),
+                                                              ResultsPage.print_results(sort_variable.get(),
+                                                                                        filter_settings)])
         results_button.pack(side=LEFT, padx=5)
 
         # Create Settings Button
@@ -329,10 +330,10 @@ class MakeWindow:
                                           command=lambda: [HelpPage(), change_help_button()])
         help_button.pack(side=LEFT, padx=5)
 
-
         # This will change the color of the home button when clicked on
         # This will also change the color of all the other buttons back to default
         global change_home_button, change_results_button, change_settings_button, change_help_button
+
         def change_home_button():
             home_button.configure_color(fg_color="#5F4B66", text_color="white")
             results_button.configure_color(fg_color="#1F262A", text_color="white")
@@ -572,7 +573,7 @@ class HistoryPage:
                 history_example1_label = Label(history_example, text=str(history_list[i][0]), font=10,
                                                bg="#2a3439", fg="#FFFFFF")
                 history_example1_label.place(relx=0.01, rely=0.5, anchor="w")
-                history_example.bind("<Button-1>", new_page)
+                history_example.bind("<Button-1>", history_page)
                 history_example.grid(row=i, column=0, padx=10, pady=5)
 
             # Design around each result
@@ -640,7 +641,7 @@ class ScanConfirmPage:
                                                   width=200,
                                                   height=75,
                                                   hover=True,
-                                                  command=lambda: [last_time_clicked(),start(),  x.start()])
+                                                  command=lambda: [last_time_clicked(), start(), x.start()])
             continue_button.place(relx=0.25, rely=0.8, anchor="center")
             ToolTip(continue_button, "Continue onto the scanning process.")
 
@@ -773,7 +774,7 @@ class ScanConfirmPage:
                                             width=100,
                                             height=50,
                                             hover=True,
-                                            command=lambda:[ResultsPage(), MainWindow(), x.stop(), stop()])
+                                            command=lambda: [ResultsPage(), MainWindow(), x.stop(), stop()])
         cancel_button.place(relx=0.70, rely=0.8, anchor="center")
         ToolTip(cancel_button, "Go back to the home page.")
 
@@ -822,7 +823,6 @@ class ResultsPage:
             results_files_frame = Frame(results_container, bg="#2a3439")
             results_files_frame.place(relx=0.5, rely=0.02, anchor="n")
             results_files_frame.config(height=50, width=900)
-
 
             # </editor-fold>
 
@@ -882,11 +882,10 @@ class ResultsPage:
         cancel_button.place(relx=0.9, rely=0.8, anchor="center")
         ToolTip(cancel_button, "Go back to the home page.")
 
-
         def ignore_selected():
             for i in range(len(list_results)):
-                #if var.get():
-                    print(list_results[i] + "checked")
+                # if var.get():
+                print(list_results[i] + "checked")
 
         ignore_selected_button = TkinterCustomButton(master=results_frame,
                                                      fg_color="#8797AF",
@@ -898,7 +897,7 @@ class ResultsPage:
                                                      width=200,
                                                      height=75,
                                                      hover=True,
-                                                     command= lambda: [ignore_selected()])
+                                                     command=lambda: [ignore_selected()])
         ignore_selected_button.place(relx=0.75, rely=0.8, anchor="center")
         ToolTip(ignore_selected_button, "Ignore all the selected programs that were flagged for available updates.")
 
@@ -962,7 +961,8 @@ class ResultsPage:
                                              width=50,
                                              height=50,
                                              hover=True,
-                                             command=lambda: ResultsPage.print_results(sort_variable.get(), filter_settings))
+                                             command=lambda: ResultsPage.print_results(sort_variable.get(),
+                                                                                       filter_settings))
         refresh_button.place(relx=0.31, rely=0.025)
 
         ## Filter settings
@@ -976,7 +976,6 @@ class ResultsPage:
 
         for i in range(4):
             filter_settings.append(IntVar())
-
 
         frame_style = ttk.Style()
         frame_style.configure("BW.TCheckbutton", background="#1F262A", foreground="white", highlightthickness=0)
@@ -1138,8 +1137,6 @@ class ResultsPage:
             results_example.bind("<Button-1>", new_page)
             results_example.grid(row=i, column=0, padx=10, pady=5)
 
-
-
             # Label for Rating
             rating_label = Label(results_example, text=rating, font=14, bg=color, fg="black")
             rating_label.config(height=2, width=7)
@@ -1152,11 +1149,12 @@ class ResultsPage:
 
             # Label for Flags
 
-            #takes the oldest date a vulnerablility was discovered and compares it to the current date
-            #If 50 days or more, will setup a flag
+            # takes the oldest date a vulnerablility was discovered and compares it to the current date
+            # If 50 days or more, will setup a flag
             limit = datetime.timedelta(days=50)
-            compareDate = list_results[i-1][-1][-3].rsplit("-")
-            daysSince = datetime.date.today() - datetime.date(int(compareDate[0]), int(compareDate[1]), int(compareDate[2]))
+            compareDate = list_results[i - 1][-1][-3].rsplit("-")
+            daysSince = datetime.date.today() - datetime.date(int(compareDate[0]), int(compareDate[1]),
+                                                              int(compareDate[2]))
             if daysSince >= limit:
                 flags_label = Label(results_example, text="Flagged More than 50 Days Old", font=8, bg=color, fg="black")
                 flags_label.config(height=2, width=30)
@@ -1186,6 +1184,7 @@ class ResultsPage:
                                 pass
                             else:
                                 widget.grid_forget()
+
 
 class HelpPage:
 
@@ -1286,6 +1285,7 @@ class HelpPage:
             help_example2.grid(row=1, column=0, padx=10, pady=5)
             help_example3.grid(row=2, column=0, padx=10, pady=5)
 
+
 class SettingsPage:
 
     def __init__(self):
@@ -1385,7 +1385,6 @@ class LoginPage:
             for widget in title_bar.winfo_children()[4:]:
                 widget.destroy()
 
-
             style = ttk.Style(root)
             style.theme_use('classic')
             style.configure('Test.TSizegrip', background="#1F262A")
@@ -1428,22 +1427,22 @@ class LoginPage:
             show_pass = False
 
             toggle_label = Label(login_inner_frame, text='Show Password', font='Bold, 10', background="#2a3439",
-                                   foreground="grey")
+                                 foreground="grey")
             toggle_label.place(relx=0.52, rely=0.73, anchor='center')
 
             # Create Show Password Button
             show_password_button = TkinterCustomButton(master=login_inner_frame,
-                                              bg_color="#2a3439",
-                                              fg_color="#56667A",
-                                              hover_color="#AAA9AD",
-                                              text_font="Bold, 12",
-                                              text=" ",
-                                              text_color="white",
-                                              corner_radius=2,
-                                              width=20,
-                                              height=20,
-                                              hover=True,
-                                              command=lambda: toggle_password1())
+                                                       bg_color="#2a3439",
+                                                       fg_color="#56667A",
+                                                       hover_color="#AAA9AD",
+                                                       text_font="Bold, 12",
+                                                       text=" ",
+                                                       text_color="white",
+                                                       corner_radius=2,
+                                                       width=20,
+                                                       height=20,
+                                                       hover=True,
+                                                       command=lambda: toggle_password1())
             show_password_button.place(relx=0.4, rely=0.73, anchor='center')
 
             # Login Button (sends you to home page)
@@ -1607,11 +1606,12 @@ class RegisterPage:
                                    width=25, font=20)
             password_entry.place(relx=.4, rely=.5)
 
-            conf_password_frame = Label(register_frame, text="Confirm Password", background="#1F262A", foreground="white", font=20)
+            conf_password_frame = Label(register_frame, text="Confirm Password", background="#1F262A",
+                                        foreground="white", font=20)
             conf_password_frame.place(relx=.05, rely=.6)
             conf_password_entry = Entry(register_frame, textvariable=self.conf_password_var, background="#2a3439",
-                                   foreground="white",
-                                   width=25, font=20)
+                                        foreground="white",
+                                        width=25, font=20)
             conf_password_entry.place(relx=.4, rely=.6)
 
             # Label for roles
@@ -1784,12 +1784,82 @@ class ApplicationResultsPage:
                 count += 1
 
 
+class HistoryLogPage:
+    global history_list
+
+    def __init__(self, result_num):
+        # Toplevel object which will
+        # be treated as a new window
+        new_window = Toplevel(root)
+
+        # Toplevel widget
+        new_window.title("New Window")
+
+        # Window background color
+        new_window.configure(background="#2a3439")
+
+        # Scaling UI to user's screen
+        app_width = 1064
+        app_height = 600
+        screen_width = new_window.winfo_screenwidth()
+        screen_height = new_window.winfo_screenheight()
+        x = (screen_width / 2) - (app_width / 2)
+        y = (screen_height / 2) - (app_height / 2)
+        new_window.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
+
+        new_window.resizable(True, True)
+
+        # Changes the default tkinter to our Sieve logo when minimized
+        new_window.iconbitmap('logo.ico')
+
+        # Change the text after minimizing the tool to task bar
+        new_window.title("Sieve")
+
+        # Removes title bar
+        # newWindow.overrideredirect(True)
+        # newWindow.minimized = False  # only to know if root is minimized
+        # newWindow.maximized = False  # only to know if root is maximized
+
+        main_frame = Frame(new_window, bg="#2a3439")
+        main_frame.place(relx=0.5, rely=0.1, anchor="n")
+        main_frame.config(height=new_window.winfo_height(), width=new_window.winfo_width())
+
+        style = ttk.Style(new_window)
+        style.theme_use('classic')
+        style.configure('Test.TSizegrip', background="#1F262A")
+        root_size_grip = ttk.Sizegrip(new_window)
+
+        root_size_grip.configure(style="Test.TSizegrip")
+        root_size_grip.pack(side="right", anchor=SE)
+
+        count = 0
+        for record_list in history_list[result_num][1]:
+
+            # Login username and Password labels and entries
+            file_name_label = Label(main_frame, text=record_list[0][-1], font=15, background="#2a3439",
+                                    foreground="white")
+            file_name_label.grid(row=count, column=0)
+            count += 1
+
+            for record in record_list:
+
+                cve_name_label = Label(main_frame, text=record[0], font=15, background="#2a3439",
+                                                foreground="white")
+                cve_name_label.grid(row=count, column=0)
+
+                cve_score_label = Label(main_frame, text=str(f'Rating: {record[-2]}    Date: {record[-3]}'), font=15,
+                                                 background="#2a3439", foreground="white")
+                cve_score_label.grid(row=count, column=1)
+                count += 1
+            count += 1
+
+
 class AdminPage:
     def __init__(self):
         global root
 
         for widget in root.winfo_children()[1:]:
-                widget.destroy()
+            widget.destroy()
 
         root.configure(background="#2a3439")
         style = ttk.Style(root)
@@ -1816,17 +1886,17 @@ class AdminPage:
 
         # Refresh Button (unlocks account)
         refresh_button = TkinterCustomButton(master=admin_frame,
-                                          bg_color="#2a3439",
-                                          fg_color="#56667A",
-                                          hover_color="#AAA9AD",
-                                          text_font=10,
-                                          text="Refresh",
-                                          text_color="white",
-                                          corner_radius=10,
-                                          width=100,
-                                          height=30,
-                                          hover=True,
-                                          command=lambda: [AdminPage()])
+                                             bg_color="#2a3439",
+                                             fg_color="#56667A",
+                                             hover_color="#AAA9AD",
+                                             text_font=10,
+                                             text="Refresh",
+                                             text_color="white",
+                                             corner_radius=10,
+                                             width=100,
+                                             height=30,
+                                             hover=True,
+                                             command=lambda: [AdminPage()])
         refresh_button.place(relx=0.1, rely=0.7)
 
         admin_canvas = Canvas(admin_frame, height=300, width=900, bg="#2a3439")
@@ -1858,7 +1928,6 @@ class AdminPage:
                 admin_example1_label.place(relx=0.01, rely=0.5, anchor="w")
                 admin_example.bind("<Button-1>", new_user_page)
                 admin_example.grid(row=i, column=0, padx=10, pady=5)
-
 
             # Design around each result
             if int(user_list[i][5]) >= 5:

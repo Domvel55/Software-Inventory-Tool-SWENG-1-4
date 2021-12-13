@@ -156,6 +156,5 @@ def call_main():
 if __name__ == '__main__':
     call_main()
     read_config()
-    x = threading.Thread(target=root.mainloop(), args=(1,))
-    x.start()
+    root.mainloop()
     write_config()

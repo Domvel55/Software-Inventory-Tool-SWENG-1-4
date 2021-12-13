@@ -15,6 +15,10 @@ import datetime
 from plyer import notification
 from ctypes import windll
 import threading
+import yaml
+
+
+
 
 global stopped
 stopped = False
@@ -63,6 +67,7 @@ def move_app(e):
     root.geometry(f'+{e.x_root}+{e.y_root}')
 
 
+
 def set_appwindow(root):
     hwnd = windll.user32.GetParent(root.winfo_id())
     style = windll.user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
@@ -84,6 +89,8 @@ def minimizer(e):
     root.overrideredirect(False)
     boolTest = TRUE
     root.state('iconic')
+
+
 
 
 def maximize_me(e):
@@ -949,17 +956,17 @@ class ResultsPage:
         refresh_container.config(relief=RIDGE)
 
         refresh_button = TkinterCustomButton(master=results_frame,
-                                             fg_color="#848689",
+                                             fg_color="#2a3439",
                                              hover_color="#1F262A",
-                                             text_font="Bold, 14",
-                                             text="Refresh",
+                                             text_font="Bold, 24",
+                                             text="⟳",
                                              text_color="white",
                                              corner_radius=10,
-                                             width=120,
+                                             width=50,
                                              height=50,
                                              hover=True,
                                              command=lambda: ResultsPage.print_results(sort_variable.get(), filter_settings))
-        refresh_button.place(relx=0.275, rely=0)
+        refresh_button.place(relx=0.31, rely=0.025)
 
         ## Filter settings
         filter_settings_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
@@ -1239,7 +1246,7 @@ class HelpPage:
                     this will bring you to a page where you can change options such as font size and the way items are 
                     sorted to make the tool as easy to use as possible.""" \
                 .replace('\n', ' ').replace('                    ', '')
-            help_example1_body_label = Label(help_example1, text=text1, font=16, bg="#2a3439", fg="#FFFFFF",
+            help_example1_body_label = Label(help_example1, text=text1, font=14, bg="#2a3439", fg="#FFFFFF",
                                              wraplength=880, justify="left")
             help_example1_body_label.place(relx=0.01, rely=0.25, anchor="nw")
 
@@ -1438,7 +1445,7 @@ class LoginPage:
                                               text_font="Bold, 12",
                                               text=" ",
                                               text_color="white",
-                                              corner_radius=5,
+                                              corner_radius=2,
                                               width=20,
                                               height=20,
                                               hover=True,

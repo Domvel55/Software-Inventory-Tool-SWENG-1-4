@@ -200,7 +200,9 @@ def scan():
 
     destroy_pb()
     update_history()
+    ResultsPage()
     ResultsPage.print_results('By Severity', filter_settings)
+    change_results_button()
     title = 'A scan has been completed!'
     message = 'Please return to the Software Inventory Tool to view results.'
     notification.notify(title=title,
@@ -292,7 +294,7 @@ class MakeWindow:
                                              width=65,
                                              height=40,
                                              hover=True,
-                                             command=lambda: [ResultsPage(), change_results_button()])
+                                             command=lambda: [ResultsPage(), change_results_button(), ResultsPage.print_results(sort_variable.get(), filter_settings)])
         results_button.pack(side=LEFT, padx=5)
 
         # Create Settings Button
@@ -326,6 +328,7 @@ class MakeWindow:
 
         # This will change the color of the home button when clicked on
         # This will also change the color of all the other buttons back to default
+        global change_home_button, change_results_button, change_settings_button, change_help_button
         def change_home_button():
             home_button.configure_color(fg_color="#5F4B66", text_color="white")
             results_button.configure_color(fg_color="#1F262A", text_color="white")
@@ -367,7 +370,7 @@ class MainWindow:
 
         if last_page != "HomePage":
             last_page = "HomePage"
-
+            change_home_button()
             for widget in root.winfo_children()[1:]:
                 widget.destroy()
 
@@ -816,13 +819,7 @@ class ResultsPage:
             results_files_frame.place(relx=0.5, rely=0.02, anchor="n")
             results_files_frame.config(height=50, width=900)
 
-            for i in range(6):
-                results_example = Frame(results_container, bg="#2a3439")
-                results_example.config(height=50, width=900)
-                results_example1_label = Label(results_example, text=f'Software {i}', font=14, bg="#2a3439",
-                                               fg="#5B676D")
-                results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
-                results_example.grid(row=i, column=0, padx=10, pady=5)
+
             # </editor-fold>
 
     # Function to create the update buttons before and after have results

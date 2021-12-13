@@ -5,7 +5,7 @@
     This file was entirely made by the Puffins Team
     Version:11.5.2021
 """
-
+from time import sleep
 from tkinter import *
 from tkinter import ttk, filedialog
 from tkinter_custom_button import TkinterCustomButton
@@ -190,6 +190,11 @@ def scan():
         if len(record_query) != 0:
             for i in record_query:
                 nvd_query = rate.website_query(i[0])
+                try:
+                    float(nvd_query[0])
+                except ValueError:
+                    print("You just tried to convert text into a float, sorry, that isn't allowed.")
+                    continue
                 temp = i.copy()
                 temp.append(nvd_query[1])
                 temp.append(nvd_query[0])
@@ -1088,23 +1093,10 @@ class ResultsPage:
         # It will send a String to the results page with the information
         # It will only run as many times as vulnerabilities found
         for i in range(len(list_results)):
-            results_example = Frame(results_container, bg="#2a3439")
-            results_example.config(height=50, width=860)
-            results_example1_label = Label(results_example, text=str(list_results[i][0][-1].split('/')[-1]), font=14,
-                                           bg="#2a3439", fg="#FFFFFF")
-            results_names.append(results_example1_label.cget("text"))
-            results_example1_label.place(relx=0.05, rely=0.5, anchor="w")
-
-            # Selection Boxes
-            var = IntVar()
-            selection_box = Checkbutton(results_example, variable=var, onvalue=1, offvalue=0, bg="#2a3439")
-            selection_box.place(relx=0.00, rely=0.5, anchor="w")
-            results_example.bind("<Button-1>", new_page)
-            results_example.grid(row=i, column=0, padx=10, pady=5)
 
             rating = 0
 
-            # Getting the score and changing the color to match the
+            # Getting the score and changing the color to match the new rating
             for j in list_results[i]:
                 rating += float(j[-2])
             rating = rating / float(len(list_results[i]))
@@ -1122,6 +1114,35 @@ class ResultsPage:
                 color = "red"
                 rating = "Critical"
 
+            if rating == "Low":
+                if filter_settings[0].get() == 1:
+                    continue
+            elif rating == "Medium":
+                if filter_settings[1].get() == 1:
+                    continue
+            elif rating == "High":
+                if filter_settings[2].get() == 1:
+                    continue
+            elif rating == "Critical":
+                if filter_settings[3].get() == 1:
+                    continue
+
+            results_example = Frame(results_container, bg="#2a3439")
+            results_example.config(height=50, width=860)
+            results_example1_label = Label(results_example, text=str(list_results[i][0][-1].split('/')[-1]), font=14,
+                                           bg="#2a3439", fg="#FFFFFF")
+
+            results_example1_label.place(relx=0.05, rely=0.5, anchor="w")
+
+            # Selection Boxes
+            var = IntVar()
+            selection_box = Checkbutton(results_example, variable=var, onvalue=1, offvalue=0, bg="#2a3439")
+            selection_box.place(relx=0.00, rely=0.5, anchor="w")
+            results_example.bind("<Button-1>", new_page)
+            results_example.grid(row=i, column=0, padx=10, pady=5)
+
+
+
             # Label for Rating
             rating_label = Label(results_example, text=rating, font=14, bg=color, fg="black")
             rating_label.config(height=2, width=7)
@@ -1133,6 +1154,7 @@ class ResultsPage:
             rate_frame1.place(relx=0.5, rely=0.99, anchor="s")
 
             # Label for Flags
+
             #takes the oldest date a vulnerablility was discovered and compares it to the current date
             #If 50 days or more, will setup a flag
             limit = datetime.timedelta(days=50)
@@ -1143,12 +1165,11 @@ class ResultsPage:
                 flags_label.config(height=2, width=30)
                 flags_label.place(relx=0.5, rely=0.5, anchor="w")
 
-
             # Scrollbar if more than 5 files are selected
             if len(list_results) > 5:
                 results_sb = ttk.Scrollbar(results_canvas, orient="vertical",
                                            command=results_canvas.yview)
-                results_sb.place(relx=0.98, height=results_canvas.winfo_height())
+                results_sb.place(relx=0.98, height=300)
                 results_canvas.configure(yscrollcommand=results_sb.set)
 
     # If search bar is empty, re-print original results.
@@ -1219,7 +1240,7 @@ class HelpPage:
                     of scan you would like to run. Mousing over the options will give a brief description of 
                     the differences between them. From there you will be directed to the Results Page. Here
                     the applications that have vulnerabilities will be listed. If the user that is logged in
-                    has the permissions, they will be able to update the application from here. Otherwise they 
+                    has the permissions, they will be able to update the application from here. Otherwise they
                     will just be able to see the vulnerabilities. If instead the Results page is clicked, this will
                     display the results from the scan that was last run. And lastly if the Settings Page is selected, 
                     this will bring you to a page where you can change options such as font size and the way items are 
@@ -1231,12 +1252,12 @@ class HelpPage:
 
             help_example2 = Frame(help_frame, bg="#2a3439")
             help_example2.place(relx=0.5, rely=0.02, anchor="n")
-            help_example2.config(height=150, width=900)
+            help_example2.config(height=125, width=900)
             help_example2_header_label = Label(help_example2, text='How the Vulnerabilities are scored:', font=24,
                                                bg="#2a3439", fg="#FFFFFF")
             help_example2_header_label.place(relx=0.01, rely=0.1, anchor="nw")
 
-            text2 = """ To score the vulnerabilities we will be interfacing with the a CVSS 2.0 scorer.
+            text2 = """To score the vulnerabilities we will be interfacing with the a CVSS 2.0 scorer.
                     CVSS or better known as the Common Vulnerability Scoring System will take in a number of parameters
                     in order to delivery an accurate threat score. Some of the items taken into account when calculating
                     a score are the Access Vector, Access Complexity, Authentication, Confidentiality Impact, Integrity Impact,
@@ -1249,7 +1270,7 @@ class HelpPage:
 
             help_example3 = Frame(help_frame, bg="#2a3439")
             help_example3.place(relx=0.5, rely=0.02, anchor="n")
-            help_example3.config(height=150, width=900)
+            help_example3.config(height=125, width=900)
             help_example3_header_label = Label(help_example3, text="What databases we're checking against:", font=24,
                                                bg="#2a3439", fg="#FFFFFF")
             help_example3_header_label.place(relx=0.01, rely=0.1, anchor="nw")
@@ -1985,7 +2006,6 @@ class ApplicationAdminPage:
             global account_status
             account_status = "Locked"
             account_status_label2.config(text=account_status)
-
 
         # Updates account status to unlocked
         def account_unlock():

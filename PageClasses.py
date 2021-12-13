@@ -1154,10 +1154,16 @@ class ResultsPage:
             rate_frame1.place(relx=0.5, rely=0.99, anchor="s")
 
             # Label for Flags
-            flags_label = Label(results_example, text="Date: "+list_results[i-0][-0][-3], font=8, bg=color, fg="black")
-            flags_label.config(height=2, width=15)
-            flags_label.place(relx=0.72, rely=0.5, anchor="w")
 
+            #takes the oldest date a vulnerablility was discovered and compares it to the current date
+            #If 50 days or more, will setup a flag
+            limit = datetime.timedelta(days=50)
+            compareDate = list_results[i-1][-1][-3].rsplit("-")
+            daysSince = datetime.date.today() - datetime.date(int(compareDate[0]), int(compareDate[1]), int(compareDate[2]))
+            if daysSince >= limit:
+                flags_label = Label(results_example, text="Flagged More than 50 Days Old", font=8, bg=color, fg="black")
+                flags_label.config(height=2, width=30)
+                flags_label.place(relx=0.5, rely=0.5, anchor="w")
 
             # Scrollbar if more than 5 files are selected
             if len(list_results) > 5:

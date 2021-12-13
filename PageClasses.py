@@ -15,9 +15,6 @@ import datetime
 from plyer import notification
 from ctypes import windll
 import threading
-import yaml
-
-
 
 
 global stopped
@@ -1230,32 +1227,31 @@ class HelpPage:
             # Help tip examples
             help_example1 = Frame(help_frame, bg="#2a3439")
             help_example1.place(relx=0.5, rely=0.02, anchor="n")
-            help_example1.config(height=200, width=900)
+            help_example1.config(height=220, width=1060)
             help_example1_header_label = Label(help_example1, text='How to use the program:', font=24, bg="#2a3439",
                                                fg="#FFFFFF")
-            help_example1_header_label.place(relx=0.01, rely=0.1, anchor="nw")
+            help_example1_header_label.place(relx=0.01, rely=0.01, anchor="nw")
 
-            text1 = """First after logging in, you have a choice of what to do. If choose to run a scan
-                    this can be done clicking onto the home page. From here you have the choice of what kind
-                    of scan you would like to run. Mousing over the options will give a brief description of 
-                    the differences between them. From there you will be directed to the Results Page. Here
-                    the applications that have vulnerabilities will be listed. If the user that is logged in
-                    has the permissions, they will be able to update the application from here. Otherwise they
-                    will just be able to see the vulnerabilities. If instead the Results page is clicked, this will
-                    display the results from the scan that was last run. And lastly if the Settings Page is selected, 
-                    this will bring you to a page where you can change options such as font size and the way items are 
-                    sorted to make the tool as easy to use as possible.""" \
+            text1 = """First after logging in, you have a choice of what to do. If choose to run a scan this can be done 
+                    clicking onto the home page. From here you have the choice of what kind of scan you would like to run. 
+                    Mousing over the options will give a brief description of the differences between them. From there you 
+                    will be directed to the Results Page. Here the applications that have vulnerabilities will be listed. If 
+                    the user that is logged in has the permissions, they will be able to update the application from here. 
+                    Otherwise they will just be able to see the vulnerabilities. If instead the Results page is clicked, 
+                    this will display the results from the scan that was last run. And lastly if the Settings Page is selected, 
+                    this will bring you to a page where you can change options such as font size and the way items are sorted to make the 
+                    tool as easy to use as possible.""" \
                 .replace('\n', ' ').replace('                    ', '')
             help_example1_body_label = Label(help_example1, text=text1, font=14, bg="#2a3439", fg="#FFFFFF",
-                                             wraplength=880, justify="left")
-            help_example1_body_label.place(relx=0.01, rely=0.25, anchor="nw")
+                                             wraplength=1060, justify="left")
+            help_example1_body_label.place(relx=0.01, rely=0.125, anchor="nw")
 
             help_example2 = Frame(help_frame, bg="#2a3439")
             help_example2.place(relx=0.5, rely=0.02, anchor="n")
-            help_example2.config(height=125, width=900)
+            help_example2.config(height=140, width=1064)
             help_example2_header_label = Label(help_example2, text='How the Vulnerabilities are scored:', font=24,
                                                bg="#2a3439", fg="#FFFFFF")
-            help_example2_header_label.place(relx=0.01, rely=0.1, anchor="nw")
+            help_example2_header_label.place(relx=0.01, rely=0.01, anchor="nw")
 
             text2 = """To score the vulnerabilities we will be interfacing with the a CVSS 2.0 scorer.
                     CVSS or better known as the Common Vulnerability Scoring System will take in a number of parameters
@@ -1264,13 +1260,13 @@ class HelpPage:
                     and lastly the Availability Impact.
             """ \
                 .replace('\n', ' ').replace('                    ', '')
-            help_example2_body_label = Label(help_example2, text=text2, font=16, bg="#2a3439", fg="#FFFFFF",
-                                             wraplength=880, justify="left")
+            help_example2_body_label = Label(help_example2, text=text2, font=14, bg="#2a3439", fg="#FFFFFF",
+                                             wraplength=1060, justify="left")
             help_example2_body_label.place(relx=0.01, rely=0.25, anchor="nw")
 
             help_example3 = Frame(help_frame, bg="#2a3439")
             help_example3.place(relx=0.5, rely=0.02, anchor="n")
-            help_example3.config(height=125, width=900)
+            help_example3.config(height=168, width=1060)
             help_example3_header_label = Label(help_example3, text="What databases we're checking against:", font=24,
                                                bg="#2a3439", fg="#FFFFFF")
             help_example3_header_label.place(relx=0.01, rely=0.1, anchor="nw")
@@ -1282,15 +1278,13 @@ class HelpPage:
                     availability of accessing other databases that may or may not exist or
                     be available for public access.""" \
                 .replace('\n', ' ').replace('                    ', '')
-            help_example3_body_label = Label(help_example3, text=text3, font=16, bg="#2a3439", fg="#FFFFFF",
-                                             wraplength=880, justify="left")
-            help_example3_body_label.place(relx=0.01, rely=0.25, anchor="nw")
+            help_example3_body_label = Label(help_example3, text=text3, font=14, bg="#2a3439", fg="#FFFFFF",
+                                             wraplength=1060, justify="left")
+            help_example3_body_label.place(relx=0.01, rely=0.3, anchor="nw")
             # Align tips in a grid
             help_example1.grid(row=0, column=0, padx=10, pady=5)
             help_example2.grid(row=1, column=0, padx=10, pady=5)
             help_example3.grid(row=2, column=0, padx=10, pady=5)
-            # </editor-fold>
-
 
 class SettingsPage:
 

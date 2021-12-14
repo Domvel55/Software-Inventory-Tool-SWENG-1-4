@@ -1817,6 +1817,23 @@ class ApplicationResultsPage:
         main_frame.place(relx=0.5, rely=0.1, anchor="n")
         main_frame.config(height=new_window.winfo_height(), width=new_window.winfo_width())
 
+        application_canvas = Canvas(main_frame, height=500, width=700, bg="#2a3439")
+        application_canvas.place(relx=0.5, rely=0.00, anchor="n")
+
+        # Container for results
+        application_container = Frame(application_canvas, bg="#1F262A", borderwidth=2)
+        application_container.place(relx=0.5, rely=0.1, anchor="n")
+        application_container.config(relief=RIDGE, height=350, width=700)
+
+        # Bind scrollbar to container
+        application_container.bind(
+            "<Configure>",
+            lambda e: application_canvas.configure(
+                scrollregion=application_canvas.bbox("all")
+            )
+        )
+        application_canvas.create_window((0, 0), window=application_container, anchor="nw")
+
         style = ttk.Style(new_window)
         style.theme_use('classic')
         style.configure('Test.TSizegrip', background="#1F262A")
@@ -1825,35 +1842,51 @@ class ApplicationResultsPage:
         root_size_grip.configure(style="Test.TSizegrip")
         root_size_grip.pack(side="right", anchor=SE)
 
-        submit_comment_button = TkinterCustomButton(master=main_frame,
-                                                fg_color="#848689",
-                                                hover_color="#1F262A",
-                                                text_font="Bold, 14",
-                                                text="Submit Comment",
-                                                text_color="white",
-                                                corner_radius=10,
-                                                width=170,
-                                                height=35,
-                                                hover=True,
-                                                command=lambda: update_comments(result_num, comment_text.get("1.0", 'end-1c')))
-        submit_comment_button.grid(row=0, column=0)
+
 
         # Login username and Password labels and entries
-        file_name_label = Label(main_frame, text=list_results[result_num][0][-1], font=15, background="#2a3439",
+        file_name_label = Label(application_container, text=list_results[result_num][0][-1], font=15, background="#2a3439",
                                 foreground="white")
         file_name_label.grid(row=1, column=0)
 
         for i in range(len(list_results)):
             count = 2
             for j in list_results[result_num]:
-                cvss_score_label = Label(main_frame, text=str(f'CVE: {j[0]}     Rating: {j[-2]}    Date: {j[-3]}'),
+                cvss_score_label = Label(application_container, text=str(f'\nCVE: {j[0]}     Rating: {j[-2]}    Date: {j[-3]}'),
                                          font=15, background="#2a3439", foreground="white")
                 cvss_score_label.grid(row=count, column=0)
-                count += 1
 
-        comment_text = Text(main_frame, font=15, background="#2a3439", foreground="white",
-                            height=10, width=30)
-        comment_text.grid(row=count+1, column=0)
+                cvss_description_label = Label(application_container, text=str(f'Description: {j[1]}') , font = 15,
+                                               wraplength=650, background="#2a3439",
+                                               foreground="white")
+                cvss_description_label.grid(row=count+1, column=0)
+                count += 2
+
+        comment_label = Label(application_container, text="Enter a comment below...", font=15, background="#2a3439",
+                                foreground="white")
+        comment_label.grid(row=count+1, column=0)
+
+        comment_text = Text(application_container, font=15, background="#2a3439", foreground="white", height=10, width=70)
+        comment_text.grid(row=count+2, column=0)
+
+        submit_comment_button = TkinterCustomButton(master=application_container,
+                                                    fg_color="#848689",
+                                                    hover_color="#1F262A",
+                                                    text_font="Bold, 14",
+                                                    text="Submit Comment",
+                                                    text_color="white",
+                                                    corner_radius=10,
+                                                    width=170,
+                                                    height=35,
+                                                    hover=True,
+                                                    command=lambda: update_comments(result_num,
+                                                                                    comment_text.get("1.0", 'end-1c')))
+        submit_comment_button.grid(row=count+3, column=0)
+
+        # Scrollbar
+        application_sb = ttk.Scrollbar(application_canvas, orient="vertical", command=application_canvas.yview)
+        application_sb.place(relx=0.98, height=500)
+        application_canvas.configure(yscrollcommand=application_sb.set)
 
 
 class HistoryLogPage:
@@ -1948,7 +1981,7 @@ class HistoryLogPage:
             count += 2
             record_counter += 1
 
-        # Scrollbar if more than 5 results are displayed
+        # Scrollbar
         history_log_sb = ttk.Scrollbar(history_log_canvas, orient="vertical", command=history_log_canvas.yview)
         history_log_sb.place(relx=0.98, height=500)
         history_log_canvas.configure(yscrollcommand=history_log_sb.set)

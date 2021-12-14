@@ -16,7 +16,7 @@ import threading
 root.configure(background="#2a3439")
 
 # Scaling UI to user's screen
-app_width = 1064
+app_width = 1096
 app_height = 600
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
@@ -156,6 +156,5 @@ def call_main():
 if __name__ == '__main__':
     call_main()
     read_config()
-    x = threading.Thread(target=root.mainloop(), args=(1,))
-    x.start()
+    root.mainloop()
     write_config()

@@ -5,7 +5,7 @@
     This file was entirely made by the Puffins Team
     Version:11.5.2021
 """
-
+from time import sleep
 from tkinter import *
 from tkinter import ttk, filedialog
 from tkinter_custom_button import TkinterCustomButton
@@ -22,11 +22,12 @@ import threading
 global stopped
 stopped = False
 
-
 now = "Last Scanned: ----"
 sort_variable = None
-files_list, user_list, history_list, list_results, filter_settings, sched_list = [], [], [], [], [], []
-name, role, last_page= "", "", ""
+history_counter = 0
+files_list, user_list, history_list, list_results, filter_settings, sched_list, check_buttons = [], [], [], [], [], [], []
+history_comments = {}
+name, role, last_page = "", "", ""
 results_progressbar = None
 
 root = Tk()
@@ -107,6 +108,10 @@ def new_page(e):
     ApplicationResultsPage(e.widget.grid_info()['row'])
 
 
+def history_page(e):
+    HistoryLogPage(e.widget.grid_info()['row'])
+
+
 def new_user_page(e):
     ApplicationAdminPage(e.widget.grid_info()['row'])
 
@@ -127,8 +132,9 @@ def frame_mapped(e):
 
 
 def update_history():
-    global list_results
+    global list_results, history_counter
     history_list.append([now, list_results])
+    history_counter += 1
 
 
 def unlock_account(user_num):
@@ -164,6 +170,40 @@ def start():
     list_results.clear()
 
 
+def update_comments(result_num, text):
+    history_comments[history_counter] = {result_num: text}
+
+def reset_results_list():
+    global list_results
+    list_results.clear()
+
+def remove_selected():
+    global list_results, check_buttons
+    temp = []
+    for i in range(len(list_results)):
+        if check_buttons[i].get() == 0:
+            temp.append(list_results[i])
+    list_results = temp
+    check_buttons.clear()
+
+def update_selected():
+    global list_results, check_buttons
+    new_list = []
+    popped_list = []
+    for i in range(len(list_results)):
+        if check_buttons[i].get() == 0:
+            new_list.append(list_results[i])
+        else:
+            popped_list.append(list_results[i])
+    list_results = new_list
+    check_buttons.clear()
+    return popped_list
+
+def print_updates(list_to_print):
+    for i in range(len(list_to_print)):
+        print((str(list_to_print[i][0][-1].split('/')[-1])))
+
+
 # This will scan the Database
 # This function will be called no matter which config is decided on
 def scan():
@@ -193,6 +233,7 @@ def scan():
         if len(record_query) != 0:
             for i in record_query:
                 nvd_query = rate.website_query(i[0])
+                sleep(0.75)
                 temp = i.copy()
                 temp.append(nvd_query[1])
                 temp.append(nvd_query[0])
@@ -202,7 +243,9 @@ def scan():
 
     destroy_pb()
     update_history()
+    ResultsPage()
     ResultsPage.print_results('By Severity', filter_settings)
+    change_results_button()
     title = 'A scan has been completed!'
     message = 'Please return to the Software Inventory Tool to view results.'
     notification.notify(title=title,
@@ -294,7 +337,9 @@ class MakeWindow:
                                              width=65,
                                              height=40,
                                              hover=True,
-                                             command=lambda: [ResultsPage(), change_results_button()])
+                                             command=lambda: [ResultsPage(), change_results_button(),
+                                                              ResultsPage.print_results(sort_variable.get(),
+                                                                                        filter_settings)])
         results_button.pack(side=LEFT, padx=5)
 
         # Create Settings Button
@@ -325,9 +370,10 @@ class MakeWindow:
                                           command=lambda: [HelpPage(), change_help_button()])
         help_button.pack(side=LEFT, padx=5)
 
-
         # This will change the color of the home button when clicked on
         # This will also change the color of all the other buttons back to default
+        global change_home_button, change_results_button, change_settings_button, change_help_button
+
         def change_home_button():
             home_button.configure_color(fg_color="#5F4B66", text_color="white")
             results_button.configure_color(fg_color="#1F262A", text_color="white")
@@ -369,7 +415,7 @@ class MainWindow:
 
         if last_page != "HomePage":
             last_page = "HomePage"
-
+            change_home_button()
             for widget in root.winfo_children()[1:]:
                 widget.destroy()
 
@@ -567,7 +613,7 @@ class HistoryPage:
                 history_example1_label = Label(history_example, text=str(history_list[i][0]), font=10,
                                                bg="#2a3439", fg="#FFFFFF")
                 history_example1_label.place(relx=0.01, rely=0.5, anchor="w")
-                history_example.bind("<Button-1>", new_page)
+                history_example.bind("<Button-1>", history_page)
                 history_example.grid(row=i, column=0, padx=10, pady=5)
 
             # Design around each result
@@ -578,7 +624,7 @@ class HistoryPage:
             # Scrollbar if more than 5 results are displayed
             if len(history_list) > 5:
                 history_sb = ttk.Scrollbar(history_canvas, orient="vertical", command=history_canvas.yview)
-                history_sb.place(relx=0.98, height=history_canvas.winfo_height())
+                history_sb.place(relx=0.98, height=300)
                 history_canvas.configure(yscrollcommand=history_sb.set)
 
 
@@ -635,7 +681,7 @@ class ScanConfirmPage:
                                                   width=200,
                                                   height=75,
                                                   hover=True,
-                                                  command=lambda: [last_time_clicked(),start(),  x.start()])
+                                                  command=lambda: [last_time_clicked(), start(), x.start()])
             continue_button.place(relx=0.25, rely=0.8, anchor="center")
             ToolTip(continue_button, "Continue onto the scanning process.")
 
@@ -675,7 +721,7 @@ class ScanConfirmPage:
 
         def browse_files():
             global files_list
-            filenames = filedialog.askopenfilenames(initialdir="C:\Program Files",
+            filenames = filedialog.askopenfilenames(initialdir="C:\ProgramData\Microsoft\Windows\Start Menu\Programs",
                                                     title="Select Files",
                                                     filetypes=(("all files",
                                                                 "*.*"),
@@ -768,7 +814,7 @@ class ScanConfirmPage:
                                             width=100,
                                             height=50,
                                             hover=True,
-                                            command=lambda:[ResultsPage(), MainWindow(), x.stop(), stop()])
+                                            command=lambda: [ResultsPage(), MainWindow(), x.stop(), stop()])
         cancel_button.place(relx=0.70, rely=0.8, anchor="center")
         ToolTip(cancel_button, "Go back to the home page.")
 
@@ -818,13 +864,6 @@ class ResultsPage:
             results_files_frame.place(relx=0.5, rely=0.02, anchor="n")
             results_files_frame.config(height=50, width=900)
 
-            for i in range(6):
-                results_example = Frame(results_container, bg="#2a3439")
-                results_example.config(height=50, width=900)
-                results_example1_label = Label(results_example, text=f'Software {i}', font=14, bg="#2a3439",
-                                               fg="#5B676D")
-                results_example1_label.place(relx=0.01, rely=0.5, anchor="w")
-                results_example.grid(row=i, column=0, padx=10, pady=5)
             # </editor-fold>
 
     # Function to create the update buttons before and after have results
@@ -851,7 +890,7 @@ class ResultsPage:
                                                 width=200,
                                                 height=75,
                                                 hover=True,
-                                                command=lambda: None)
+                                                command=lambda: none)
         update_all_button.place(relx=0.15, rely=0.8, anchor="center")
         ToolTip(update_all_button, "Update all the programs flagged for available updates.")
 
@@ -865,7 +904,9 @@ class ResultsPage:
                                                      width=200,
                                                      height=75,
                                                      hover=True,
-                                                     command=lambda: None)
+                                                     command=lambda: [print_updates(update_selected()),
+                                                                        ResultsPage.print_results(sort_variable.get(),
+                                                                                                    filter_settings)])
         update_selected_button.place(relx=0.35, rely=0.8, anchor="center")
         ToolTip(update_selected_button, "Update all the selected programs that were flagged for available updates.")
 
@@ -883,11 +924,11 @@ class ResultsPage:
         cancel_button.place(relx=0.9, rely=0.8, anchor="center")
         ToolTip(cancel_button, "Go back to the home page.")
 
-
+        #not functioning
         def ignore_selected():
             for i in range(len(list_results)):
-                #if var.get():
-                    print(list_results[i] + "checked")
+                # if var.get():
+                print(list_results[i] + "checked")
 
         ignore_selected_button = TkinterCustomButton(master=results_frame,
                                                      fg_color="#8797AF",
@@ -899,7 +940,9 @@ class ResultsPage:
                                                      width=200,
                                                      height=75,
                                                      hover=True,
-                                                     command= lambda: [ignore_selected()])
+                                                     command=lambda: [remove_selected(),
+                                                                      ResultsPage.print_results(sort_variable.get(),
+                                                                                       filter_settings)])
         ignore_selected_button.place(relx=0.75, rely=0.8, anchor="center")
         ToolTip(ignore_selected_button, "Ignore all the selected programs that were flagged for available updates.")
 
@@ -913,7 +956,7 @@ class ResultsPage:
                                                 width=200,
                                                 height=75,
                                                 hover=True,
-                                                command=lambda: [ResultsPage(), MainWindow()])
+                                                command=lambda: [ResultsPage(), MainWindow(), reset_results_list()])
         ignore_all_button.place(relx=0.55, rely=0.8, anchor="center")
         ToolTip(ignore_all_button, "Ignore all the programs flagged for available updates.")
 
@@ -954,17 +997,18 @@ class ResultsPage:
         refresh_container.config(relief=RIDGE)
 
         refresh_button = TkinterCustomButton(master=results_frame,
-                                             fg_color="#848689",
+                                             fg_color="#2a3439",
                                              hover_color="#1F262A",
-                                             text_font="Bold, 14",
-                                             text="Refresh",
+                                             text_font="Bold, 24",
+                                             text="⟳",
                                              text_color="white",
                                              corner_radius=10,
-                                             width=120,
+                                             width=50,
                                              height=50,
                                              hover=True,
-                                             command=lambda: ResultsPage.print_results(sort_variable.get(), filter_settings))
-        refresh_button.place(relx=0.275, rely=0)
+                                             command=lambda: ResultsPage.print_results(sort_variable.get(),
+                                                                                       filter_settings))
+        refresh_button.place(relx=0.31, rely=0.025)
 
         ## Filter settings
         filter_settings_container = Frame(results_frame, bg="#1F262A", borderwidth=2)
@@ -978,21 +1022,24 @@ class ResultsPage:
         for i in range(4):
             filter_settings.append(IntVar())
 
-
         frame_style = ttk.Style()
         frame_style.configure("BW.TCheckbutton", background="#1F262A", foreground="white", highlightthickness=0)
 
         filter_button_1 = ttk.Checkbutton(filter_settings_container, text='Hide low', onvalue=1, offvalue=0,
-                                          variable=filter_settings[0], style="BW.TCheckbutton")
+                                          variable=filter_settings[0], style="BW.TCheckbutton",
+                                          command=lambda: ResultsPage.print_results(sort_variable.get(), filter_settings))
         filter_button_1.grid(row=2, column=1, padx=20)
         filter_button_2 = ttk.Checkbutton(filter_settings_container, text='Hide medium', onvalue=1, offvalue=0,
-                                          variable=filter_settings[1], style="BW.TCheckbutton")
+                                          variable=filter_settings[1], style="BW.TCheckbutton",
+                                          command=lambda: ResultsPage.print_results(sort_variable.get(), filter_settings))
         filter_button_2.grid(row=2, column=2, padx=20)
         filter_button_3 = ttk.Checkbutton(filter_settings_container, text='Hide high', onvalue=1, offvalue=0,
-                                          variable=filter_settings[2], style="BW.TCheckbutton")
+                                          variable=filter_settings[2], style="BW.TCheckbutton",
+                                          command=lambda: ResultsPage.print_results(sort_variable.get(), filter_settings))
         filter_button_3.grid(row=2, column=3, padx=20)
         filter_button_4 = ttk.Checkbutton(filter_settings_container, text='Hide critical', onvalue=1, offvalue=0,
-                                          variable=filter_settings[3], style="BW.TCheckbutton")
+                                          variable=filter_settings[3], style="BW.TCheckbutton",
+                                          command=lambda: ResultsPage.print_results(sort_variable.get(), filter_settings))
         filter_button_4.grid(row=2, column=4, padx=20)
 
         style = ttk.Style(root)
@@ -1091,23 +1138,10 @@ class ResultsPage:
         # It will send a String to the results page with the information
         # It will only run as many times as vulnerabilities found
         for i in range(len(list_results)):
-            results_example = Frame(results_container, bg="#2a3439")
-            results_example.config(height=50, width=860)
-            results_example1_label = Label(results_example, text=str(list_results[i][0][-1].split('/')[-1]), font=14,
-                                           bg="#2a3439", fg="#FFFFFF")
-            results_names.append(results_example1_label.cget("text"))
-            results_example1_label.place(relx=0.05, rely=0.5, anchor="w")
-
-            # Selection Boxes
-            var = IntVar()
-            selection_box = Checkbutton(results_example, variable=var, onvalue=1, offvalue=0, bg="#2a3439")
-            selection_box.place(relx=0.00, rely=0.5, anchor="w")
-            results_example.bind("<Button-1>", new_page)
-            results_example.grid(row=i, column=0, padx=10, pady=5)
 
             rating = 0
 
-            # Getting the score and changing the color to match the
+            # Getting the score and changing the color to match the new rating
             for j in list_results[i]:
                 rating += float(j[-2])
             rating = rating / float(len(list_results[i]))
@@ -1125,6 +1159,36 @@ class ResultsPage:
                 color = "red"
                 rating = "Critical"
 
+            if rating == "Low":
+                if filter_settings[0].get() == 1:
+                    continue
+            elif rating == "Medium":
+                if filter_settings[1].get() == 1:
+                    continue
+            elif rating == "High":
+                if filter_settings[2].get() == 1:
+                    continue
+            elif rating == "Critical":
+                if filter_settings[3].get() == 1:
+                    continue
+
+            results_example = Frame(results_container, bg="#2a3439")
+            results_example.config(height=50, width=860)
+            results_example1_label = Label(results_example, text=str(list_results[i][0][-1].split('/')[-1]), font=14,
+                                           bg="#2a3439", fg="#FFFFFF")
+
+            results_example1_label.place(relx=0.05, rely=0.5, anchor="w")
+
+            # Selection Boxes
+            check_buttons.append(IntVar())
+
+            selection_box = Checkbutton(results_example, variable=check_buttons[i], onvalue=1, offvalue=0, bg="#2a3439")
+            selection_box.place(relx=0.00, rely=0.5, anchor="w")
+            results_example.bind("<Button-1>", new_page)
+            results_example.grid(row=i, column=0, padx=10, pady=5)
+
+
+
             # Label for Rating
             rating_label = Label(results_example, text=rating, font=14, bg=color, fg="black")
             rating_label.config(height=2, width=7)
@@ -1136,35 +1200,49 @@ class ResultsPage:
             rate_frame1.place(relx=0.5, rely=0.99, anchor="s")
 
             # Label for Flags
-            flags_label = Label(results_example, text="Date of Discovery: "+list_results[i-1][-1][-3], font=8, bg=color, fg="black")
-            flags_label.config(height=2, width=30)
-            flags_label.place(relx=0.5, rely=0.5, anchor="w")
 
+            # takes the oldest date a vulnerablility was discovered and compares it to the current date
+            # If 365 days or more, will setup a flag
+            limit = datetime.timedelta(days=365)
+            compareDate = list_results[i][-1][-3].rsplit("-")
+            daysSince = datetime.date.today() - datetime.date(int(compareDate[0]), int(compareDate[1]),
+                                                              int(compareDate[2]))
+            if daysSince >= limit:
+                flags_label = Label(results_example, text="Flagged! " + str(daysSince.days) + " days old", font=8, bg=color, fg="black")
+                flags_label.config(height=2, width=30)
+                flags_label.place(relx=0.5, rely=0.5, anchor="w")
 
             # Scrollbar if more than 5 files are selected
             if len(list_results) > 5:
                 results_sb = ttk.Scrollbar(results_canvas, orient="vertical",
                                            command=results_canvas.yview)
-                results_sb.place(relx=0.98, height=results_canvas.winfo_height())
+                results_sb.place(relx=0.98, height=300)
                 results_canvas.configure(yscrollcommand=results_sb.set)
 
-    # If search bar is empty, re-print original results.
-    # Otherwise, hide results that don't contain the keyword;
-    # Leave those that do.
-    def search(keyword):
-        if keyword == '':
-            ResultsPage.print_results(sort_variable.get(), filter_settings)
-        elif not any(keyword in result for result in results_names):
-            search_entry.insert(0, "No results match keyword ")
-        else:
-            for widget in results_container.winfo_children():
-                if widget.winfo_class() == 'Frame':
-                    for child in widget.winfo_children():
-                        if child.winfo_class() == 'Label' and '.' in child.cget("text"):
-                            if keyword in child.cget("text"):
-                                pass
-                            else:
-                                widget.grid_forget()
+
+        # If search bar is empty, re-print original results.
+        # Otherwise, hide results that don't contain the keyword;
+        # Leave those that do.
+        def search(keyword):
+            if keyword == '':
+                for result in results_container.winfo_children():
+                    if result.winfo_class() == 'Frame':
+                        result.grid()
+            elif not any(keyword in result for result in results_names):
+                search_entry.insert(0, "No results match keyword ")
+            else:
+                for result in results_container.winfo_children():
+                    if result.winfo_class() == 'Frame':
+                        result.grid()
+                for widget in results_container.winfo_children():
+                    if widget.winfo_class() == 'Frame':
+                        for child in widget.winfo_children():
+                            if child.winfo_class() == 'Label' and '.' in child.cget("text"):
+                                if keyword in child.cget("text"):
+                                    pass
+                                else:
+                                    widget.grid_forget()
+
 
 class HelpPage:
 
@@ -1206,47 +1284,46 @@ class HelpPage:
             # Help tip examples
             help_example1 = Frame(help_frame, bg="#2a3439")
             help_example1.place(relx=0.5, rely=0.02, anchor="n")
-            help_example1.config(height=200, width=900)
+            help_example1.config(height=220, width=1060)
             help_example1_header_label = Label(help_example1, text='How to use the program:', font=24, bg="#2a3439",
                                                fg="#FFFFFF")
-            help_example1_header_label.place(relx=0.01, rely=0.1, anchor="nw")
+            help_example1_header_label.place(relx=0.01, rely=0.01, anchor="nw")
 
-            text1 = """First after logging in, you have a choice of what to do. If choose to run a scan
-                    this can be done clicking onto the home page. From here you have the choice of what kind
-                    of scan you would like to run. Mousing over the options will give a brief description of 
-                    the differences between them. From there you will be directed to the Results Page. Here
-                    the applications that have vulnerabilities will be listed. If the user that is logged in
-                    has the permissions, they will be able to update the application from here. Otherwise they 
-                    will just be able to see the vulnerabilities. If instead the Results page is clicked, this will
-                    display the results from the scan that was last run. And lastly if the Settings Page is selected, 
-                    this will bring you to a page where you can change options such as font size and the way items are 
-                    sorted to make the tool as easy to use as possible.""" \
+            text1 = """First after logging in, you have a choice of what to do. If choose to run a scan this can be done 
+                    clicking onto the home page. From here you have the choice of what kind of scan you would like to run. 
+                    Mousing over the options will give a brief description of the differences between them. From there you 
+                    will be directed to the Results Page. Here the applications that have vulnerabilities will be listed. If 
+                    the user that is logged in has the permissions, they will be able to update the application from here. 
+                    Otherwise they will just be able to see the vulnerabilities. If instead the Results page is clicked, 
+                    this will display the results from the scan that was last run. And lastly if the Settings Page is selected, 
+                    this will bring you to a page where you can change options such as font size and the way items are sorted to make the 
+                    tool as easy to use as possible.""" \
                 .replace('\n', ' ').replace('                    ', '')
-            help_example1_body_label = Label(help_example1, text=text1, font=16, bg="#2a3439", fg="#FFFFFF",
-                                             wraplength=880, justify="left")
-            help_example1_body_label.place(relx=0.01, rely=0.25, anchor="nw")
+            help_example1_body_label = Label(help_example1, text=text1, font=14, bg="#2a3439", fg="#FFFFFF",
+                                             wraplength=1060, justify="left")
+            help_example1_body_label.place(relx=0.01, rely=0.125, anchor="nw")
 
             help_example2 = Frame(help_frame, bg="#2a3439")
             help_example2.place(relx=0.5, rely=0.02, anchor="n")
-            help_example2.config(height=150, width=900)
+            help_example2.config(height=140, width=1064)
             help_example2_header_label = Label(help_example2, text='How the Vulnerabilities are scored:', font=24,
                                                bg="#2a3439", fg="#FFFFFF")
-            help_example2_header_label.place(relx=0.01, rely=0.1, anchor="nw")
+            help_example2_header_label.place(relx=0.01, rely=0.01, anchor="nw")
 
-            text2 = """ To score the vulnerabilities we will be interfacing with the a CVSS 2.0 scorer.
+            text2 = """To score the vulnerabilities we will be interfacing with the a CVSS 2.0 scorer.
                     CVSS or better known as the Common Vulnerability Scoring System will take in a number of parameters
                     in order to delivery an accurate threat score. Some of the items taken into account when calculating
                     a score are the Access Vector, Access Complexity, Authentication, Confidentiality Impact, Integrity Impact,
                     and lastly the Availability Impact.
             """ \
                 .replace('\n', ' ').replace('                    ', '')
-            help_example2_body_label = Label(help_example2, text=text2, font=16, bg="#2a3439", fg="#FFFFFF",
-                                             wraplength=880, justify="left")
+            help_example2_body_label = Label(help_example2, text=text2, font=14, bg="#2a3439", fg="#FFFFFF",
+                                             wraplength=1060, justify="left")
             help_example2_body_label.place(relx=0.01, rely=0.25, anchor="nw")
 
             help_example3 = Frame(help_frame, bg="#2a3439")
             help_example3.place(relx=0.5, rely=0.02, anchor="n")
-            help_example3.config(height=150, width=900)
+            help_example3.config(height=168, width=1060)
             help_example3_header_label = Label(help_example3, text="What databases we're checking against:", font=24,
                                                bg="#2a3439", fg="#FFFFFF")
             help_example3_header_label.place(relx=0.01, rely=0.1, anchor="nw")
@@ -1258,14 +1335,13 @@ class HelpPage:
                     availability of accessing other databases that may or may not exist or
                     be available for public access.""" \
                 .replace('\n', ' ').replace('                    ', '')
-            help_example3_body_label = Label(help_example3, text=text3, font=16, bg="#2a3439", fg="#FFFFFF",
-                                             wraplength=880, justify="left")
-            help_example3_body_label.place(relx=0.01, rely=0.25, anchor="nw")
+            help_example3_body_label = Label(help_example3, text=text3, font=14, bg="#2a3439", fg="#FFFFFF",
+                                             wraplength=1060, justify="left")
+            help_example3_body_label.place(relx=0.01, rely=0.3, anchor="nw")
             # Align tips in a grid
             help_example1.grid(row=0, column=0, padx=10, pady=5)
             help_example2.grid(row=1, column=0, padx=10, pady=5)
             help_example3.grid(row=2, column=0, padx=10, pady=5)
-            # </editor-fold>
 
 
 class SettingsPage:
@@ -1293,7 +1369,7 @@ class SettingsPage:
             settings_frame.config(height=500, width=700)
             settings_frame.config(relief=RIDGE, background="#1F262A")
 
-            settings_page_label = ttk.Label(settings_frame, text='Settings Page', background="#1F262A",
+            settings_page_label = ttk.Label(settings_frame, text='Settings', font= 'bold, 14', background="#1F262A",
                                             foreground="white")
             settings_page_label.place(relx=0.5, rely=0.15, anchor='center')
 
@@ -1306,21 +1382,12 @@ class SettingsPage:
             set_options_frame.config(relief=RIDGE)
             set_options_frame.config(padding=(30, 15))
 
-            text_size_label = ttk.Label(set_options_frame, text='Text size', background="#1F262A", foreground="white")
+            text_size_label = ttk.Label(set_options_frame, text='Days Until Flagged', background="#1F262A", foreground="white")
             text_size_label.grid(row=0, column=0, padx=50, pady=30)
-            decrease_txt_size_button = Button(set_options_frame, text='-', bg="#2a3439", fg="white")
-            decrease_txt_size_button.grid(row=0, column=1)
+
             txt_size_entry = ttk.Entry(set_options_frame, width=5)
             txt_size_entry.grid(row=0, column=2)
-            txt_size_entry.insert(0, '12')
-            increase_txt_size_button = Button(set_options_frame, text='+', bg="#2a3439", fg="white")
-            increase_txt_size_button.grid(row=0, column=3)
-
-            ignore_directories_label = ttk.Label(set_options_frame, text='Choose directories to ignore:',
-                                                 background="#1F262A", foreground="white")
-            ignore_directories_label.grid(row=1, column=0, padx=50, pady=30)
-            browse_button = Button(set_options_frame, text='Browse...', bg="#2a3439", fg="white")
-            browse_button.grid(row=1, column=2)
+            txt_size_entry.insert(0, '365')
 
             set_3_label = ttk.Label(set_options_frame, text='When scan finishes...', background="#1F262A",
                                     foreground="white")
@@ -1336,9 +1403,6 @@ class SettingsPage:
             set_3_button_2 = ttk.Radiobutton(set_options_frame, text='Close the program', variable=after_scan,
                                              style="BW.TRadiobutton", value='close')
             set_3_button_2.grid(row=3, column=2)
-            set_3_button_3 = ttk.Radiobutton(set_options_frame, text='Shut down computer', variable=after_scan,
-                                             style="BW.TRadiobutton", value='shut_down')
-            set_3_button_3.grid(row=4, column=2)
 
             reset_settings_label = ttk.Label(set_options_frame, text='Reset Default Settings', background="#1F262A",
                                              foreground="white")
@@ -1366,7 +1430,6 @@ class LoginPage:
                 widget.destroy()
             for widget in title_bar.winfo_children()[4:]:
                 widget.destroy()
-
 
             style = ttk.Style(root)
             style.theme_use('classic')
@@ -1410,22 +1473,22 @@ class LoginPage:
             show_pass = False
 
             toggle_label = Label(login_inner_frame, text='Show Password', font='Bold, 10', background="#2a3439",
-                                   foreground="grey")
+                                 foreground="grey")
             toggle_label.place(relx=0.52, rely=0.73, anchor='center')
 
             # Create Show Password Button
             show_password_button = TkinterCustomButton(master=login_inner_frame,
-                                              bg_color="#2a3439",
-                                              fg_color="#56667A",
-                                              hover_color="#AAA9AD",
-                                              text_font="Bold, 12",
-                                              text=" ",
-                                              text_color="white",
-                                              corner_radius=5,
-                                              width=20,
-                                              height=20,
-                                              hover=True,
-                                              command=lambda: toggle_password1())
+                                                       bg_color="#2a3439",
+                                                       fg_color="#56667A",
+                                                       hover_color="#AAA9AD",
+                                                       text_font="Bold, 12",
+                                                       text=" ",
+                                                       text_color="white",
+                                                       corner_radius=2,
+                                                       width=20,
+                                                       height=20,
+                                                       hover=True,
+                                                       command=lambda: toggle_password1())
             show_password_button.place(relx=0.4, rely=0.73, anchor='center')
 
             # Login Button (sends you to home page)
@@ -1590,11 +1653,12 @@ class RegisterPage:
                                    width=25, font=20)
             password_entry.place(relx=.4, rely=.5)
 
-            conf_password_frame = Label(register_frame, text="Confirm Password", background="#1F262A", foreground="white", font=20)
+            conf_password_frame = Label(register_frame, text="Confirm Password", background="#1F262A",
+                                        foreground="white", font=20)
             conf_password_frame.place(relx=.05, rely=.6)
             conf_password_entry = Entry(register_frame, textvariable=self.conf_password_var, background="#2a3439",
-                                   foreground="white",
-                                   width=25, font=20)
+                                        foreground="white",
+                                        width=25, font=20)
             conf_password_entry.place(relx=.4, rely=.6)
 
             # Label for roles
@@ -1704,7 +1768,7 @@ class RegisterPage:
 
 
 class ApplicationResultsPage:
-    global list_results
+    global list_results, history_comments
 
     def __init__(self, result_num):
         # Toplevel object which will
@@ -1751,22 +1815,135 @@ class ApplicationResultsPage:
         root_size_grip.configure(style="Test.TSizegrip")
         root_size_grip.pack(side="right", anchor=SE)
 
+        submit_comment_button = TkinterCustomButton(master=main_frame,
+                                                fg_color="#848689",
+                                                hover_color="#1F262A",
+                                                text_font="Bold, 14",
+                                                text="Submit Comment",
+                                                text_color="white",
+                                                corner_radius=10,
+                                                width=170,
+                                                height=35,
+                                                hover=True,
+                                                command=lambda: update_comments(result_num, comment_text.get("1.0", 'end-1c')))
+        submit_comment_button.grid(row=0, column=0)
+
         # Login username and Password labels and entries
         file_name_label = Label(main_frame, text=list_results[result_num][0][-1], font=15, background="#2a3439",
                                 foreground="white")
-        file_name_label.grid(row=0, column=0)
+        file_name_label.grid(row=1, column=0)
 
         for i in range(len(list_results)):
-            count = 1
+            count = 2
             for j in list_results[result_num]:
-                cvss_name_label = Label(main_frame, text=j[0], font=15, background="#2a3439",
-                                        foreground="white")
-                cvss_name_label.grid(row=count, column=0)
-
-                cvss_score_label = Label(main_frame, text=str(f'Rating: {j[-2]}    Date: {j[-3]}'), font=15,
-                                         background="#2a3439", foreground="white")
-                cvss_score_label.grid(row=count, column=1)
+                cvss_score_label = Label(main_frame, text=str(f'CVE: {j[0]}     Rating: {j[-2]}    Date: {j[-3]}'),
+                                         font=15, background="#2a3439", foreground="white")
+                cvss_score_label.grid(row=count, column=0)
                 count += 1
+
+        comment_text = Text(main_frame, font=15, background="#2a3439", foreground="white",
+                            height=10, width=30)
+        comment_text.grid(row=count+1, column=0)
+
+
+class HistoryLogPage:
+    global history_list, history_comments
+
+    def __init__(self, result_num):
+        # Toplevel object which will
+        # be treated as a new window
+        new_window = Toplevel(root)
+
+        # Toplevel widget
+        new_window.title("New Window")
+
+        # Window background color
+        new_window.configure(background="#2a3439")
+
+        # Scaling UI to user's screen
+        app_width = 1064
+        app_height = 600
+        screen_width = new_window.winfo_screenwidth()
+        screen_height = new_window.winfo_screenheight()
+        x = (screen_width / 2) - (app_width / 2)
+        y = (screen_height / 2) - (app_height / 2)
+        new_window.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
+
+        new_window.resizable(True, True)
+
+        # Changes the default tkinter to our Sieve logo when minimized
+        new_window.iconbitmap('logo.ico')
+
+        # Change the text after minimizing the tool to task bar
+        new_window.title("Sieve")
+
+        # Removes title bar
+        # newWindow.overrideredirect(True)
+        # newWindow.minimized = False  # only to know if root is minimized
+        # newWindow.maximized = False  # only to know if root is maximized
+
+        main_frame = Frame(new_window, bg="#2a3439")
+        main_frame.place(relx=0.5, rely=0.1, anchor="n")
+        main_frame.config(height=new_window.winfo_height(), width=new_window.winfo_width())
+
+        history_log_canvas = Canvas(main_frame, height=500, width=700, bg="#2a3439")
+        history_log_canvas.place(relx=0.5, rely=0.00, anchor="n")
+
+        # Container for results
+        history_log_container = Frame(history_log_canvas, bg="#1F262A", borderwidth=2)
+        history_log_container.place(relx=0.5, rely=0.1, anchor="n")
+        history_log_container.config(relief=RIDGE, height=350, width=700)
+
+        # Bind scrollbar to container
+        history_log_container.bind(
+            "<Configure>",
+            lambda e: history_log_canvas.configure(
+                scrollregion=history_log_canvas.bbox("all")
+            )
+        )
+        history_log_canvas.create_window((0, 0), window=history_log_container, anchor="nw")
+
+
+        style = ttk.Style(new_window)
+        style.theme_use('classic')
+        style.configure('Test.TSizegrip', background="#1F262A")
+        root_size_grip = ttk.Sizegrip(new_window)
+
+        root_size_grip.configure(style="Test.TSizegrip")
+        root_size_grip.pack(side="right", anchor=SE)
+
+        count = 0
+        record_counter = 0
+        for record_list in history_list[result_num][1]:
+
+            # Login username and Password labels and entries
+            file_name_label = Label(history_log_container, text=record_list[0][-1], font=15, background="#2a3439",
+                                    foreground="white")
+            file_name_label.grid(row=count, column=0)
+            count += 1
+
+            for record in record_list:
+                cvss_score_label = Label(history_log_container, text=str(f'CVE: {record[0]}     Rating: {record[-2]}    Date: {record[-3]}'),
+                                         font=15, background="#2a3439", foreground="white")
+                cvss_score_label.grid(row=count, column=0)
+                count += 1
+            try:
+                comment_label = Label(history_log_container, text=f'Comments: \n{history_comments[history_counter][record_counter]}',
+                                  font=15, background="#2a3439", foreground="white")
+                comment_label.grid(row=count+1, column=0)
+            except:
+                comment_label = Label(history_log_container, text='No Comments',
+                                      font=15, background="#2a3439", foreground="white")
+                comment_label.grid(row=count + 1, column=0)
+            count += 2
+            record_counter += 1
+
+        # Scrollbar if more than 5 results are displayed
+        history_log_sb = ttk.Scrollbar(history_log_canvas, orient="vertical", command=history_log_canvas.yview)
+        history_log_sb.place(relx=0.98, height=500)
+        history_log_canvas.configure(yscrollcommand=history_log_sb.set)
+
+
 
 
 class AdminPage:
@@ -1775,7 +1952,7 @@ class AdminPage:
         global last_page
 
         for widget in root.winfo_children()[1:]:
-                widget.destroy()
+            widget.destroy()
 
         last_page="AdminPage"
 
@@ -1804,17 +1981,17 @@ class AdminPage:
 
         # Refresh Button (unlocks account)
         refresh_button = TkinterCustomButton(master=admin_frame,
-                                          bg_color="#2a3439",
-                                          fg_color="#56667A",
-                                          hover_color="#AAA9AD",
-                                          text_font=10,
-                                          text="Refresh",
-                                          text_color="white",
-                                          corner_radius=10,
-                                          width=100,
-                                          height=30,
-                                          hover=True,
-                                          command=lambda: [AdminPage()])
+                                             bg_color="#2a3439",
+                                             fg_color="#56667A",
+                                             hover_color="#AAA9AD",
+                                             text_font=10,
+                                             text="Refresh",
+                                             text_color="white",
+                                             corner_radius=10,
+                                             width=100,
+                                             height=30,
+                                             hover=True,
+                                             command=lambda: [AdminPage()])
         refresh_button.place(relx=0.1, rely=0.7)
 
         admin_canvas = Canvas(admin_frame, height=300, width=900, bg="#2a3439")
@@ -1846,7 +2023,6 @@ class AdminPage:
                 admin_example1_label.place(relx=0.01, rely=0.5, anchor="w")
                 admin_example.bind("<Button-1>", new_user_page)
                 admin_example.grid(row=i, column=0, padx=10, pady=5)
-
 
             # Design around each result
             if int(user_list[i][5]) >= 5:
@@ -1989,7 +2165,6 @@ class ApplicationAdminPage:
             account_status = "Locked"
             account_status_label2.config(text=account_status)
 
-
         # Updates account status to unlocked
         def account_unlock():
             global account_status
@@ -2128,4 +2303,3 @@ class ScheduleScanPage:
             x = threading.Thread(target=scan)
             sched_list.remove(sched_list[0])
             last_time_clicked(), start(), x.start()
-

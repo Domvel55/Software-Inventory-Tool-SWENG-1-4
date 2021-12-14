@@ -1366,7 +1366,7 @@ class SettingsPage:
             settings_frame.config(height=500, width=700)
             settings_frame.config(relief=RIDGE, background="#1F262A")
 
-            settings_page_label = ttk.Label(settings_frame, text='Settings Page', background="#1F262A",
+            settings_page_label = ttk.Label(settings_frame, text='Settings', font= 'bold, 14', background="#1F262A",
                                             foreground="white")
             settings_page_label.place(relx=0.5, rely=0.15, anchor='center')
 

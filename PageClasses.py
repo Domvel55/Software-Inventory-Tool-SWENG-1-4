@@ -12,9 +12,12 @@ from tkinter_custom_button import TkinterCustomButton
 from Database import *
 import os
 import datetime
+import time
+from apscheduler.schedulers.background import BackgroundScheduler
 from plyer import notification
 from ctypes import windll
 import threading
+
 
 global stopped
 stopped = False
@@ -22,7 +25,7 @@ stopped = False
 now = "Last Scanned: ----"
 sort_variable = None
 history_counter = 0
-files_list, user_list, history_list, list_results, filter_settings, check_buttons = [], [], [], [], [], []
+files_list, user_list, history_list, list_results, filter_settings, sched_list, check_buttons = [], [], [], [], [], [], []
 history_comments = {}
 name, role, last_page = "", "", ""
 results_progressbar = None
@@ -489,7 +492,7 @@ class MainWindow:
                                                        width=130,
                                                        height=40,
                                                        hover=True,
-                                                       command=lambda: ResultsPage())
+                                                       command=lambda: ScheduleScanPage())
             schedule_scan_button.place(relx=.27)
             ToolTip(schedule_scan_button, "Schedule a full scan.")
 
@@ -1556,7 +1559,8 @@ class LoginPage:
             error_message = LabelFrame(login_inner_frame, bg="#2a3439", fg="red", font=10,
                                        text=error, relief=FLAT, labelanchor="n")
             error_message.place(relx=0.5, rely=0.68, anchor="n")
-            error_message.config(height=19, width=340)
+            error_message.config(height=26, width=340)
+            error_message.after(3000, lambda: error_message.destroy())
 
         def enter_login(e):
             if check_login():
@@ -1757,6 +1761,8 @@ class RegisterPage:
                                        text="Registration Error", relief=FLAT, labelanchor="n")
             error_message.place(relx=0.5, rely=0.78, anchor="n")
             error_message.config(height=20, width=170)
+            error_message.after(2000, lambda: error_message.destroy())
+
 
         root.bind('<Return>', enter_register)
 
@@ -1943,9 +1949,12 @@ class HistoryLogPage:
 class AdminPage:
     def __init__(self):
         global root
+        global last_page
 
         for widget in root.winfo_children()[1:]:
             widget.destroy()
+
+        last_page="AdminPage"
 
         root.configure(background="#2a3439")
         style = ttk.Style(root)
@@ -2161,3 +2170,136 @@ class ApplicationAdminPage:
             global account_status
             account_status = "Unlocked"
             account_status_label2.config(text=account_status)
+
+
+class ScheduleScanPage:
+    minute_var: StringVar
+    hour_var: StringVar
+    day_var: StringVar
+    month_var: StringVar
+    year_var: StringVar
+
+    def __init__(self):
+        global root
+        global last_page
+        global sched_date
+        global sched_list
+
+        self.minute_var = StringVar(value="")
+        self.hour_var = StringVar(value="")
+        self.day_var = StringVar(value="")
+        self.month_var = StringVar(value="")
+        self.year_var = StringVar(value="")
+
+        last_page = "ScheduleScanPage"
+
+        for widget in root.winfo_children()[1:]:
+            widget.destroy()
+
+        style = ttk.Style(root)
+        style.theme_use('classic')
+        style.configure('Test.TSizegrip', background="#1F262A")
+        root_size_grip = ttk.Sizegrip(root)
+
+        root_size_grip.configure(style="Test.TSizegrip")
+        root_size_grip.pack(side="right", anchor=SE)
+
+        schedule_frame = Frame(root)
+        schedule_frame.place(relx=0.5, rely=0.5, anchor='center')
+        schedule_frame.config(height=500, width=700)
+        schedule_frame.config(relief=RIDGE, background="#1F262A")
+
+        schedule_button = TkinterCustomButton(master=schedule_frame,
+                                              fg_color="aquamarine1",
+                                              hover_color="aquamarine4",
+                                              text_font=14,
+                                              text="Schedule",
+                                              text_color="black",
+                                              corner_radius=0,
+                                              width=90,
+                                              height=40,
+                                              hover=True,
+                                              command=lambda: [schedule_time() if check_time() else schedule_error()])
+        schedule_button.grid(row=7, column=2, padx=10, pady=5)
+
+
+        # Static labels for each attribute
+        minute_label = Label(schedule_frame, text="Minute: ", font=15, background="#1F262A", foreground="white")
+        hour_label = Label(schedule_frame, text="Hour: ", font=15, background="#1F262A", foreground="white")
+        day_label = Label(schedule_frame, text="Day: ", font=15, background="#1F262A", foreground="white")
+        month_label = Label(schedule_frame, text="Month: ", font=15, background="#1F262A", foreground="white")
+        year_label = Label(schedule_frame, text="Year: ", font=15, background="#1F262A", foreground="white")
+        sched_list_label = Label(schedule_frame, text="Schedule List ", font=15, background="#1F262A", foreground="white")
+
+
+        # Showing value of each attribute
+        minute_entry = Entry(schedule_frame, textvariable=self.minute_var, background="#1F262A", foreground="white", width=3, font=20)
+        hour_entry = Entry(schedule_frame, textvariable=self.hour_var, background="#1F262A", foreground="white", width=3, font=20)
+        day_entry = Entry(schedule_frame, textvariable=self.day_var, background="#1F262A", foreground="white", width=3, font=20)
+        month_entry = Entry(schedule_frame, textvariable=self.month_var, background="#1F262A", foreground="white", width=3, font=20)
+        year_entry = Entry(schedule_frame, textvariable=self.year_var, background="#1F262A", foreground="white", width=5, font=20)
+
+        # Arranging static labels
+        minute_label.grid(row=2, column=1, padx=10, pady=5)
+        hour_label.grid(row=3, column=1, padx=10, pady=5)
+        day_label.grid(row=4, column=1, padx=10, pady=5)
+        month_label.grid(row=5, column=1, padx=10, pady=5)
+        year_label.grid(row=6, column=1, padx=10, pady=5)
+        sched_list_label.grid(row=2, column=3, padx=10, pady=5)
+
+        # Arranging variable labels
+        minute_entry.grid(row=2, column=2, padx=10, pady=5)
+        hour_entry.grid(row=3, column=2, padx=10, pady=5)
+        day_entry.grid(row=4, column=2, padx=10, pady=5)
+        month_entry.grid(row=5, column=2, padx=10, pady=5)
+        year_entry.grid(row=6, column=2, padx=10, pady=5)
+
+        for i in range(len(sched_list)):
+            time = sched_list[i]
+            time_label = Label(schedule_frame, text=time, font=10,
+                                             bg="#1F262A", fg="white")
+            time_label.grid(row=(i+3), column=3, padx=10, pady=5)
+
+
+
+        def check_time():
+            valid_time = True
+            global sched_date
+            current_time = datetime.datetime.now()
+            try:
+                sched_date = datetime.datetime(int(self.year_var.get()), int(self.month_var.get()),
+                                                   int(self.day_var.get()), int(self.hour_var.get()),
+                                                    int(self.minute_var.get()))
+                valid_time = True
+            except ValueError:
+                valid_time = False
+
+            if current_time>sched_date:
+                valid_time = False
+
+            return valid_time
+
+
+
+        def schedule_error():
+            error_message = LabelFrame(schedule_frame, bg="#1F262A", fg="red", font=10, text="Schedule Error", relief=FLAT, labelanchor="n")
+            error_message.grid(row=7, column=1, padx=10, pady=5)
+            error_message.config(height=20, width=170)
+            error_message.after(2000, lambda: error_message.destroy())
+
+        def schedule_time():
+            sched = BackgroundScheduler(daemon=True)
+            sched.add_job(sched_scan,'date', run_date=datetime.datetime(int(self.year_var.get()), int(self.month_var.get()),
+                                                   int(self.day_var.get()), int(self.hour_var.get()),
+                                                    int(self.minute_var.get()), 0), args=['job1'])
+            sched_list.append(str(datetime.datetime(int(self.year_var.get()), int(self.month_var.get()),
+                                                   int(self.day_var.get()), int(self.hour_var.get()),
+                                                    int(self.minute_var.get()), 0)))
+            sched.start()
+            ScheduleScanPage()
+
+        def sched_scan(job1):
+            ScanConfirmPage.make_full_scan_config(self)
+            x = threading.Thread(target=scan)
+            sched_list.remove(sched_list[0])
+            last_time_clicked(), start(), x.start()

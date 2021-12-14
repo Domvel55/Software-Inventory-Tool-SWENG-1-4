@@ -904,6 +904,7 @@ class ResultsPage:
         cancel_button.place(relx=0.9, rely=0.8, anchor="center")
         ToolTip(cancel_button, "Go back to the home page.")
 
+        #not functioning
         def ignore_selected():
             for i in range(len(list_results)):
                 # if var.get():
@@ -1187,7 +1188,7 @@ class ResultsPage:
             daysSince = datetime.date.today() - datetime.date(int(compareDate[0]), int(compareDate[1]),
                                                               int(compareDate[2]))
             if daysSince >= limit:
-                flags_label = Label(results_example, text="Flagged is: " + str(daysSince.days) + " days old", font=8, bg=color, fg="black")
+                flags_label = Label(results_example, text="Flagged! " + str(daysSince.days) + " days old", font=8, bg=color, fg="black")
                 flags_label.config(height=2, width=30)
                 flags_label.place(relx=0.5, rely=0.5, anchor="w")
 
@@ -1389,21 +1390,12 @@ class SettingsPage:
             set_options_frame.config(relief=RIDGE)
             set_options_frame.config(padding=(30, 15))
 
-            text_size_label = ttk.Label(set_options_frame, text='Text size', background="#1F262A", foreground="white")
+            text_size_label = ttk.Label(set_options_frame, text='Days Until Flagged', background="#1F262A", foreground="white")
             text_size_label.grid(row=0, column=0, padx=50, pady=30)
-            decrease_txt_size_button = Button(set_options_frame, text='-', bg="#2a3439", fg="white")
-            decrease_txt_size_button.grid(row=0, column=1)
+
             txt_size_entry = ttk.Entry(set_options_frame, width=5)
             txt_size_entry.grid(row=0, column=2)
-            txt_size_entry.insert(0, '12')
-            increase_txt_size_button = Button(set_options_frame, text='+', bg="#2a3439", fg="white")
-            increase_txt_size_button.grid(row=0, column=3)
-
-            ignore_directories_label = ttk.Label(set_options_frame, text='Choose directories to ignore:',
-                                                 background="#1F262A", foreground="white")
-            ignore_directories_label.grid(row=1, column=0, padx=50, pady=30)
-            browse_button = Button(set_options_frame, text='Browse...', bg="#2a3439", fg="white")
-            browse_button.grid(row=1, column=2)
+            txt_size_entry.insert(0, '365')
 
             set_3_label = ttk.Label(set_options_frame, text='When scan finishes...', background="#1F262A",
                                     foreground="white")
@@ -1419,9 +1411,6 @@ class SettingsPage:
             set_3_button_2 = ttk.Radiobutton(set_options_frame, text='Close the program', variable=after_scan,
                                              style="BW.TRadiobutton", value='close')
             set_3_button_2.grid(row=3, column=2)
-            set_3_button_3 = ttk.Radiobutton(set_options_frame, text='Shut down computer', variable=after_scan,
-                                             style="BW.TRadiobutton", value='shut_down')
-            set_3_button_3.grid(row=4, column=2)
 
             reset_settings_label = ttk.Label(set_options_frame, text='Reset Default Settings', background="#1F262A",
                                              foreground="white")

@@ -170,9 +170,11 @@ def start():
 def update_comments(result_num, text):
     history_comments[history_counter] = {result_num: text}
 
+
 def reset_results_list():
     global list_results
     list_results.clear()
+
 
 def remove_selected():
     global list_results, check_buttons
@@ -182,6 +184,7 @@ def remove_selected():
             temp.append(list_results[i])
     list_results = temp
     check_buttons.clear()
+
 
 def update_selected():
     global list_results, check_buttons
@@ -196,9 +199,12 @@ def update_selected():
     check_buttons.clear()
     return popped_list
 
+
 def print_updates(list_to_print):
+    temp = []
     for i in range(len(list_to_print)):
-        print((str(list_to_print[i][0][-1].split('/')[-1])))
+        temp.append(str(list_to_print[i][0][-1].split('/')[-1]))
+    return temp
 
 
 # This will scan the Database
@@ -309,6 +315,7 @@ class ToolTip(object):
 
 
 class MakeWindow:
+
     def make_nav_buttons(self):
         home_button = TkinterCustomButton(master=title_bar, bg_color=None,
                                           fg_color="#1F262A",
@@ -887,7 +894,10 @@ class ResultsPage:
                                                 width=200,
                                                 height=75,
                                                 hover=True,
-                                                command=lambda: none)
+                                                command=lambda: [UpdatePage(print_updates(list_results)),
+                                                                 reset_results_list(),
+                                                                 ResultsPage.print_results(sort_variable.get(),
+                                                                                           filter_settings)])
         update_all_button.place(relx=0.15, rely=0.8, anchor="center")
         ToolTip(update_all_button, "Update all the programs flagged for available updates.")
 
@@ -901,7 +911,7 @@ class ResultsPage:
                                                      width=200,
                                                      height=75,
                                                      hover=True,
-                                                     command=lambda: [print_updates(update_selected()),
+                                                     command=lambda: [UpdatePage(print_updates(update_selected())),
                                                                         ResultsPage.print_results(sort_variable.get(),
                                                                                                     filter_settings)])
         update_selected_button.place(relx=0.35, rely=0.8, anchor="center")
@@ -1938,6 +1948,59 @@ class HistoryLogPage:
         history_log_canvas.configure(yscrollcommand=history_log_sb.set)
 
 
+class UpdatePage:
+
+    def __init__(self, update_list):
+        # Toplevel object which will
+        # be treated as a new window
+        new_window = Toplevel(root)
+
+        # Toplevel widget
+        new_window.title("New Window")
+
+        # Window background color
+        new_window.configure(background="#2a3439")
+
+        # Scaling UI to user's screen
+        app_width = 500
+        app_height = 400
+        screen_width = new_window.winfo_screenwidth()
+        screen_height = new_window.winfo_screenheight()
+        x = (screen_width / 2) - (app_width / 2)
+        y = (screen_height / 2) - (app_height / 2)
+        new_window.geometry(f'{app_width}x{app_height}+{int(x)}+{int(y)}')
+
+        new_window.resizable(True, True)
+
+        # Changes the default tkinter to our Sieve logo when minimized
+        new_window.iconbitmap('logo.ico')
+
+        # Change the text after minimizing the tool to task bar
+        new_window.title("Sieve")
+
+        # Removes title bar
+        # newWindow.overrideredirect(True)
+        # newWindow.minimized = False  # only to know if root is minimized
+        # newWindow.maximized = False  # only to know if root is maximized
+
+        main_frame = Frame(new_window, bg="#2a3439")
+        main_frame.place(relx=0.5, rely=0.1, anchor="n")
+        main_frame.config(height=new_window.winfo_height(), width=new_window.winfo_width())
+
+        update_label = Label(main_frame, text='The following programs may require an update\n'
+                                              'To retrieve the most recent version of each\n'
+                                              'application, visit the main distribution page\n', font=15, background="#2a3439",
+                                foreground="white")
+        update_label.grid(row=0, column=0)
+
+        count = 1
+        for record in update_list:
+
+            record_label = Label(main_frame, text=record, font=15,
+                                 background="#2a3439",
+                                 foreground="white")
+            record_label.grid(row=count, column=0)
+            count += 1
 
 
 class AdminPage:

@@ -174,16 +174,31 @@ def reset_results_list():
     global list_results
     list_results.clear()
 
-def remove_checks():
+def remove_selected():
     global list_results, check_buttons
+    temp = []
     for i in range(len(list_results)):
-        if check_buttons[i].get() == 1:
-            list_results.pop(i)
+        if check_buttons[i].get() == 0:
+            temp.append(list_results[i])
+    list_results = temp
     check_buttons.clear()
 
+def update_selected():
+    global list_results, check_buttons
+    new_list = []
+    popped_list = []
+    for i in range(len(list_results)):
+        if check_buttons[i].get() == 0:
+            new_list.append(list_results[i])
+        else:
+            popped_list.append(list_results[i])
+    list_results = new_list
+    check_buttons.clear()
+    return popped_list
 
-
-
+def print_updates(list_to_print):
+    for i in range(len(list_to_print)):
+        print((str(list_to_print[i][0][-1].split('/')[-1])))
 
 
 # This will scan the Database
@@ -886,7 +901,9 @@ class ResultsPage:
                                                      width=200,
                                                      height=75,
                                                      hover=True,
-                                                     command=lambda: none)
+                                                     command=lambda: [print_updates(update_selected()),
+                                                                        ResultsPage.print_results(sort_variable.get(),
+                                                                                                    filter_settings)])
         update_selected_button.place(relx=0.35, rely=0.8, anchor="center")
         ToolTip(update_selected_button, "Update all the selected programs that were flagged for available updates.")
 
@@ -920,7 +937,7 @@ class ResultsPage:
                                                      width=200,
                                                      height=75,
                                                      hover=True,
-                                                     command=lambda: [remove_checks(),
+                                                     command=lambda: [remove_selected(),
                                                                       ResultsPage.print_results(sort_variable.get(),
                                                                                        filter_settings)])
         ignore_selected_button.place(relx=0.75, rely=0.8, anchor="center")
@@ -1198,34 +1215,6 @@ class ResultsPage:
                                            command=results_canvas.yview)
                 results_sb.place(relx=0.98, height=300)
                 results_canvas.configure(yscrollcommand=results_sb.set)
-
-            '''
-            # This list stores names of programs in results whose checkboxes are selected.
-            selected_list = []
-
-            selection_box.config(command=lambda: ResultsPage.append_selected_list(result_name))
-
-            # Each check button gets this function as a command
-            # with the name of the program as displayed in the result
-            # as a parameter.
-            def append_selected_list(program_name):
-                if program_name in selected_list:
-                    selected_list.remove(program_name)
-                else:
-                    selected_list.append(program_name)
-                print("selected_list: ")
-                print(selected_list)
-
-            @staticmethod
-            def update_selected():
-                for program in selected_list:
-                    for widget in results_container.winfo_children():
-                        if widget.winfo_class() == 'Frame':
-                            for child in widget.winfo_children():
-                                if child.winfo_class() == 'Label' and program == child.cget("text"):
-                                    print("Update " + program)
-                                    widget.grid_forget()
-            '''
 
 
         # If search bar is empty, re-print original results.

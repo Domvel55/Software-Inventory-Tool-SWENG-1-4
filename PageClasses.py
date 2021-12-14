@@ -594,7 +594,7 @@ class HistoryPage:
             # Scrollbar if more than 5 results are displayed
             if len(history_list) > 5:
                 history_sb = ttk.Scrollbar(history_canvas, orient="vertical", command=history_canvas.yview)
-                history_sb.place(relx=0.98, height=history_canvas.winfo_height())
+                history_sb.place(relx=0.98, height=300)
                 history_canvas.configure(yscrollcommand=history_sb.set)
 
 
@@ -1879,6 +1879,24 @@ class HistoryLogPage:
         main_frame.place(relx=0.5, rely=0.1, anchor="n")
         main_frame.config(height=new_window.winfo_height(), width=new_window.winfo_width())
 
+        history_log_canvas = Canvas(main_frame, height=500, width=700, bg="#2a3439")
+        history_log_canvas.place(relx=0.5, rely=0.00, anchor="n")
+
+        # Container for results
+        history_log_container = Frame(history_log_canvas, bg="#1F262A", borderwidth=2)
+        history_log_container.place(relx=0.5, rely=0.1, anchor="n")
+        history_log_container.config(relief=RIDGE, height=350, width=700)
+
+        # Bind scrollbar to container
+        history_log_container.bind(
+            "<Configure>",
+            lambda e: history_log_canvas.configure(
+                scrollregion=history_log_canvas.bbox("all")
+            )
+        )
+        history_log_canvas.create_window((0, 0), window=history_log_container, anchor="nw")
+
+
         style = ttk.Style(new_window)
         style.theme_use('classic')
         style.configure('Test.TSizegrip', background="#1F262A")
@@ -1892,26 +1910,33 @@ class HistoryLogPage:
         for record_list in history_list[result_num][1]:
 
             # Login username and Password labels and entries
-            file_name_label = Label(main_frame, text=record_list[0][-1], font=15, background="#2a3439",
+            file_name_label = Label(history_log_container, text=record_list[0][-1], font=15, background="#2a3439",
                                     foreground="white")
             file_name_label.grid(row=count, column=0)
             count += 1
 
             for record in record_list:
-                cvss_score_label = Label(main_frame, text=str(f'CVE: {record[0]}     Rating: {record[-2]}    Date: {record[-3]}'),
+                cvss_score_label = Label(history_log_container, text=str(f'CVE: {record[0]}     Rating: {record[-2]}    Date: {record[-3]}'),
                                          font=15, background="#2a3439", foreground="white")
                 cvss_score_label.grid(row=count, column=0)
                 count += 1
             try:
-                comment_label = Label(main_frame, text=f'Comments: \n{history_comments[history_counter][record_counter]}',
+                comment_label = Label(history_log_container, text=f'Comments: \n{history_comments[history_counter][record_counter]}',
                                   font=15, background="#2a3439", foreground="white")
                 comment_label.grid(row=count+1, column=0)
             except:
-                comment_label = Label(main_frame, text='No Comments',
+                comment_label = Label(history_log_container, text='No Comments',
                                       font=15, background="#2a3439", foreground="white")
                 comment_label.grid(row=count + 1, column=0)
             count += 2
             record_counter += 1
+
+        # Scrollbar if more than 5 results are displayed
+        history_log_sb = ttk.Scrollbar(history_log_canvas, orient="vertical", command=history_log_canvas.yview)
+        history_log_sb.place(relx=0.98, height=500)
+        history_log_canvas.configure(yscrollcommand=history_log_sb.set)
+
+
 
 
 class AdminPage:

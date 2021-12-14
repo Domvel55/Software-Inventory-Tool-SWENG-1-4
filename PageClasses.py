@@ -22,7 +22,7 @@ stopped = False
 now = "Last Scanned: ----"
 sort_variable = None
 history_counter = 0
-files_list, user_list, history_list, list_results, filter_settings = [], [], [], [], []
+files_list, user_list, history_list, list_results, filter_settings, check_buttons = [], [], [], [], [], []
 history_comments = {}
 name, role, last_page = "", "", ""
 results_progressbar = None
@@ -173,6 +173,18 @@ def update_comments(result_num, text):
 def reset_results_list():
     global list_results
     list_results.clear()
+
+def remove_checks():
+    global list_results, check_buttons
+    for i in range(len(list_results)):
+        if check_buttons[i].get() == 1:
+            list_results.pop(i)
+    check_buttons.clear()
+
+
+
+
+
 
 # This will scan the Database
 # This function will be called no matter which config is decided on
@@ -860,7 +872,7 @@ class ResultsPage:
                                                 width=200,
                                                 height=75,
                                                 hover=True,
-                                                command=lambda: None)
+                                                command=lambda: none)
         update_all_button.place(relx=0.15, rely=0.8, anchor="center")
         ToolTip(update_all_button, "Update all the programs flagged for available updates.")
 
@@ -874,7 +886,7 @@ class ResultsPage:
                                                      width=200,
                                                      height=75,
                                                      hover=True,
-                                                     command=lambda: None)
+                                                     command=lambda: none)
         update_selected_button.place(relx=0.35, rely=0.8, anchor="center")
         ToolTip(update_selected_button, "Update all the selected programs that were flagged for available updates.")
 
@@ -907,7 +919,9 @@ class ResultsPage:
                                                      width=200,
                                                      height=75,
                                                      hover=True,
-                                                     command=lambda: [ignore_selected()])
+                                                     command=lambda: [remove_checks(),
+                                                                      ResultsPage.print_results(sort_variable.get(),
+                                                                                       filter_settings)])
         ignore_selected_button.place(relx=0.75, rely=0.8, anchor="center")
         ToolTip(ignore_selected_button, "Ignore all the selected programs that were flagged for available updates.")
 
@@ -991,16 +1005,20 @@ class ResultsPage:
         frame_style.configure("BW.TCheckbutton", background="#1F262A", foreground="white", highlightthickness=0)
 
         filter_button_1 = ttk.Checkbutton(filter_settings_container, text='Hide low', onvalue=1, offvalue=0,
-                                          variable=filter_settings[0], style="BW.TCheckbutton")
+                                          variable=filter_settings[0], style="BW.TCheckbutton",
+                                          command=lambda: ResultsPage.print_results(sort_variable.get(), filter_settings))
         filter_button_1.grid(row=2, column=1, padx=20)
         filter_button_2 = ttk.Checkbutton(filter_settings_container, text='Hide medium', onvalue=1, offvalue=0,
-                                          variable=filter_settings[1], style="BW.TCheckbutton")
+                                          variable=filter_settings[1], style="BW.TCheckbutton",
+                                          command=lambda: ResultsPage.print_results(sort_variable.get(), filter_settings))
         filter_button_2.grid(row=2, column=2, padx=20)
         filter_button_3 = ttk.Checkbutton(filter_settings_container, text='Hide high', onvalue=1, offvalue=0,
-                                          variable=filter_settings[2], style="BW.TCheckbutton")
+                                          variable=filter_settings[2], style="BW.TCheckbutton",
+                                          command=lambda: ResultsPage.print_results(sort_variable.get(), filter_settings))
         filter_button_3.grid(row=2, column=3, padx=20)
         filter_button_4 = ttk.Checkbutton(filter_settings_container, text='Hide critical', onvalue=1, offvalue=0,
-                                          variable=filter_settings[3], style="BW.TCheckbutton")
+                                          variable=filter_settings[3], style="BW.TCheckbutton",
+                                          command=lambda: ResultsPage.print_results(sort_variable.get(), filter_settings))
         filter_button_4.grid(row=2, column=4, padx=20)
 
         style = ttk.Style(root)
@@ -1141,11 +1159,14 @@ class ResultsPage:
             results_example1_label.place(relx=0.05, rely=0.5, anchor="w")
 
             # Selection Boxes
-            var = IntVar()
-            selection_box = Checkbutton(results_example, variable=var, onvalue=1, offvalue=0, bg="#2a3439")
+            check_buttons.append(IntVar())
+
+            selection_box = Checkbutton(results_example, variable=check_buttons[i], onvalue=1, offvalue=0, bg="#2a3439")
             selection_box.place(relx=0.00, rely=0.5, anchor="w")
             results_example.bind("<Button-1>", new_page)
             results_example.grid(row=i, column=0, padx=10, pady=5)
+
+
 
             # Label for Rating
             rating_label = Label(results_example, text=rating, font=14, bg=color, fg="black")
@@ -1177,7 +1198,7 @@ class ResultsPage:
                 results_sb.place(relx=0.98, height=300)
                 results_canvas.configure(yscrollcommand=results_sb.set)
 
-
+            '''
             # This list stores names of programs in results whose checkboxes are selected.
             selected_list = []
 
@@ -1203,6 +1224,8 @@ class ResultsPage:
                                 if child.winfo_class() == 'Label' and program == child.cget("text"):
                                     print("Update " + program)
                                     widget.grid_forget()
+            '''
+
 
         # If search bar is empty, re-print original results.
         # Otherwise, hide results that don't contain the keyword;
